@@ -69,4 +69,50 @@ HearthstoneCore.DEBUG {
 // MARK: UI
 
 initscr()
+start_color()
 
+noecho()
+curs_set(0)
+
+init_pair(0, Int16(COLOR_BLACK), Int16(COLOR_GREEN))
+
+let message = "Hello, World!"
+
+let screenHeight = getmaxy(stdscr)
+let screenWidth = getmaxx(stdscr)
+
+clear()
+
+let xpos = (screenWidth / 2) - (Int32(message.count) / 2)
+let ypos = screenHeight / 2
+
+log.info("(\(xpos), \(ypos))")
+
+move(ypos, xpos)
+attron(COLOR_PAIR(0))
+addstr(message)
+attroff(COLOR_PAIR(0))
+refresh()
+
+getch()
+endwin()
+
+/*
+initscr()               // init curses
+noecho()                // don't echo user input
+cbreak()                // no line buffering
+nonl()                  // return doesn't add new line
+keypad(stdscr, true)    // give us access to arrow keys
+intrflush(stdscr, false)// prevent inturrupt from messing up screen
+
+var win = newwin(10,10,1,1)
+
+box(win, UInt32("|"), UInt32("-"))
+touchwin(win)
+wrefresh(win)
+
+getchar()
+
+getch()
+endwin()
+*/
