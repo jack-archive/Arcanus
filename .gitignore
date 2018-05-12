@@ -1,0 +1,4 @@
+.build/
+Package.resolved
+.DS_Store
+Hearthstone.xcodeproj/

@@ -1,0 +1,39 @@
+// Copyright © 2018 Jack Maloney. All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import Foundation
+import SwiftyBeaver
+import Socket
+
+public let log = SwiftyBeaver.self
+//public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
+
+public func DEBUG(_ code: () -> Void) {
+    if _isDebugAssertConfiguration() {
+        code()
+    }
+}
+
+public class Hearthstone {
+    public static let console: ConsoleDestination = ConsoleDestination()
+    public static var logFiles: [FileDestination] = []
+    
+    public class func initLog() {
+        console.asynchronously = false
+        console.minLevel = .info
+        log.addDestination(console)
+    }
+    
+    public class func addLogFile(path: String) {
+        let dest = FileDestination()
+        dest.asynchronously = false
+        dest.logFileURL = URL(fileURLWithPath: path)
+        dest.minLevel = .verbose
+        logFiles.append(dest)
+        log.addDestination(dest)
+        log.info("Logging to file at \(path)")
+    }
+}
