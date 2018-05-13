@@ -22,12 +22,17 @@ public class Hearthstone {
     public static var logFiles: [FileDestination] = []
     
     public class func initLog() {
+
+    }
+
+    public class func addConsole() {
         console.asynchronously = false
         console.minLevel = .info
         log.addDestination(console)
+        log.info("Logging to Console")
     }
     
-    public class func addLogFile(path: String) {
+    public class func addLogFile(path: String, minLevel: SwiftyBeaver.Level = .verbose) {
         let dest = FileDestination()
         dest.asynchronously = false
         dest.logFileURL = URL(fileURLWithPath: path)

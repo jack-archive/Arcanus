@@ -43,14 +43,24 @@ let logPath = logPathOption.value // optional
 let verbosity = verbosityOption.value
 
 Hearthstone.initLog()
-if logPath != nil {
-    Hearthstone.addLogFile(path: logPath!)
-}
 
 HearthstoneCore.DEBUG {
     let logDirectory = "./Hearthstone Logs"
     
     let fileManager = FileManager.default
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
+
+    // try! fileManager.removeItem(atPath: "\(logDirectory)/last")
+    Hearthstone.addLogFile(path: "\(logDirectory)/last")
+
+    let COLOR_RED = "\u{001b}[31;1m"
+    let COLOR_RESET = "\u{001b}[0m"
+
+    /// Use `tail -f Hearthstone\ Logs/last` to watch a constant log of all runs live
+    log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
+    log.info("\(COLOR_RED)========================== NEW LOG \(dateFormatter.string(from: Date())) ===========================\(COLOR_RESET)")
+    log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
     
     if !fileManager.fileExists(atPath: logDirectory, isDirectory: nil) {
         do {
@@ -61,9 +71,12 @@ HearthstoneCore.DEBUG {
         }
     }
     
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
+
     Hearthstone.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
+}
+
+if logPath != nil {
+    Hearthstone.addLogFile(path: logPath!)
 }
 
 // MARK: UI
