@@ -1,4 +1,4 @@
-// swift-tools-version:4.1
+// swift-tools-version:4.0
 // Copyright © 2018 Jack Maloney. All Rights Reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
