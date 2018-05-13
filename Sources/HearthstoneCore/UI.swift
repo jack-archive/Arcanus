@@ -39,9 +39,11 @@ public class HearthstoneUI {
     
     public func mainMenu() {
         queue.sync {
-            let menuOptions = ["Play Local", "Play Agent", "Play over Network", "Simulate", "Collection"]
+            let menuOptions = ["Play Local", "Play Agent", "Play over Network", "Simulate", "Collection", "","Options"].map({ $0 == "" ? MenuItem.empty : .option($0) })
             
-            buildMenu(title: "Main Menu", options: menuOptions)
+            switch menu(title: "Main Menu", items: menuOptions) {
+                
+            }
             
             //init_pair(1, Int16(COLOR_RED), Int16(COLOR_GREEN))
             /*
@@ -58,12 +60,32 @@ public class HearthstoneUI {
         endUI()
     }
     
-    func buildMenu(title: String, options: [String]) -> Int {
-        let maxLen = Int32(options.reduce(0, { return $1.count > $0 ? $1.count : $0 }))
+    enum MenuItem {
+        case option(String)
+        case empty
+        
+        func convert(strs: [String]) -> [MenuItem] {
+            return
+        }
+    }
+    
+    func menu(title: String, items: MenuItem...) -> Int {
+        return menu(title: title, items: items)
+    }
+    
+    func menu(title: String, items: [MenuItem]) -> Int {
+        let maxLen = Int32(items.reduce(0, {
+            switch $1 {
+            case .option(let s):
+                return s.count > $0 ? s.count : $0
+            case .empty:
+                return $0
+            }
+        }))
         
         refreshScreenBounds()
         checkScreenBounds()
-        let height: Int32 = Int32(options.count) + 2
+        let height: Int32 = Int32(items.count) + 2
         let width: Int32 = (maxLen + 14)
         let xpos = (screenWidth / 2) - (width / 2)
         let ypos = (screenHeight / 2) - (height / 2)
@@ -76,16 +98,17 @@ public class HearthstoneUI {
         init_pair(2, Int16(COLOR_BLACK), Int16(COLOR_WHITE))
         init_pair(3, Int16(COLOR_WHITE), Int16(COLOR_RED))
         
-        wbkgd(win, UInt32(COLOR_PAIR(1)))
+        wbkgd(win, UInt32(COLOR_PAIR(2)))
         box(win, 0, 0)
         wmove(win, 0, (width / 2) - (Int32(title.count) / 2))
-        waddstr(win, title)
+        wattron(win, COLOR_PAIR(1))
+        waddstr(win, " \(title) ")
         
         var choice = 0
         while (true) {
             log.debug("Choice: \(choice)")
             wattron(win, COLOR_PAIR(2))
-            for (k, item) in options.enumerated() {
+            for (k, item) in items.enumerated() {
                 let text = "< \(item) >"
                 wmove(win, Int32(k) + 1, (width / 2) - (Int32(text.count) / 2))
                 if k == choice {
@@ -105,7 +128,7 @@ public class HearthstoneUI {
                     choice -= 1
                 }
             case KEY_DOWN:
-                if choice < (options.count - 1) {
+                if choice < (items.count - 1) {
                     choice += 1
                 }
             case KEY_ENTER, 13:
@@ -116,28 +139,7 @@ public class HearthstoneUI {
             }
         }
     }
-    
-    func mainUIFunc() {
-        
-        let message = "Hello, World!"
-        
-        
-        
-        clear()
-        
-        let xpos = (screenWidth / 2) - (Int32(message.count) / 2)
-        let ypos = screenHeight / 2
-        log.info("(\(xpos), \(ypos))")
-        
-        move(ypos, xpos)
-        attron(COLOR_PAIR(0))
-        addstr(message)
-        attroff(COLOR_PAIR(0))
-        refresh()
-        
-        getch()
-    }
-    
+
     func endUI() {
         queue.sync {
             endwin()
@@ -166,4 +168,36 @@ public class HearthstoneUI {
         }
     }
     
+}
+
+class Menu {
+    enum Item {
+        case option(String)
+        case empty
+    }
+    
+    var items: [Item]
+    
+    convenience init(_ items: Item...) {
+        self.init(items)
+    }
+    
+    init(_ items: [Item]) {
+        self.items = items
+    }
+    
+    func longestItem() -> Int32 {
+        return Int32(items.reduce(0, {
+            switch $1 {
+            case .option(let s):
+                return s.count > $0 ? s.count : $0
+            case .empty:
+                return $0
+            }
+        }))
+    }
+    
+    func draw() {
+        
+    }
 }
