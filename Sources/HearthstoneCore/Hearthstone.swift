@@ -1,4 +1,4 @@
-// Copyright © 2018 Jack Maloney. All Rights Reserved.
+// Copyright © 2017-2018 Jack Maloney. All Rights Reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -22,7 +22,7 @@ public class Hearthstone {
     public static var logFiles: [FileDestination] = []
     
     public class func initLog() {
-
+        
     }
 
     public class func addConsole() {
@@ -41,4 +41,17 @@ public class Hearthstone {
         log.addDestination(dest)
         log.info("Logging to file at \(path)")
     }
+}
+
+public class HearthstoneClient {
+    var UI: HearthstoneUI
+    public init() {
+        UI = HearthstoneUI()
+    }
+    
+    public func main() {
+        UI.startUIThread()
+        UI.mainMenu()
+    }
+    
 }

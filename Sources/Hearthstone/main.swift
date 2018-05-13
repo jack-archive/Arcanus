@@ -1,4 +1,4 @@
-// Copyright © 2018 Jack Maloney. All Rights Reserved.
+// Copyright © 2017-2018 Jack Maloney. All Rights Reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -80,7 +80,10 @@ if logPath != nil {
 }
 
 // MARK: UI
+var client = HearthstoneClient()
+client.main()
 
+/*
 initscr()
 start_color()
 
@@ -109,7 +112,7 @@ refresh()
 
 getch()
 endwin()
-
+*/
 /*
 initscr()               // init curses
 noecho()                // don't echo user input
