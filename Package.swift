@@ -5,7 +5,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(
@@ -33,7 +32,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "Hearthstone", dependencies: [ "HearthstoneCore", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket" ])
+        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON" ])
     ],
     swiftLanguageVersions: [4]
 )

@@ -7,7 +7,6 @@
 import Foundation
 import SwiftyBeaver
 import Socket
-import cncurses
 
 public let log = SwiftyBeaver.self
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))

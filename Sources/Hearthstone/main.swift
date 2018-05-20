@@ -9,6 +9,7 @@ import CommandLineKit
 import SwiftyBeaver
 import HearthstoneCore
 import cncurses
+import SwiftyJSON
 
 // MARK: Commmand Line Parsing
 
@@ -20,12 +21,14 @@ let cli = CommandLineKit.CommandLine()
 
 let logPathOption = StringOption(shortFlag: "l", longFlag: "log", required: false,
                                  helpMessage: "Path to the log file.")
+let cardsPathOption = StringOption(shortFlag: "c", longFlag: "cardfile", required: false,
+                                 helpMessage: "Path to the cards.json file.")
 let helpOption = BoolOption(shortFlag: "h", longFlag: "help",
                             helpMessage: "Prints a help message.")
 let verbosityOption = CounterOption(shortFlag: "v", longFlag: "verbose",
                                     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 
-cli.addOptions(logPathOption, helpOption, verbosityOption)
+cli.addOptions(logPathOption, cardsPathOption, helpOption, verbosityOption)
 
 do {
     try cli.parse()
@@ -40,6 +43,7 @@ if helpOption.wasSet {
 }
 
 let logPath = logPathOption.value // optional
+let cardPath = cardsPathOption.value // optional
 let verbosity = verbosityOption.value
 
 Hearthstone.initLog()
@@ -70,13 +74,26 @@ HearthstoneCore.DEBUG {
             fatalError("Couldn't Create Logs Directory at ./\(logDirectory)")
         }
     }
-    
 
     Hearthstone.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
 }
 
 if logPath != nil {
     Hearthstone.addLogFile(path: logPath!)
+}
+
+let url = "https://api.hearthstonejson.com/v1/latest/enUS/cards.json"
+
+let fileManager = FileManager.default
+if cardPath != nil && !fileManager.fileExists(atPath: cardPath!) {
+    log.info("Card File (\(cardPath!)) does not exist, attempting to downloading a copy.")
+    print("Card file at \(cardPath!) doesn't exist, attempting downloading a copy...")
+    
+    let data = try Data(contentsOf: URL(string: url)!)
+    let json = JSON(data: data)
+    try json.description.write(toFile: cardPath!, atomically: true, encoding: .utf8)
+    print("Saved downloaded card file to \(cardPath!)")
+    log.info("Saved downloaded card file to \(cardPath!)")
 }
 
 // MARK: UI

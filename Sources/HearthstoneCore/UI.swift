@@ -5,12 +5,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import Darwin.ncurses
+import cncurses
 import Dispatch
 
 public class HearthstoneUI {
-    let minX: Int32 = 40
-    let minY: Int32 = 30
+    let minX: Int32 = 30
+    let minY: Int32 = 20
     
     var screenWidth: Int32 = 0
     var screenHeight: Int32 = 0
@@ -27,6 +27,7 @@ public class HearthstoneUI {
     public func startUIThread() {
         queue.sync {
             initscr()                   // init curses
+            keypad(stdscr, true)
             noecho()                    // don't echo user input
             cbreak()                    // no line buffering
             nonl()                      // return doesn't add new line
@@ -39,23 +40,12 @@ public class HearthstoneUI {
     
     public func mainMenu() {
         queue.sync {
-            let menuOptions = ["Play Local", "Play Agent", "Play over Network", "Simulate", "Collection", "","Options"].map({ $0 == "" ? MenuItem.empty : .option($0) })
-            
-            switch menu(title: "Main Menu", items: menuOptions) {
-                
+            let menuOptions = ["Play Local", "Play Agent", "Play over Network", "Simulate", "Collection", "Options"]
+            switch mainMenu(title: "Main Menu", items: menuOptions) {
+            default:
+                optionsScreen()
+                break
             }
-            
-            //init_pair(1, Int16(COLOR_RED), Int16(COLOR_GREEN))
-            /*
-             wattron(win, COLOR_PAIR(1))
-             wbkgd(win, UInt32(COLOR_PAIR(1)))
-             box(win, 0, 0)
-             wmove(win, 1, 1)
-             waddstr(win, "Hola!")
-             wrefresh(win)
-             wattroff(win, COLOR_PAIR(1))
-             */
-            //getch()
         }
         endUI()
     }
@@ -63,25 +53,10 @@ public class HearthstoneUI {
     enum MenuItem {
         case option(String)
         case empty
-        
-        func convert(strs: [String]) -> [MenuItem] {
-            return
-        }
     }
     
-    func menu(title: String, items: MenuItem...) -> Int {
-        return menu(title: title, items: items)
-    }
-    
-    func menu(title: String, items: [MenuItem]) -> Int {
-        let maxLen = Int32(items.reduce(0, {
-            switch $1 {
-            case .option(let s):
-                return s.count > $0 ? s.count : $0
-            case .empty:
-                return $0
-            }
-        }))
+    func mainMenu(title: String, items: [String]) -> Int {
+        let maxLen = Int32(items.reduce(0, { $1.count > $0 ? $1.count : $0 }))
         
         refreshScreenBounds()
         checkScreenBounds()
@@ -92,7 +67,6 @@ public class HearthstoneUI {
         
         let win = newwin(height, width, ypos, xpos)
         refresh()
-        keypad(stdscr, true)
         
         init_pair(1, Int16(COLOR_RED), Int16(COLOR_WHITE))
         init_pair(2, Int16(COLOR_BLACK), Int16(COLOR_WHITE))
@@ -100,9 +74,12 @@ public class HearthstoneUI {
         
         wbkgd(win, UInt32(COLOR_PAIR(2)))
         box(win, 0, 0)
-        wmove(win, 0, (width / 2) - (Int32(title.count) / 2))
+        wmove(win, 0, (width / 2) - ((Int32(title.count) + 4) / 2))
+        waddstr(win, "|")
         wattron(win, COLOR_PAIR(1))
         waddstr(win, " \(title) ")
+        wattron(win, COLOR_PAIR(2))
+        waddstr(win, "|")
         
         var choice = 0
         while (true) {
@@ -140,6 +117,35 @@ public class HearthstoneUI {
         }
     }
 
+    func optionsScreen() {
+        refreshScreenBounds()
+        checkScreenBounds()
+        let height: Int32 = 30
+        let width: Int32 = 80
+        let xpos = (screenWidth / 2) - (width / 2)
+        let ypos = (screenHeight / 2) - (height / 2)
+
+        let title = "Options"
+        let win = newwin(height, width, ypos, xpos)
+        refresh()
+
+        init_pair(1, Int16(COLOR_RED), Int16(COLOR_WHITE))
+        init_pair(2, Int16(COLOR_BLACK), Int16(COLOR_WHITE))
+        init_pair(3, Int16(COLOR_WHITE), Int16(COLOR_RED))
+
+        wbkgd(win, UInt32(COLOR_PAIR(2)))
+        box(win, 0, 0)
+        wmove(win, 0, (width / 2) - ((Int32(title.count) + 4) / 2))
+        waddstr(win, "|")
+        wattron(win, COLOR_PAIR(1))
+        waddstr(win, " \(title) ")
+        wattron(win, COLOR_PAIR(2))
+        waddstr(win, "|")
+        wrefresh(win)
+
+        getch()
+    }
+    
     func endUI() {
         queue.sync {
             endwin()
@@ -166,38 +172,5 @@ public class HearthstoneUI {
                 }
             }
         }
-    }
-    
-}
-
-class Menu {
-    enum Item {
-        case option(String)
-        case empty
-    }
-    
-    var items: [Item]
-    
-    convenience init(_ items: Item...) {
-        self.init(items)
-    }
-    
-    init(_ items: [Item]) {
-        self.items = items
-    }
-    
-    func longestItem() -> Int32 {
-        return Int32(items.reduce(0, {
-            switch $1 {
-            case .option(let s):
-                return s.count > $0 ? s.count : $0
-            case .empty:
-                return $0
-            }
-        }))
-    }
-    
-    func draw() {
-        
     }
 }
