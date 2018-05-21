@@ -1,0 +1,62 @@
+[
+  {
+    "faction" : "HORDE",
+    "flavor" : "\"Kill 30 raptors.\" - Hemet Nesingwary",
+    "id" : "CS2_172",
+    "dbfId" : 216,
+    "rarity" : "FREE",
+    "collectible" : true,
+    "cardClass" : "NEUTRAL",
+    "type" : "MINION",
+    "howToEarnGolden" : "Unlocked at Hunter Level 57.",
+    "health" : 2,
+    "race" : "BEAST",
+    "set" : "CORE",
+    "attack" : 3,
+    "artist" : "Dan Brereton",
+    "name" : "Bloodfen Raptor",
+    "cost" : 2
+  },
+  {
+    "flavor" : "He just wants a hug.   A sloppy... slimy... hug.",
+    "id" : "CS2_173",
+    "name" : "Bluegill Warrior",
+    "dbfId" : 739,
+    "rarity" : "FREE",
+    "collectible" : true,
+    "cardClass" : "NEUTRAL",
+    "type" : "MINION",
+    "howToEarnGolden" : "Unlocked at Paladin Level 53.",
+    "health" : 1,
+    "race" : "MURLOC",
+    "set" : "CORE",
+    "text" : "<b>Charge<\/b>",
+    "attack" : 2,
+    "artist" : "Jakub Kasper",
+    "mechanics" : [
+      "CHARGE"
+    ],
+    "cost" : 2
+  },
+  {
+    "faction" : "HORDE",
+    "flavor" : "Sen'jin Village is nice, if you like trolls and dust.",
+    "id" : "CS2_179",
+    "dbfId" : 635,
+    "name" : "Sen'jin Shieldmasta",
+    "collectible" : true,
+    "cardClass" : "NEUTRAL",
+    "rarity" : "FREE",
+    "type" : "MINION",
+    "howToEarnGolden" : "Unlocked at Rogue Level 59.",
+    "health" : 5,
+    "set" : "CORE",
+    "text" : "<b>Taunt<\/b>",
+    "attack" : 3,
+    "artist" : "Brian Despain",
+    "mechanics" : [
+      "TAUNT"
+    ],
+    "cost" : 4
+  }
+]

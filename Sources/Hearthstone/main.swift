@@ -43,7 +43,7 @@ if helpOption.wasSet {
 }
 
 let logPath = logPathOption.value // optional
-let cardPath = cardsPathOption.value // optional
+let cardPath = cardsPathOption.value ?? "cards.json" // default value
 let verbosity = verbosityOption.value
 
 Hearthstone.initLog()
@@ -84,21 +84,27 @@ if logPath != nil {
 
 let url = "https://api.hearthstonejson.com/v1/latest/enUS/cards.json"
 
+// Load new card file
 let fileManager = FileManager.default
-if cardPath != nil && !fileManager.fileExists(atPath: cardPath!) {
-    log.info("Card File (\(cardPath!)) does not exist, attempting to downloading a copy.")
-    print("Card file at \(cardPath!) doesn't exist, attempting downloading a copy...")
+if !fileManager.fileExists(atPath: cardPath) {
+    log.info("Card File (\(cardPath)) does not exist, attempting to downloading a copy.")
+    print("Card file at \(cardPath) doesn't exist, attempting downloading a copy...")
     
     let data = try Data(contentsOf: URL(string: url)!)
     let json = JSON(data: data)
-    try json.description.write(toFile: cardPath!, atomically: true, encoding: .utf8)
-    print("Saved downloaded card file to \(cardPath!)")
-    log.info("Saved downloaded card file to \(cardPath!)")
+    try json.description.write(toFile: cardPath, atomically: true, encoding: .utf8)
+    print("Saved downloaded card file to \(cardPath)")
+    log.info("Saved downloaded card file to \(cardPath)")
 }
 
+stuff()
+
+let hs = Hearthstone()
+try hs.loadCardFile(path: cardPath)
+
 // MARK: UI
-var client = HearthstoneClient()
-client.main()
+//var client = HearthstoneClient()
+//client.main()
 
 /*
 initscr()
