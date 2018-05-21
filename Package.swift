@@ -32,7 +32,8 @@ let package = Package(
     ],
     targets: [
         .target(name: "Hearthstone", dependencies: [ "HearthstoneCore", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON" ])
+        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON" ]),
+        .target(name: "CardFileGenerator", dependencies: [ "SwiftyJSON", "CommandLine" ])
     ],
     swiftLanguageVersions: [4]
 )

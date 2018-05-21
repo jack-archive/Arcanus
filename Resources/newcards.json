@@ -58,5 +58,42 @@
       "TAUNT"
     ],
     "cost" : 4
+  },
+  {
+    "faction" : "ALLIANCE",
+    "flavor" : "ADD ME TO YOUR DECK, MAGGOT!",
+    "id" : "CS2_188",
+    "dbfId" : 242,
+    "name" : "Abusive Sergeant",
+    "collectible" : true,
+    "cardClass" : "NEUTRAL",
+    "rarity" : "COMMON",
+    "type" : "MINION",
+    "health" : 1,
+    "set" : "EXPERT1",
+    "text" : "<b>Battlecry:<\/b> Give a minion +2 Attack this turn.",
+    "targetingArrowText" : "Give +2 Attack this turn.",
+    "attack" : 1,
+    "playRequirements" : {
+      "REQ_TARGET_IF_AVAILABLE" : 0,
+      "REQ_MINION_TARGET" : 0
+    },
+    "artist" : "Luca Zontini",
+    "mechanics" : [
+      "BATTLECRY"
+    ],
+    "cost" : 1
+  },
+  {
+    "set" : "EXPERT1",
+    "id" : "CS2_188o",
+    "dbfId" : 809,
+    "cardClass" : "NEUTRAL",
+    "text" : "This minion has +2 Attack this turn.",
+    "mechanics" : [
+      "TAG_ONE_TURN_EFFECT"
+    ],
+    "type" : "ENCHANTMENT",
+    "name" : "'Inspired'"
   }
 ]

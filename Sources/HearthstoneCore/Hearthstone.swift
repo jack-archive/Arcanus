@@ -44,6 +44,10 @@ public class Hearthstone {
         log.info("Logging to file at \(path)")
     }
     
+    public enum Error: Swift.Error {
+        case badJSON
+    }
+    
     // MARK: Instance functionality
     var cardIndex: [Card] = []
     
@@ -52,11 +56,51 @@ public class Hearthstone {
     public func loadCardFile(path: String) throws {
         let json = JSON(data: try Data(contentsOf: URL(fileURLWithPath: path)))
         for (_, subJson):(String, JSON) in json {
+            
+            // Get name, and corresponding class
             let name = subJson["name"].string!
             print(name)
-            let cls = Card.classForName(name)!
-            let instance = cls.init()
-            print(instance.name)
+            guard let cls = Card.classForName(name) else {
+                log.warning("\(name) not implemented yet, skipping it.")
+                continue;
+            }
+            
+            guard let id = subJson["id"].string, let dbfId = subJson["dbfId"].int,
+            let classStr = subJson["cardClass"].string, let typeStr = subJson["type"].string,
+                let cost = subJson["cost"].int else {
+                    log.error("Bad Card JSON file while loading \(name), please fix format.")
+                    throw Error.badJSON
+            }
+            
+            guard let cardClass = Card.Class.fromJSON(classStr) else {
+                log.error("\(classStr) does not correspond to a class.")
+                throw Error.badJSON
+            }
+            
+            guard let type = Card.CardType.fromJSON(typeStr) else {
+                log.error("\(typeStr) does not correspond to a type.")
+                throw Error.badJSON
+            }
+            
+            
+            switch type {
+            case .minion:
+                guard let attack = subJson["attack"].int, let health = subJson["health"].int else {
+                    log.error("Bad Card JSON file while loading \(name), please fix format.")
+                    throw Error.badJSON
+                }
+                
+                let minionCls = cls as! Minion.Type
+                let instance = minionCls.init(id, name, cardClass, cost, attack, health)
+                cardIndex.append(instance)
+                log.info("Loaded Minion: \(instance)")
+                
+            case .spell: break
+            case .weapon: break
+            case .enchantment: break
+            }
+            
+            
         }
     }
 }

@@ -82,21 +82,6 @@ if logPath != nil {
     Hearthstone.addLogFile(path: logPath!)
 }
 
-let url = "https://api.hearthstonejson.com/v1/latest/enUS/cards.json"
-
-// Load new card file
-let fileManager = FileManager.default
-if !fileManager.fileExists(atPath: cardPath) {
-    log.info("Card File (\(cardPath)) does not exist, attempting to downloading a copy.")
-    print("Card file at \(cardPath) doesn't exist, attempting downloading a copy...")
-    
-    let data = try Data(contentsOf: URL(string: url)!)
-    let json = JSON(data: data)
-    try json.description.write(toFile: cardPath, atomically: true, encoding: .utf8)
-    print("Saved downloaded card file to \(cardPath)")
-    log.info("Saved downloaded card file to \(cardPath)")
-}
-
 stuff()
 
 let hs = Hearthstone()
