@@ -94,8 +94,6 @@ public class Minion: Card {
         self.health = health
         super.init(id, 0, name, cardClass, .minion, cost)
     }
-    
-    
 }
 
 public class BloodfenRaptor: Minion {
@@ -103,6 +101,7 @@ public class BloodfenRaptor: Minion {
         super.init(id, "Bloodfen Raptor", cardClass, cost, attack, health)
     }
 }
+
 /*
 public class BluegillWarrior: Minion {
     public required init() {

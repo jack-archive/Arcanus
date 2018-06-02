@@ -85,11 +85,25 @@ if logPath != nil {
 stuff()
 
 let hs = Hearthstone()
-try hs.loadCardFile(path: cardPath)
+Hearthstone.addConsole(.verbose)
+//try hs.loadCardFile(path: cardPath)
+
+let server = try HearthstoneGameServer(25565)
+server.startServer()
+
+sleep(1)
+
+let client1 = try HearthstoneClient()
+let client2 = try HearthstoneClient()
+
+try client1.main()
+try client2.main()
+
+sleep(10)
 
 // MARK: UI
-//var client = HearthstoneClient()
-//client.main()
+// var client = HearthstoneClient()
+// client.main()
 
 /*
 initscr()

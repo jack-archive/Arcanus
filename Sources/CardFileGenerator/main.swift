@@ -65,9 +65,4 @@ for (_, subJson):(String, JSON) in json {
     let collectible = subJson["collectible"].bool ?? false
     let mechanics = subJson["mechanics"].array ?? []
     
-    switch type {
-    case "MINION":
-        
-    default:
-    }
 }

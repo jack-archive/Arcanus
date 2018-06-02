@@ -40,7 +40,7 @@ public class HearthstoneUI {
     
     public func mainMenu() {
         queue.sync {
-            let menuOptions = ["Play Local", "Play Agent", "Play over Network", "Simulate", "Collection", "Options"]
+            let menuOptions = ["Play Agent", "Start Server", "Connect To Server", "Simulate", "Collection", "Options"]
             switch mainMenu(title: "Main Menu", items: menuOptions) {
             default:
                 optionsScreen()
