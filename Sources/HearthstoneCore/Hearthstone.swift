@@ -18,7 +18,7 @@ public func DEBUG(_ code: () -> Void) {
     }
 }
 
-public class Hearthstone {
+public class Hearthstone: HearthstoneUIController {
     // MARK: Static functionality
     public static let console: ConsoleDestination = ConsoleDestination()
     public static var logFiles: [FileDestination] = []
@@ -38,7 +38,7 @@ public class Hearthstone {
         let dest = FileDestination()
         dest.asynchronously = false
         dest.logFileURL = URL(fileURLWithPath: path)
-        dest.minLevel = .verbose
+        dest.minLevel = minLevel
         logFiles.append(dest)
         log.addDestination(dest)
         log.info("Logging to file at \(path)")
@@ -49,61 +49,41 @@ public class Hearthstone {
     }
     
     // MARK: Instance functionality
-    var cardIndex: [Card] = []
+    var ui: HearthstoneUI
+    var queue: DispatchQueue
     
-    public init() {}
-    /*
-     public func loadCardFile(path: String) throws {
-     let json = JSON(data: try Data(contentsOf: URL(fileURLWithPath: path)))
-     for (_, subJson):(String, JSON) in json {
-     
-     // Get name, and corresponding class
-     let name = subJson["name"].string!
-     print(name)
-     guard let cls = Card.classForName(name) else {
-     log.warning("\(name) not implemented yet, skipping it.")
-     continue;
-     }
-     
-     guard let id = subJson["id"].string, let dbfId = subJson["dbfId"].int,
-     let classStr = subJson["cardClass"].string, let typeStr = subJson["type"].string,
-     let cost = subJson["cost"].int else {
-     log.error("Bad Card JSON file while loading \(name), please fix format.")
-     throw Error.badJSON
-     }
-     
-     guard let cardClass = Card.Class.fromJSON(classStr) else {
-     log.error("\(classStr) does not correspond to a class.")
-     throw Error.badJSON
-     }
-     
-     guard let type = Card.CardType.fromJSON(typeStr) else {
-     log.error("\(typeStr) does not correspond to a type.")
-     throw Error.badJSON
-     }
-     
-     
-     switch type {
-     case .minion:
-     guard let attack = subJson["attack"].int, let health = subJson["health"].int else {
-     log.error("Bad Card JSON file while loading \(name), please fix format.")
-     throw Error.badJSON
-     }
-     
-     let minionCls = cls as! Minion.Type
-     let instance = minionCls.init(id, name, cardClass, cost, attack, health)
-     cardIndex.append(instance)
-     log.info("Loaded Minion: \(instance)")
-     
-     case .spell: break
-     case .weapon: break
-     case .enchantment: break
-     }
-     
-     
-     }
-     }
-     */
+    public init(ui: HearthstoneUI) {
+        self.ui = ui
+        self.queue = DispatchQueue(label: "Hearthstone Controller Queue")
+        self.ui.controller = self
+    }
+    
+    public func start() {
+        ui.initUI()
+        ui.showMainMenu()
+        ui.endUI()
+    }
+    
+    public func startServer(port: Int) {
+        queue.async {
+            
+        }
+    }
+}
+
+public protocol HearthstoneUIController: class {
+    func startServer(port: Int)
+}
+
+public protocol HearthstoneUI {
+    // Should be Weak!
+    var controller: HearthstoneUIController! { get set }
+    
+    func initUI()
+    
+    func showMainMenu()
+
+    func endUI()
 }
 
 func namespaceAsString() -> String {
@@ -111,12 +91,10 @@ func namespaceAsString() -> String {
 }
 
 public class HearthstoneClient {
-    var UI: HearthstoneUI
     var socket: Socket
     var queue: DispatchQueue
     
     public init() throws {
-        UI = HearthstoneUI()
         try self.socket = Socket.create()
         self.queue = DispatchQueue(label: "Hearthstone Client")
     }
@@ -133,8 +111,6 @@ public class HearthstoneClient {
                 
             }
         }
-        //UI.startUIThread()
-        //UI.mainMenu()
     }
 }
 

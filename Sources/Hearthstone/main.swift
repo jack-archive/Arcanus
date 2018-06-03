@@ -56,7 +56,7 @@ HearthstoneCore.DEBUG {
     dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
 
     // try! fileManager.removeItem(atPath: "\(logDirectory)/last")
-    Hearthstone.addLogFile(path: "\(logDirectory)/last")
+    Hearthstone.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
 
     let COLOR_RED = "\u{001b}[31;1m"
     let COLOR_RESET = "\u{001b}[0m"
@@ -81,13 +81,12 @@ HearthstoneCore.DEBUG {
 if logPath != nil {
     Hearthstone.addLogFile(path: logPath!)
 }
+// Hearthstone.addConsole(.verbose)
 
-stuff()
+let hs = Hearthstone(ui: HearthstoneCursesUI())
+hs.start()
 
-let hs = Hearthstone()
-Hearthstone.addConsole(.verbose)
-//try hs.loadCardFile(path: cardPath)
-
+/*
 let server = try HearthstoneGameServer(25565)
 server.startServer()
 
@@ -100,57 +99,5 @@ try client1.main()
 try client2.main()
 
 sleep(10)
-
-// MARK: UI
-// var client = HearthstoneClient()
-// client.main()
-
-/*
-initscr()
-start_color()
-
-noecho()
-curs_set(0)
-
-init_pair(0, Int16(COLOR_BLACK), Int16(COLOR_GREEN))
-
-let message = "Hello, World!"
-
-let screenHeight = getmaxy(stdscr)
-let screenWidth = getmaxx(stdscr)
-
-clear()
-
-let xpos = (screenWidth / 2) - (Int32(message.count) / 2)
-let ypos = screenHeight / 2
-
-log.info("(\(xpos), \(ypos))")
-
-move(ypos, xpos)
-attron(COLOR_PAIR(0))
-addstr(message)
-attroff(COLOR_PAIR(0))
-refresh()
-
-getch()
-endwin()
 */
-/*
-initscr()               // init curses
-noecho()                // don't echo user input
-cbreak()                // no line buffering
-nonl()                  // return doesn't add new line
-keypad(stdscr, true)    // give us access to arrow keys
-intrflush(stdscr, false)// prevent inturrupt from messing up screen
 
-var win = newwin(10,10,1,1)
-
-box(win, UInt32("|"), UInt32("-"))
-touchwin(win)
-wrefresh(win)
-
-getchar()
-
-getch()
-endwin()
-*/

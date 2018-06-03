@@ -1,0 +1,14 @@
+{
+    "player0": {
+        "class": "Warlock",
+        "deck": 4,
+        "hand": 0,
+        "board": []
+    },
+    "player1": {
+        "class": "Mage",
+        "deck": 4,
+        "hand": 0,
+        "board": []
+    }
+}

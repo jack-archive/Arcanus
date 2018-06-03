@@ -6,16 +6,6 @@
 
 import Foundation
 
-public func stuff() {
-    /*
-    print("yo")
-    if let bloodfen = NSClassFromString("\(namespaceAsString()).BloodfenRaptor") as? Card.Type {
-        let instance = bloodfen.init() as! BloodfenRaptor
-        print(instance.name)
-    }
-    */
-}
-
 public class Card {
     public static func makeNameClassReady(_ name: String) -> String {
         return name.replacingOccurrences(of: " ", with: "")
