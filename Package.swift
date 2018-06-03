@@ -21,6 +21,7 @@ let package = Package(
         .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "1.0.0"),
         .package(url: "https://github.com/ClibSwift/ncurses.git", .branch("master")),
         .package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", from: "17.0.0"),
+        .Package(url: "https://github.com/mxcl/PromiseKit", from: "6.2.0")
         
         /*
         
