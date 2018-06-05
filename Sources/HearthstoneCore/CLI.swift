@@ -17,14 +17,31 @@ public class HearthstoneCLI : HearthstoneUI {
     }
     
     public func mainMenu() {
-        let rv = menu(title: "Main Menu", options: Hearthstone.MainMenuOptions.allAsStrings)
+        let option = Hearthstone.MainMenuOption.all[menu(title: "Main Menu", options: Hearthstone.MainMenuOption.allAsStrings)]
+        switch option {
+        case .playAgent: break
+        case .startServer:
+            let port = intPrompt("Port", 49152..<65535, def: 55555)
+            log.debug("Port: \(port)")
+            controller.mainMenuOptionSelected(.startServer(port))
+            sleep(10)
+        case .joinServer:
+            let hostname = stringPrompt("Hostname", def: "127.0.0.1")
+            let port = intPrompt("Port", 49152..<65535, def: 55555)
+            controller.mainMenuOptionSelected(.joinServer(hostname, port))
+            sleep(8)
+        case .simulate: break
+        case .collection: break
+        case .options: break
+        }
+        
     }
     
     public func endUI() {
         
     }
     
-    func boolPrompt(_ prompt:String) -> Bool? {
+    func boolPrompt(_ prompt: String) -> Bool? {
         while true {
             print(prompt, terminator: "? ")
             print("[y/n]: ".bold, terminator: "")
@@ -41,6 +58,66 @@ public class HearthstoneCLI : HearthstoneUI {
             default:
                 continue;
             }
+        }
+    }
+    
+    func intPrompt(arrow: Bool = true, _ prompt: String, _ range: Range<Int> = Range<Int>(Int.min...Int.max), def: Int? = nil) -> Int {
+        while true {
+            if arrow {
+                print("==>".blue, terminator: " ")
+            }
+            
+            print(prompt.bold, terminator: " ")
+            
+            if def != nil {
+                print("(default: \(def!))", terminator: " ")
+            }
+            
+            log.debug("Range: \(range)")
+            
+            if range.lowerBound != Int.min && range.upperBound != Int.max {
+                print("[\(range.lowerBound)-\(range.upperBound)]:".bold, terminator: " ")
+            }
+            
+            guard let line = readLine() else {
+                continue
+            }
+            
+            if line == "" && def != nil {
+                return def!
+            }
+            
+            let rv = Int(line)
+            if rv == nil || rv! < range.lowerBound || rv! > range.upperBound {
+                continue
+            } else {
+                return rv!
+            }
+        }
+    }
+    
+    func stringPrompt(arrow: Bool = true, _ prompt: String, def: String? = nil) -> String {
+        while true {
+            if arrow {
+                print("==>".blue, terminator: " ")
+            }
+            
+            print(prompt.bold, terminator: " ")
+            
+            if def != nil {
+                print("(default: \(def!))", terminator: "")
+            }
+            print(":".bold, terminator: "")
+            
+            guard let line = readLine() else {
+                continue
+            }
+            
+            if line == "" && def != nil {
+                return def!
+            }
+            
+            return line
         }
     }
     

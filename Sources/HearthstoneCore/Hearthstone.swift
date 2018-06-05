@@ -58,15 +58,15 @@ public class Hearthstone: HearthstoneUIController {
         self.ui.controller = self
     }
     
-    enum MainMenuOptions: CustomStringConvertible {
+    public enum MainMenuOption: CustomStringConvertible {
         case playAgent
-        case startServer(port: Int)
-        case joinServer
+        case startServer(Int)
+        case joinServer(String?, Int)
         case simulate
         case collection
         case options
         
-        var description: String {
+        public var description: String {
             switch self {
             case .playAgent: return "Play Agents"
             case .startServer: return "Start Server"
@@ -77,7 +77,7 @@ public class Hearthstone: HearthstoneUIController {
             }
         }
         
-        static let all: [MainMenuOptions] = [.playAgent, .startServer(port: 0), .joinServer, .simulate, .collection, .options]
+        static let all: [MainMenuOption] = [.playAgent, .startServer(0), .joinServer(nil, 0), .simulate, .collection, .options]
         static var allAsStrings: [String] { return all.map({ return $0.description }) }
     }
     
@@ -87,15 +87,34 @@ public class Hearthstone: HearthstoneUIController {
         ui.endUI()
     }
     
-    public func startServer(port: Int) {
+    public func mainMenuOptionSelected(_ opt: MainMenuOption) {
         queue.async {
-            
+            switch opt {
+            case .playAgent: break
+            case .startServer(let port):
+                guard let server = try? HearthstoneGameServer(port) else {
+                    fatalError("Couldn't open Server")
+                }
+                server.startServer()
+                
+                guard let client = try? HearthstoneClient(port: port) else {
+                    fatalError("Couldn't connect client")
+                }
+                
+            case .joinServer(let host, let port):
+                guard let client = try? HearthstoneClient(port: port) else {
+                    fatalError("Couldn't connect client")
+                }
+            case .simulate: break
+            case .collection: break
+            case .options: break
+            }
         }
     }
 }
 
 public protocol HearthstoneUIController: class {
-    func startServer(port: Int)
+    func mainMenuOptionSelected(_ opt: Hearthstone.MainMenuOption)
 }
 
 public protocol HearthstoneUI {
@@ -117,23 +136,13 @@ public class HearthstoneClient {
     var socket: Socket
     var queue: DispatchQueue
     
-    public init() throws {
+    public init(server: String = "127.0.0.1", port: Int) throws {
         try self.socket = Socket.create()
         self.queue = DispatchQueue(label: "Hearthstone Client")
-    }
-    
-    public func main() throws {
-        queue.async {
-            do {
-                log.debug("Connecting to Server")
-                try self.socket.connect(to: "127.0.0.1", port: 25565)
-                log.debug("Connected to Server")
-                let s = try self.socket.readString()
-                print(s!)
-            } catch {
-                
-            }
-        }
+        
+        log.debug("Connecting to Server @ \(server) on port \(port)")
+        try self.socket.connect(to: server, port: Int32(port))
+        log.debug("Connected to Server @ \(server) on port \(port)")
     }
 }
 
