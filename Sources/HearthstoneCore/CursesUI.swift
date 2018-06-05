@@ -9,7 +9,6 @@ import cncurses
 import Dispatch
 
 public class HearthstoneCursesUI : HearthstoneUI {
-    
     let minX: Int32 = 30
     let minY: Int32 = 20
     
@@ -38,7 +37,7 @@ public class HearthstoneCursesUI : HearthstoneUI {
         //wrefresh(stdscr)
     }
     
-    public func showMainMenu() {
+    public func mainMenu() {
         let menuOptions = ["Play Agent", "Start Server", "Connect To Server", "Simulate", "Collection", "Options"]
         switch menu(title: "Main Menu", items: menuOptions) {
         case 2:

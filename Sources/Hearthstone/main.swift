@@ -83,7 +83,7 @@ if logPath != nil {
 }
 // Hearthstone.addConsole(.verbose)
 
-let hs = Hearthstone(ui: HearthstoneCursesUI())
+let hs = Hearthstone(ui: HearthstoneCLI())
 hs.start()
 
 /*

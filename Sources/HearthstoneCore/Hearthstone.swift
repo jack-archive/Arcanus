@@ -58,9 +58,32 @@ public class Hearthstone: HearthstoneUIController {
         self.ui.controller = self
     }
     
+    enum MainMenuOptions: CustomStringConvertible {
+        case playAgent
+        case startServer(port: Int)
+        case joinServer
+        case simulate
+        case collection
+        case options
+        
+        var description: String {
+            switch self {
+            case .playAgent: return "Play Agents"
+            case .startServer: return "Start Server"
+            case .joinServer: return "Join Server"
+            case .simulate: return "Simulate"
+            case .collection: return "Collection"
+            case .options: return "Options"
+            }
+        }
+        
+        static let all: [MainMenuOptions] = [.playAgent, .startServer(port: 0), .joinServer, .simulate, .collection, .options]
+        static var allAsStrings: [String] { return all.map({ return $0.description }) }
+    }
+    
     public func start() {
         ui.initUI()
-        ui.showMainMenu()
+        ui.mainMenu()
         ui.endUI()
     }
     
@@ -79,10 +102,10 @@ public protocol HearthstoneUI {
     // Should be Weak!
     var controller: HearthstoneUIController! { get set }
     
-    func initUI()
     
-    func showMainMenu()
-
+    
+    func initUI()
+    func mainMenu()
     func endUI()
 }
 
