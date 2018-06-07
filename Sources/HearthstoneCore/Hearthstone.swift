@@ -100,7 +100,6 @@ public class Hearthstone: HearthstoneUIController {
                 guard let client = try? HearthstoneClient(port: port) else {
                     fatalError("Couldn't connect client")
                 }
-                
             case .joinServer(let host, let port):
                 guard let client = try? HearthstoneClient(port: port) else {
                     fatalError("Couldn't connect client")
@@ -143,6 +142,20 @@ public class HearthstoneClient {
         log.debug("Connecting to Server @ \(server) on port \(port)")
         try self.socket.connect(to: server, port: Int32(port))
         log.debug("Connected to Server @ \(server) on port \(port)")
+        self.main()
+    }
+    
+    func main() {
+        queue.async {
+            do {
+                while true {
+                    let str = try self.socket.readString()
+                    log.debug(str)
+                }
+            } catch {
+                fatalError()
+            }
+        }
     }
 }
 
@@ -151,22 +164,60 @@ public class HearthstoneGameServer {
     var socket: Socket
     var sockets: [Socket] = []
     var queue: DispatchQueue
+    var game: Game
+    
+    enum Message {
+        case startGame
+        
+        var json: JSON {
+            switch self {
+            case .startGame: return JSON(data: "{ msg: \"\(self.key )\" }".data(using: .utf8)!)
+            }
+        }
+        
+        var key: String {
+            switch self {
+            case .startGame: return "START_GAME"
+            }
+        }
+    }
     
     public init(_ port: Int) throws {
         self.port = port
         
         try socket = Socket.create()
         queue = DispatchQueue(label: "Hearthstone Server")
+        game = Game()
     }
     
     public func startServer() {
         queue.async {
             do {
                 try self.connectClients()
+                try self.startGame()
             } catch {
                 fatalError()
             }
         }
+    }
+    
+    func sendMsg(player: Int? = nil, json: JSON) throws {
+        switch player {
+        case nil:
+            try sockets[0].write(from: json.rawData())
+            try sockets[1].write(from: json.rawData())
+        case 0:
+            try sockets[0].write(from: json.rawData())
+        case 1:
+            try sockets[1].write(from: json.rawData())
+        default:
+            fatalError()
+        }
+    }
+    
+    func startGame() throws {
+        try sendMsg(json: Message.startGame.json)
+        
     }
     
     func connectClients() throws {
@@ -179,9 +230,11 @@ public class HearthstoneGameServer {
         try sockets.append(socket.acceptClientConnection())
         log.debug("Second Client Connected")
         socket.close()
-        
-        for soc in sockets {
-            try soc.write(from: "Hello, World!\n")
-        }
     }
+    
+    
+}
+
+public class Game {
+    
 }
