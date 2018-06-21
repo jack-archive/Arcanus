@@ -23,7 +23,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.2.0"),
         .package(url: "https://github.com/onevcat/Rainbow", from: "3.0.0"),
         
-        .package(url: "https://github.com/PerfectlySoft/Perfect.git", from: "3.1.1"),
+        .package(url: "https://github.com/PerfectlySoft/PerfectLib.git", from: "3.1.1"),
         .package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", from: "3.0.0")
         
         /*
