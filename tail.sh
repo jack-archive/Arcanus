@@ -1,3 +1,3 @@
 #!/bin/bash
 
-tail -f Hearthstone\ Logs/last
+tail -f Arcanus\ Logs/last

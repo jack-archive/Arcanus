@@ -10,7 +10,6 @@ import SwiftyBeaver
 import Arcanus
 import cncurses
 import SwiftyJSON
-import PerfectLib
 
 // MARK: Commmand Line Parsing
 
@@ -19,6 +18,8 @@ let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 #endif
 
 let cli = CommandLineKit.CommandLine()
+
+let serverOption = BoolOption(shortFlag: "s", longFlag: "server", helpMessage: "Start a server.")
 
 let logPathOption = StringOption(shortFlag: "l", longFlag: "log", required: false,
                                  helpMessage: "Path to the log file.")
@@ -29,7 +30,7 @@ let helpOption = BoolOption(shortFlag: "h", longFlag: "help",
 let verbosityOption = CounterOption(shortFlag: "v", longFlag: "verbose",
                                     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 
-cli.addOptions(logPathOption, cardsPathOption, helpOption, verbosityOption)
+cli.addOptions(serverOption, logPathOption, cardsPathOption, helpOption, verbosityOption)
 
 do {
     try cli.parse()
@@ -81,9 +82,15 @@ Arcanus.DEBUG {
 if logPath != nil {
     ArcanusController.addLogFile(path: logPath!)
 }
+
+if serverOption.value {
+    log.info("Server-Side")
+    Arcanus.ServerMain()
+} else {
+    log.info("Client-Side")
+}
+
 // Arcanus.addConsole(.verbose)
-
-
 
 /*
 let hs = ArcanusController(ui: ArcanusCLI())

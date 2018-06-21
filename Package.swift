@@ -35,8 +35,8 @@ let package = Package(
         */
     ],
     targets: [
+        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectHTTPServer" ]),
         .target(name: "CLI", dependencies: [ "Arcanus", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib" ])
     ],
     swiftLanguageVersions: [4]
 )
