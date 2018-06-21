@@ -6,7 +6,7 @@
 
 import Foundation
 import Rainbow
-import ArcanusCore
+import Arcanus
 
 public class ArcanusCLI : ArcanusUI {
     public var controller: ArcanusUIController!
@@ -18,7 +18,7 @@ public class ArcanusCLI : ArcanusUI {
     }
     
     public func mainMenu() {
-        let option = Arcanus.MainMenuOption.all[menu(title: "Main Menu", options: Arcanus.MainMenuOption.allAsStrings)]
+        let option = ArcanusController.MainMenuOption.all[menu(title: "Main Menu", options: ArcanusController.MainMenuOption.allAsStrings)]
         switch option {
         case .playAgent: break
         case .startServer:
