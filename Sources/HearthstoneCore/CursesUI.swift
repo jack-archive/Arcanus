@@ -32,7 +32,7 @@ public class HearthstoneCursesUI : HearthstoneUI {
         log.debug("Has Color: \(has_colors())")
         
         init_pair(0, Int16(COLOR_WHITE), Int16(COLOR_BLUE))
-        bkgd(UInt32(COLOR_PAIR(0)))
+        bkgd(chtype(COLOR_PAIR(0)))
         //refresh()
         //wrefresh(stdscr)
     }
@@ -70,7 +70,7 @@ public class HearthstoneCursesUI : HearthstoneUI {
         init_pair(2, Int16(COLOR_BLACK), Int16(COLOR_WHITE))
         init_pair(3, Int16(COLOR_WHITE), Int16(COLOR_RED))
         
-        wbkgd(win, UInt32(COLOR_PAIR(2)))
+        wbkgd(win, chtype(COLOR_PAIR(2)))
         box(win, 0, 0)
         wmove(win, 0, (width / 2) - ((Int32(title.count) + 4) / 2))
         waddstr(win, "|")
@@ -135,7 +135,7 @@ public class HearthstoneCursesUI : HearthstoneUI {
         init_pair(2, Int16(COLOR_BLACK), Int16(COLOR_WHITE))
         init_pair(3, Int16(COLOR_WHITE), Int16(COLOR_RED))
         
-        wbkgd(win, UInt32(COLOR_PAIR(2)))
+        wbkgd(win, chtype(COLOR_PAIR(2)))
         box(win, 0, 0)
         wmove(win, 0, (width / 2) - ((Int32(title.count) + 4) / 2))
         waddstr(win, "|")
@@ -198,7 +198,7 @@ public class HearthstoneCursesUI : HearthstoneUI {
         init_pair(2, Int16(COLOR_BLACK), Int16(COLOR_WHITE))
         init_pair(3, Int16(COLOR_WHITE), Int16(COLOR_RED))
         
-        wbkgd(win, UInt32(COLOR_PAIR(2)))
+        wbkgd(win, chtype(COLOR_PAIR(2)))
         box(win, 0, 0)
         wmove(win, 0, (width / 2) - ((Int32(title.count) + 4) / 2))
         waddstr(win, "|")
