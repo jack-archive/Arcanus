@@ -22,7 +22,8 @@ let package = Package(
         .package(url: "https://github.com/ClibSwift/ncurses.git", .branch("master")),
         .package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", from: "17.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.2.0"),
-        .package(url: "https://github.com/onevcat/Rainbow", from: "3.0.0")
+        .package(url: "https://github.com/onevcat/Rainbow", from: "3.0.0"),
+        .package(url: "https://github.com/PerfectlySoft/Perfect.git", from: "3.1.1")
         
         /*
         
@@ -34,7 +35,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "Hearthstone", dependencies: [ "HearthstoneCore", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit" ]),
+        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "Perfect" ]),
         //.target(name: "CardFileGenerator", dependencies: [ "SwiftyJSON", "CommandLine" ])
     ],
     swiftLanguageVersions: [4]
