@@ -10,6 +10,7 @@ import SwiftyBeaver
 import Arcanus
 import cncurses
 import SwiftyJSON
+import PerfectLib
 
 // MARK: Commmand Line Parsing
 
@@ -57,6 +58,7 @@ Arcanus.DEBUG {
 
     // try! fileManager.removeItem(atPath: "\(logDirectory)/last")
     ArcanusController.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
+    ArcanusController.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
 
     let COLOR_RED = "\u{001b}[31;1m"
     let COLOR_RESET = "\u{001b}[0m"
@@ -74,8 +76,6 @@ Arcanus.DEBUG {
             fatalError("Couldn't Create Logs Directory at ./\(logDirectory)")
         }
     }
-
-    ArcanusController.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
 }
 
 if logPath != nil {
@@ -83,9 +83,12 @@ if logPath != nil {
 }
 // Arcanus.addConsole(.verbose)
 
+
+
+/*
 let hs = ArcanusController(ui: ArcanusCLI())
 hs.start()
-
+*/
 /*
 let server = try ArcanusGameServer(25565)
 server.startServer()
