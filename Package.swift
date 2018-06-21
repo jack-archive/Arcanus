@@ -34,7 +34,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "Hearthstone", dependencies: [ "HearthstoneCore", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "Perfect" ])
+        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib" ])
     ],
     swiftLanguageVersions: [4]
 )
