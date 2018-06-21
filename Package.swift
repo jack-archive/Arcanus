@@ -15,13 +15,12 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SwiftyBeaver/SwiftyBeaver.git", from: "1.5.2"),
-        // .package(url: "https://github.com/jmmaloney4/CommandLine.git", from: "3.1.1"),
         .package(url: "https://github.com/jatoben/CommandLine.git", .branch("master")),
         .package(url: "https://github.com/evgenyneu/SigmaSwiftStatistics.git", from: "7.0.2"),
         .package(url: "https://github.com/IBM-Swift/BlueSocket.git", from: "1.0.0"),
         .package(url: "https://github.com/ClibSwift/ncurses.git", .branch("master")),
         .package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", from: "17.0.0"),
-        .package(url: "https://github.com/mxcl/PromiseKit.git", from: "6.2.0"),
+        .package(url: "https://github.com/mxcl/PromiseKit.git", from: "6.2.9"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0")
         
         /*
@@ -35,7 +34,6 @@ let package = Package(
     targets: [
         .target(name: "Hearthstone", dependencies: [ "HearthstoneCore", "SwiftyBeaver", "CommandLine"]),
         .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit" ]),
-        //.target(name: "CardFileGenerator", dependencies: [ "SwiftyJSON", "CommandLine" ])
     ],
     swiftLanguageVersions: [4]
 )
