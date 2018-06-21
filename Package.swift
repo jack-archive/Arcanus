@@ -10,8 +10,8 @@ import PackageDescription
 let package = Package(
     name: "Arcanus",
     products: [
-        .library(name: "ArcanusCore", targets: ["ArcanusCore"]),
-        .executable(name: "Arcanus", targets: ["Arcanus"])
+        .library(name: "Arcanus", targets: ["Arcanus"]),
+        .executable(name: "arc", targets: ["CLI"])
     ],
     dependencies: [
         .package(url: "https://github.com/SwiftyBeaver/SwiftyBeaver.git", from: "1.5.2"),
@@ -33,8 +33,8 @@ let package = Package(
         */
     ],
     targets: [
-        .target(name: "Arcanus", dependencies: [ "ArcanusCore", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "ArcanusCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib" ])
+        .target(name: "CLI", dependencies: [ "Arcanus", "SwiftyBeaver", "CommandLine"]),
+        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib" ])
     ],
     swiftLanguageVersions: [4]
 )

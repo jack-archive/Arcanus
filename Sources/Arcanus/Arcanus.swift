@@ -18,7 +18,7 @@ public func DEBUG(_ code: () -> Void) {
     }
 }
 
-public class Arcanus: ArcanusUIController {
+public class ArcanusController: ArcanusUIController {
     // MARK: Static functionality
     public static let console: ConsoleDestination = ConsoleDestination()
     public static var logFiles: [FileDestination] = []
@@ -113,7 +113,7 @@ public class Arcanus: ArcanusUIController {
 }
 
 public protocol ArcanusUIController: class {
-    func mainMenuOptionSelected(_ opt: Arcanus.MainMenuOption)
+    func mainMenuOptionSelected(_ opt: ArcanusController.MainMenuOption)
 }
 
 public protocol ArcanusUI {
@@ -128,7 +128,7 @@ public protocol ArcanusUI {
 }
 
 func namespaceAsString() -> String {
-    return String(reflecting: Arcanus.self).components(separatedBy: ".")[0]
+    return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
 }
 
 public class ArcanusClient {

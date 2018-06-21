@@ -7,7 +7,7 @@
 import Foundation
 import CommandLineKit
 import SwiftyBeaver
-import ArcanusCore
+import Arcanus
 import cncurses
 import SwiftyJSON
 
@@ -46,9 +46,9 @@ let logPath = logPathOption.value // optional
 let cardPath = cardsPathOption.value ?? "cards.json" // default value
 let verbosity = verbosityOption.value
 
-Arcanus.initLog()
+ArcanusController.initLog()
 
-ArcanusCore.DEBUG {
+Arcanus.DEBUG {
     let logDirectory = "./Arcanus Logs"
     
     let fileManager = FileManager.default
@@ -56,7 +56,7 @@ ArcanusCore.DEBUG {
     dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
 
     // try! fileManager.removeItem(atPath: "\(logDirectory)/last")
-    Arcanus.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
+    ArcanusController.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
 
     let COLOR_RED = "\u{001b}[31;1m"
     let COLOR_RESET = "\u{001b}[0m"
@@ -75,15 +75,15 @@ ArcanusCore.DEBUG {
         }
     }
 
-    Arcanus.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
+    ArcanusController.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
 }
 
 if logPath != nil {
-    Arcanus.addLogFile(path: logPath!)
+    ArcanusController.addLogFile(path: logPath!)
 }
 // Arcanus.addConsole(.verbose)
 
-let hs = Arcanus(ui: ArcanusCLI())
+let hs = ArcanusController(ui: ArcanusCLI())
 hs.start()
 
 /*

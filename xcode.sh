@@ -2,4 +2,4 @@
 
 swift package update
 swift package generate-xcodeproj
-open ./Hearthstone.xcodeproj
+open ./Arcanus.xcodeproj

@@ -7,8 +7,11 @@
 import Foundation
 import cncurses
 import Dispatch
-import ArcanusCore
+import Arcanus
 
+// Not maintained rn - a project for another day
+
+/*
 public class ArcanusCursesUI : ArcanusUI {
     let minX: Int32 = 30
     let minY: Int32 = 20
@@ -239,3 +242,4 @@ public class ArcanusCursesUI : ArcanusUI {
         }
     }
 }
+*/
