@@ -8,10 +8,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "Hearthstone",
+    name: "Arcanus",
     products: [
-        .library(name: "HearthstoneCore", targets: ["HearthstoneCore"]),
-        .executable(name: "Hearthstone", targets: ["Hearthstone"])
+        .library(name: "ArcanusCore", targets: ["ArcanusCore"]),
+        .executable(name: "Arcanus", targets: ["Arcanus"])
     ],
     dependencies: [
         .package(url: "https://github.com/SwiftyBeaver/SwiftyBeaver.git", from: "1.5.2"),
@@ -33,9 +33,8 @@ let package = Package(
         */
     ],
     targets: [
-        .target(name: "Hearthstone", dependencies: [ "HearthstoneCore", "SwiftyBeaver", "CommandLine"]),
-        .target(name: "HearthstoneCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib" ]),
-        //.target(name: "CardFileGenerator", dependencies: [ "SwiftyJSON", "CommandLine" ])
+        .target(name: "Arcanus", dependencies: [ "ArcanusCore", "SwiftyBeaver", "CommandLine"]),
+        .target(name: "ArcanusCore", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib" ])
     ],
     swiftLanguageVersions: [4]
 )

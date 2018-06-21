@@ -7,7 +7,7 @@
 import Foundation
 import CommandLineKit
 import SwiftyBeaver
-import HearthstoneCore
+import ArcanusCore
 import cncurses
 import SwiftyJSON
 
@@ -46,22 +46,22 @@ let logPath = logPathOption.value // optional
 let cardPath = cardsPathOption.value ?? "cards.json" // default value
 let verbosity = verbosityOption.value
 
-Hearthstone.initLog()
+Arcanus.initLog()
 
-HearthstoneCore.DEBUG {
-    let logDirectory = "./Hearthstone Logs"
+ArcanusCore.DEBUG {
+    let logDirectory = "./Arcanus Logs"
     
     let fileManager = FileManager.default
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
 
     // try! fileManager.removeItem(atPath: "\(logDirectory)/last")
-    Hearthstone.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
+    Arcanus.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
 
     let COLOR_RED = "\u{001b}[31;1m"
     let COLOR_RESET = "\u{001b}[0m"
 
-    /// Use `tail -f Hearthstone\ Logs/last` to watch a constant log of all runs live
+    /// Use `tail -f Arcanus\ Logs/last` to watch a constant log of all runs live
     log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
     log.info("\(COLOR_RED)========================== NEW LOG \(dateFormatter.string(from: Date())) ===========================\(COLOR_RESET)")
     log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
@@ -75,25 +75,25 @@ HearthstoneCore.DEBUG {
         }
     }
 
-    Hearthstone.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
+    Arcanus.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
 }
 
 if logPath != nil {
-    Hearthstone.addLogFile(path: logPath!)
+    Arcanus.addLogFile(path: logPath!)
 }
-// Hearthstone.addConsole(.verbose)
+// Arcanus.addConsole(.verbose)
 
-let hs = Hearthstone(ui: HearthstoneCLI())
+let hs = Arcanus(ui: ArcanusCLI())
 hs.start()
 
 /*
-let server = try HearthstoneGameServer(25565)
+let server = try ArcanusGameServer(25565)
 server.startServer()
 
 sleep(1)
 
-let client1 = try HearthstoneClient()
-let client2 = try HearthstoneClient()
+let client1 = try ArcanusClient()
+let client2 = try ArcanusClient()
 
 try client1.main()
 try client2.main()

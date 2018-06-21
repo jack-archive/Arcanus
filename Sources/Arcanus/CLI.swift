@@ -6,9 +6,10 @@
 
 import Foundation
 import Rainbow
+import ArcanusCore
 
-public class HearthstoneCLI : HearthstoneUI {
-    public var controller: HearthstoneUIController!
+public class ArcanusCLI : ArcanusUI {
+    public var controller: ArcanusUIController!
     
     public init() {}
     
@@ -17,7 +18,7 @@ public class HearthstoneCLI : HearthstoneUI {
     }
     
     public func mainMenu() {
-        let option = Hearthstone.MainMenuOption.all[menu(title: "Main Menu", options: Hearthstone.MainMenuOption.allAsStrings)]
+        let option = Arcanus.MainMenuOption.all[menu(title: "Main Menu", options: Arcanus.MainMenuOption.allAsStrings)]
         switch option {
         case .playAgent: break
         case .startServer:
