@@ -1,6 +1,6 @@
 .build/
 Package.resolved
 .DS_Store
-Hearthstone.xcodeproj/
-Hearthstone\ Logs/
+Arcanus.xcodeproj/
+Arcanus\ Logs/
 cards.json
