@@ -1,0 +1,6 @@
+21:19:26.310 [38;5;38mINFO[0m Arcanus.addLogFile():44 - Logging to file at ./Arcanus Logs/log-20180620-21:19:26
+21:22:00.115 [38;5;38mINFO[0m Arcanus.addLogFile():44 - Logging to file at ./Arcanus Logs/last
+21:22:00.118 [38;5;38mINFO[0m main.Arcanus():65 - [31;1m================================================================================[0m
+21:22:00.119 [38;5;38mINFO[0m main.Arcanus():66 - [31;1m========================== NEW LOG 20180620-21:22:00 ===========================[0m
+21:22:00.119 [38;5;38mINFO[0m main.Arcanus():67 - [31;1m================================================================================[0m
+21:22:00.119 [38;5;38mINFO[0m Arcanus.addLogFile():44 - Logging to file at ./Arcanus Logs/log-20180620-21:22:00

@@ -18,7 +18,7 @@ public func DEBUG(_ code: () -> Void) {
     }
 }
 
-public class Hearthstone: HearthstoneUIController {
+public class Arcanus: ArcanusUIController {
     // MARK: Static functionality
     public static let console: ConsoleDestination = ConsoleDestination()
     public static var logFiles: [FileDestination] = []
@@ -49,12 +49,12 @@ public class Hearthstone: HearthstoneUIController {
     }
     
     // MARK: Instance functionality
-    var ui: HearthstoneUI
+    var ui: ArcanusUI
     var queue: DispatchQueue
     
-    public init(ui: HearthstoneUI) {
+    public init(ui: ArcanusUI) {
         self.ui = ui
-        self.queue = DispatchQueue(label: "Hearthstone Controller Queue")
+        self.queue = DispatchQueue(label: "Arcanus Controller Queue")
         self.ui.controller = self
     }
     
@@ -77,8 +77,8 @@ public class Hearthstone: HearthstoneUIController {
             }
         }
         
-        static let all: [MainMenuOption] = [.playAgent, .startServer(0), .joinServer(nil, 0), .simulate, .collection, .options]
-        static var allAsStrings: [String] { return all.map({ return $0.description }) }
+        public static let all: [MainMenuOption] = [.playAgent, .startServer(0), .joinServer(nil, 0), .simulate, .collection, .options]
+        public static var allAsStrings: [String] { return all.map({ return $0.description }) }
     }
     
     public func start() {
@@ -92,16 +92,16 @@ public class Hearthstone: HearthstoneUIController {
             switch opt {
             case .playAgent: break
             case .startServer(let port):
-                guard let server = try? HearthstoneGameServer(port) else {
+                guard let server = try? ArcanusGameServer(port) else {
                     fatalError("Couldn't open Server")
                 }
                 server.startServer()
                 
-                guard let client = try? HearthstoneClient(port: port) else {
+                guard let client = try? ArcanusClient(port: port) else {
                     fatalError("Couldn't connect client")
                 }
             case .joinServer(let host, let port):
-                guard let client = try? HearthstoneClient(port: port) else {
+                guard let client = try? ArcanusClient(port: port) else {
                     fatalError("Couldn't connect client")
                 }
             case .simulate: break
@@ -112,13 +112,13 @@ public class Hearthstone: HearthstoneUIController {
     }
 }
 
-public protocol HearthstoneUIController: class {
-    func mainMenuOptionSelected(_ opt: Hearthstone.MainMenuOption)
+public protocol ArcanusUIController: class {
+    func mainMenuOptionSelected(_ opt: Arcanus.MainMenuOption)
 }
 
-public protocol HearthstoneUI {
+public protocol ArcanusUI {
     // Should be Weak!
-    var controller: HearthstoneUIController! { get set }
+    var controller: ArcanusUIController! { get set }
     
     
     
@@ -128,16 +128,16 @@ public protocol HearthstoneUI {
 }
 
 func namespaceAsString() -> String {
-    return String(reflecting: Hearthstone.self).components(separatedBy: ".")[0]
+    return String(reflecting: Arcanus.self).components(separatedBy: ".")[0]
 }
 
-public class HearthstoneClient {
+public class ArcanusClient {
     var socket: Socket
     var queue: DispatchQueue
     
     public init(server: String = "127.0.0.1", port: Int) throws {
         try self.socket = Socket.create()
-        self.queue = DispatchQueue(label: "Hearthstone Client")
+        self.queue = DispatchQueue(label: "Arcanus Client")
         
         log.debug("Connecting to Server @ \(server) on port \(port)")
         try self.socket.connect(to: server, port: Int32(port))
@@ -159,7 +159,7 @@ public class HearthstoneClient {
     }
 }
 
-public class HearthstoneGameServer {
+public class ArcanusGameServer {
     var port: Int
     var socket: Socket
     var sockets: [Socket] = []
@@ -186,7 +186,7 @@ public class HearthstoneGameServer {
         self.port = port
         
         try socket = Socket.create()
-        queue = DispatchQueue(label: "Hearthstone Server")
+        queue = DispatchQueue(label: "Arcanus Server")
         game = Game()
     }
     

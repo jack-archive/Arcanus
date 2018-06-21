@@ -7,15 +7,16 @@
 import Foundation
 import cncurses
 import Dispatch
+import ArcanusCore
 
-public class HearthstoneCursesUI : HearthstoneUI {
+public class ArcanusCursesUI : ArcanusUI {
     let minX: Int32 = 30
     let minY: Int32 = 20
     
     var screenWidth: Int32 = 0
     var screenHeight: Int32 = 0
     
-    public weak var controller: HearthstoneUIController!
+    public weak var controller: ArcanusUIController!
     
     public init() {}
     
