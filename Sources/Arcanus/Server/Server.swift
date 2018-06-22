@@ -41,6 +41,8 @@ public class GameServer {
         
         var routes = Routes()
         routes.add(method: .get, uri: "/games", handler: getGames)
+        routes.add(method: .post, uri: "/games", handler: createGame)
+        routes.add(method: .get, uri: "/games/{id}/", handler: getGameInfo)
         
         server.serverPort = 8181
         server.addRoutes(routes)
@@ -62,12 +64,36 @@ public class GameServer {
     }
     
     func createGame(req: HTTPRequest, res: HTTPResponse) {
-        print(req.postBodyString!)
+        do {
+            let game = Game()
+            game.state = .waitingForPlayers
+            log.info("Created game")
+            res.appendBody(string: try ["id": games.count].jsonEncodedString())
+            games.append(game)
+            res.completed()
+        } catch {
+            
+        }
+    }
+    
+    func getGameInfo(req: HTTPRequest, res: HTTPResponse) {
+        guard let id = req.urlVariables["id"]?.toInt() else {
+            log.warning("Bad ID")
+            res.completed(status: .notFound)
+            return
+        }
+        log.info("id: \(id)")
+        do {
+            res.appendBody(string: try ["state": games[id].state].jsonEncodedString())
+            res.completed()
+        } catch {
+            fatalError()
+        }
     }
 }
 
 public class Game {
-    public enum State: CustomStringConvertible {
+    public enum State: CustomStringConvertible, JSONConvertible {
         case waitingForPlayers
         case running
         case finished
@@ -79,7 +105,11 @@ public class Game {
             case .finished: return "Finished"
             }
         }
+        
+        public func jsonEncodedString() throws -> String {
+            return self.description
+        }
     }
     
-    var state: State = .waitingForPlayers
+    var state: State = .finished
 }
