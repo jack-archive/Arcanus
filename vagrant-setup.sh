@@ -8,7 +8,9 @@ echo 'export SWIFTENV_ROOT="$HOME/.swiftenv"' >> ~/.bashrc
 echo 'export PATH="$SWIFTENV_ROOT/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(swiftenv init -)"' >> ~/.bashrc
 
-source ~/.bashrc
+export SWIFTENV_ROOT="$HOME/.swiftenv"
+export PATH="$SWIFTENV_ROOT/bin:$PATH"
+eval "$(swiftenv init -)"
 
 swiftenv install 4.1.2
 
