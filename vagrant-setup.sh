@@ -19,3 +19,5 @@ swiftenv install 4.1.2
 git clone https://github.com/jmmaloney4/Arcanus.git
 cd Arcanus
 swift build
+
+echo "Run 'source ~/.bashrc' to get access to swift"
