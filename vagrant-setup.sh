@@ -12,6 +12,8 @@ export SWIFTENV_ROOT="$HOME/.swiftenv"
 export PATH="$SWIFTENV_ROOT/bin:$PATH"
 eval "$(swiftenv init -)"
 
+source ~/.bashrc
+
 swiftenv install 4.1.2
 
 git clone https://github.com/jmmaloney4/Arcanus.git
