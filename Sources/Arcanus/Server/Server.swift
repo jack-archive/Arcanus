@@ -8,6 +8,8 @@ import PerfectHTTP
 import PerfectHTTPServer
 import Dispatch
 import PerfectLib
+import SQLiteStORM
+import PerfectTurnstileSQLite
 
 let apiRoutes = Route(method: .get, uri: "/ping", handler: {
     request, response in
@@ -19,41 +21,48 @@ let apiRoutes = Route(method: .get, uri: "/ping", handler: {
 public func ServerMain() {
     log.warning("*** Starting Server ***")
     do {
-        GameServer.shared.start()
+        try GameServer.shared.start()
     } catch {
         fatalError()
     }
 }
 
 public class GameServer {
- 
+    
     // Singleton, lazy
     public static var shared = GameServer()
     
+    var server: HTTPServer = HTTPServer()
     var queue: DispatchQueue
-    var games: [Game] = []
+    var games: [Game] = [Game(), Game()]
     
     init() {
         queue = DispatchQueue(label: "Arcanus Game Server")
         
         var routes = Routes()
-        routes.add(method: .get, uri: "/games/", handler: getGames)
+        routes.add(method: .get, uri: "/games", handler: getGames)
         
+        server.serverPort = 8181
+        server.addRoutes(routes)
+    }
+    
+    func start() throws {
+        try server.start()
+    }
+    
+    func getGames(req: HTTPRequest, res: HTTPResponse) {
         do {
-            try HTTPServer.launch(.server(name: "Arcanus", port: 8181, routes: [apiRoutes]))
-            log.info("Launched")
+            res.setHeader(.contentType, value: "application/json")
+            let json = try games.map({ $0.state.description }).jsonEncodedString()
+            res.appendBody(string: json)
+            res.completed()
         } catch {
-            
+            fatalError()
         }
     }
     
-    func start() {
-        
-    }
-    
-    func getGames(req: HTTPRequest, res: HTTPResponse)  {
-        var json = "[\(games.map({ $0.state.description }).joined(separator: ", "))]"
-        res.appendBody(string: json)
+    func createGame(req: HTTPRequest, res: HTTPResponse) {
+        print(req.postBodyString!)
     }
 }
 
