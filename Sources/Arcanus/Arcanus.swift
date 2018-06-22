@@ -8,6 +8,7 @@ import Foundation
 import SwiftyBeaver
 import Socket
 import SwiftyJSON
+import PerfectLogger
 
 public let log = SwiftyBeaver.self
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
@@ -16,6 +17,12 @@ public func DEBUG(_ code: () -> Void) {
     if _isDebugAssertConfiguration() {
         code()
     }
+}
+
+public class Log {
+    
+    
+    
 }
 
 public class ArcanusController: ArcanusUIController {
@@ -150,7 +157,7 @@ public class ArcanusClient {
             do {
                 while true {
                     let str = try self.socket.readString()
-                    log.debug(str)
+                    log.debug(str!)
                 }
             } catch {
                 fatalError()
@@ -235,6 +242,3 @@ public class ArcanusGameServer {
     
 }
 
-public class Game {
-    
-}

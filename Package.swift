@@ -23,8 +23,10 @@ let package = Package(
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.2.9"),
         .package(url: "https://github.com/onevcat/Rainbow", from: "3.0.0"),
         
-        .package(url: "https://github.com/PerfectlySoft/PerfectLib.git", from: "3.1.1"),
-        .package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", from: "3.0.0")
+        .package(url: "https://github.com/PerfectlySoft/PerfectLib.git", from: "3.0.0"),
+        .package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", from: "3.0.0"),
+        .package(url: "https://github.com/SwiftORM/SQLite-StORM.git", from: "3.0.0"),
+        .package(url: "https://github.com/PerfectlySoft/Perfect-Logger.git", from :"3.0.0"),
         
         /*
         
@@ -35,7 +37,7 @@ let package = Package(
         */
     ],
     targets: [
-        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectHTTPServer" ]),
+        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib", "PerfectHTTPServer", "PerfectLogger", "SQLiteStORM" ]),
         .target(name: "CLI", dependencies: [ "Arcanus", "SwiftyBeaver", "CommandLine"]),
     ],
     swiftLanguageVersions: [4]
