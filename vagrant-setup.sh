@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sudo apt-get update
 sudo apt-get install git clang libncurses-dev  libcurl4-openssl-dev openssl libssl-dev uuid-dev
 
 git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
