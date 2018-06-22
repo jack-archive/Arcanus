@@ -1,3 +1,14 @@
 #!/bin/bash
 
-sudo apt-get install clang openssl libssl-dev uuid-dev
+sudo apt-get install git clang openssl libssl-dev uuid-dev
+
+git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
+echo 'export SWIFTENV_ROOT="$HOME/.swiftenv"' >> ~/.bashrc
+echo 'export PATH="$SWIFTENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(swiftenv init -)"' >> ~/.bashrc
+
+swiftenv install 4.1.2
+
+git clone https://github.com/jmmaloney4/Arcanus.git
+cd Arcanus
+swift build
