@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install git clang openssl libssl-dev uuid-dev
+sudo apt-get install git clang libncurses-dev  libcurl4-openssl-dev openssl libssl-dev uuid-dev
 
 git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
 echo 'export SWIFTENV_ROOT="$HOME/.swiftenv"' >> ~/.bashrc
