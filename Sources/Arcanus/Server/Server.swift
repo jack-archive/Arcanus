@@ -8,8 +8,14 @@ import PerfectHTTP
 import PerfectHTTPServer
 import Dispatch
 import PerfectLib
-import SQLiteStORM
-import PerfectTurnstileSQLite
+import PerfectSession
+import PerfectSessionPostgreSQL
+import PerfectCrypto
+import PerfectLocalAuthentication
+import PerfectLib
+import StORM
+import PostgresStORM
+import JSONConfig
 
 let apiRoutes = Route(method: .get, uri: "/ping", handler: {
     request, response in
@@ -35,8 +41,10 @@ public class GameServer {
     var server: HTTPServer = HTTPServer()
     var queue: DispatchQueue
     var games: [Game] = [Game(), Game()]
+    let sessionDriver = SessionPostgresDriver()
     
     init() {
+        let _ = PerfectCrypto.isInitialized
         queue = DispatchQueue(label: "Arcanus Game Server")
         
         var routes = Routes()
@@ -44,12 +52,55 @@ public class GameServer {
         routes.add(method: .post, uri: "/games", handler: createGame)
         routes.add(method: .get, uri: "/games/{id}/", handler: getGameInfo)
         
-        server.serverPort = 8181
-        server.addRoutes(routes)
+        // Configuration of Session
+        SessionConfig.name = "perfectSession" // <-- change
+        SessionConfig.idle = 86400
+        SessionConfig.cookieDomain = "localhost" //<-- change
+        SessionConfig.IPAddressLock = false
+        SessionConfig.userAgentLock = false
+        SessionConfig.CSRF.checkState = true
+        SessionConfig.CORS.enabled = true
+        SessionConfig.cookieSameSite = .lax
+        
+        var httpPort = 8181
+        var baseURL = ""
+        
+        PostgresConnector.host        = "localhost"
+        PostgresConnector.username    = "perfect"
+        PostgresConnector.password    = "perfect"
+        PostgresConnector.database    = "perfect_testing"
+        PostgresConnector.port        = 5432
+        
+        
+        // Login
+        do {
+            var confData: [String:[[String:Any]]] = [
+                "servers": [
+                    [
+                        "name":"localhost",
+                        "port":8181,
+                        "routes":[],
+                        "filters":[]
+                    ]
+                ]
+            ]
+            
+            // Load Filters
+            confData["servers"]?[0]["filters"] = filters()
+            
+            // Load Routes
+            confData["servers"]?[0]["routes"] = mainRoutes()
+            
+            try HTTPServer.launch(configurationData: confData)
+        } catch {
+            fatalError()
+        }
+        // server.serverPort = 8181
+        // server.addRoutes(routes)
     }
     
     func start() throws {
-        try server.start()
+        //try server.start()
     }
     
     func getGames(req: HTTPRequest, res: HTTPResponse) {
@@ -77,7 +128,7 @@ public class GameServer {
     }
     
     func getGameInfo(req: HTTPRequest, res: HTTPResponse) {
-        guard let id = req.urlVariables["id"]?.toInt() else {
+        guard let str = req.urlVariables["id"], let id = Int(str) else {
             log.warning("Bad ID")
             res.completed(status: .notFound)
             return
