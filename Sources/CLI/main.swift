@@ -83,6 +83,8 @@ if logPath != nil {
     ArcanusController.addLogFile(path: logPath!)
 }
 
+ArcanusController.addConsole(.verbose)
+
 if serverOption.value {
     log.info("Server-Side")
     Arcanus.ServerMain()
@@ -90,7 +92,7 @@ if serverOption.value {
     log.info("Client-Side")
 }
 
-// Arcanus.addConsole(.verbose)
+
 
 /*
 let hs = ArcanusController(ui: ArcanusCLI())

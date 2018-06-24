@@ -41,66 +41,21 @@ public class GameServer {
     var server: HTTPServer = HTTPServer()
     var queue: DispatchQueue
     var games: [Game] = [Game(), Game()]
-    let sessionDriver = SessionPostgresDriver()
     
     init() {
-        let _ = PerfectCrypto.isInitialized
         queue = DispatchQueue(label: "Arcanus Game Server")
         
         var routes = Routes()
         routes.add(method: .get, uri: "/games", handler: getGames)
         routes.add(method: .post, uri: "/games", handler: createGame)
-        routes.add(method: .get, uri: "/games/{id}/", handler: getGameInfo)
+        routes.add(method: .get, uri: "/games/{id}", handler: getGameInfo)
         
-        // Configuration of Session
-        SessionConfig.name = "perfectSession" // <-- change
-        SessionConfig.idle = 86400
-        SessionConfig.cookieDomain = "localhost" //<-- change
-        SessionConfig.IPAddressLock = false
-        SessionConfig.userAgentLock = false
-        SessionConfig.CSRF.checkState = true
-        SessionConfig.CORS.enabled = true
-        SessionConfig.cookieSameSite = .lax
-        
-        var httpPort = 8181
-        var baseURL = ""
-        
-        PostgresConnector.host        = "localhost"
-        PostgresConnector.username    = "perfect"
-        PostgresConnector.password    = "perfect"
-        PostgresConnector.database    = "perfect_testing"
-        PostgresConnector.port        = 5432
-        
-        
-        // Login
-        do {
-            var confData: [String:[[String:Any]]] = [
-                "servers": [
-                    [
-                        "name":"localhost",
-                        "port":8181,
-                        "routes":[],
-                        "filters":[]
-                    ]
-                ]
-            ]
-            
-            // Load Filters
-            confData["servers"]?[0]["filters"] = filters()
-            
-            // Load Routes
-            confData["servers"]?[0]["routes"] = mainRoutes()
-            
-            try HTTPServer.launch(configurationData: confData)
-        } catch {
-            fatalError()
-        }
-        // server.serverPort = 8181
-        // server.addRoutes(routes)
+        server.serverPort = 8181
+        server.addRoutes(routes)
     }
     
     func start() throws {
-        //try server.start()
+        try server.start()
     }
     
     func getGames(req: HTTPRequest, res: HTTPResponse) {
@@ -116,6 +71,9 @@ public class GameServer {
     
     func createGame(req: HTTPRequest, res: HTTPResponse) {
         do {
+            let username = req.headers.filter({ $0.0 == HTTPRequestHeader.Name.authorization })[0].1
+            log.info("user: \(username)")
+            
             let game = Game()
             game.state = .waitingForPlayers
             log.info("Created game")
@@ -140,6 +98,36 @@ public class GameServer {
         } catch {
             fatalError()
         }
+    }
+}
+
+public class Player {
+    static var index: [String:Player] = [:]
+    
+    var username: String
+    weak var game: Game?
+    
+    private init(username: String) { self.username = username }
+    
+    public static func forUsername(_ username: String) -> Player? {
+        return index[username]
+    }
+    
+    public static func registerUsername(_ username: String) -> Player? {
+        if index[username] != nil {
+            return nil
+        }
+        let player = Player(username: username)
+        index[username] = player
+        return player
+    }
+    
+    func joinGame(_ game: Game) -> Bool {
+        if self.game == nil {
+            self.game = game
+            return true
+        }
+        return false
     }
 }
 
