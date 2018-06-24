@@ -16,6 +16,7 @@ import PerfectLib
 import StORM
 import PostgresStORM
 import JSONConfig
+import Foundation
 
 let apiRoutes = Route(method: .get, uri: "/ping", handler: {
     request, response in
@@ -49,6 +50,7 @@ public class GameServer {
         routes.add(method: .get, uri: "/games", handler: getGames)
         routes.add(method: .post, uri: "/games", handler: createGame)
         routes.add(method: .get, uri: "/games/{id}", handler: getGameInfo)
+        routes.add(method: .post, uri: "/register", handler: register)
         
         server.serverPort = 8181
         server.addRoutes(routes)
@@ -56,6 +58,21 @@ public class GameServer {
     
     func start() throws {
         try server.start()
+    }
+    
+    func register(req: HTTPRequest, res: HTTPResponse) {
+        if req.postBodyString == nil {
+            res.completed(status: .badRequest)
+        }
+        if Player.forUsername(req.postBodyString!) != nil {
+            res.completed(status: .custom(code: 422, message: "Unprocessable Entity"))
+        }
+        if Player.registerUsername(req.postBodyString!) != nil {
+            log.info("Registered: \(req.postBodyString!)")
+            res.completed()
+        } else {
+            res.completed(status: .custom(code: 422, message: "Unprocessable Entity"))
+        }
     }
     
     func getGames(req: HTTPRequest, res: HTTPResponse) {
@@ -150,5 +167,9 @@ public class Game {
         }
     }
     
-    var state: State = .finished
+    var state: State = .waitingForPlayers
+    var index: Int = 0
+    var timeCreated: Date = Date()
+    
+    
 }
