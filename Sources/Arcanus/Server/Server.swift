@@ -41,7 +41,7 @@ public class GameServer {
     
     var server: HTTPServer = HTTPServer()
     var queue: DispatchQueue
-    var games: [Game] = [Game(), Game()]
+    var games: [Game] = []
     
     init() {
         queue = DispatchQueue(label: "Arcanus Game Server")
@@ -62,16 +62,16 @@ public class GameServer {
     
     func register(req: HTTPRequest, res: HTTPResponse) {
         if req.postBodyString == nil {
-            res.completed(status: .badRequest)
+            ArcanusError.jsonError.setError(res)
         }
-        if Player.forUsername(req.postBodyString!) != nil {
-            res.completed(status: .custom(code: 422, message: "Unprocessable Entity"))
+        if User.forUsername(req.postBodyString!) != nil {
+            ArcanusError.usernameInUse.setError(res)
         }
-        if Player.registerUsername(req.postBodyString!) != nil {
+        if User.registerUsername(req.postBodyString!) != nil {
             log.info("Registered: \(req.postBodyString!)")
             res.completed()
         } else {
-            res.completed(status: .custom(code: 422, message: "Unprocessable Entity"))
+            ArcanusError.unknownError.setError(res)
         }
     }
     
@@ -82,19 +82,24 @@ public class GameServer {
             res.appendBody(string: json)
             res.completed()
         } catch {
-            fatalError()
+            ArcanusError.unknownError.setError(res)
         }
     }
     
     func createGame(req: HTTPRequest, res: HTTPResponse) {
         do {
             let username = req.headers.filter({ $0.0 == HTTPRequestHeader.Name.authorization })[0].1
-            log.info("user: \(username)")
             
-            let game = Game()
+            guard let user = User.forUsername(username) else {
+                ArcanusError.unregisteredUsername.setError(res)
+                return
+            }
+            log.info("user: \(user.username)")
+            
+            let game = Game(user1: user, index: games.count)
             game.state = .waitingForPlayers
             log.info("Created game")
-            res.appendBody(string: try ["id": games.count].jsonEncodedString())
+            res.appendBody(string: try ["id": game.index].jsonEncodedString())
             games.append(game)
             res.completed()
         } catch {
@@ -104,12 +109,15 @@ public class GameServer {
     
     func getGameInfo(req: HTTPRequest, res: HTTPResponse) {
         guard let str = req.urlVariables["id"], let id = Int(str) else {
-            log.warning("Bad ID")
-            res.completed(status: .notFound)
+            log.warning("Bad ID / Request")
+            ArcanusError.jsonError.setError(res)
             return
         }
         log.info("id: \(id)")
         do {
+            if id < 0 || id >= games.count {
+                ArcanusError.gameNotFound.setError(res, info: ["id": id])
+            }
             res.appendBody(string: try ["state": games[id].state].jsonEncodedString())
             res.completed()
         } catch {
@@ -118,23 +126,24 @@ public class GameServer {
     }
 }
 
-public class Player {
-    static var index: [String:Player] = [:]
+// User ID / Auth, Player stores game related data
+public class User {
+    static var index: [String:User] = [:]
     
     var username: String
     weak var game: Game?
     
     private init(username: String) { self.username = username }
     
-    public static func forUsername(_ username: String) -> Player? {
+    public static func forUsername(_ username: String) -> User? {
         return index[username]
     }
     
-    public static func registerUsername(_ username: String) -> Player? {
+    public static func registerUsername(_ username: String) -> User? {
         if index[username] != nil {
             return nil
         }
-        let player = Player(username: username)
+        let player = User(username: username)
         index[username] = player
         return player
     }
@@ -167,9 +176,15 @@ public class Game {
         }
     }
     
-    var state: State = .waitingForPlayers
-    var index: Int = 0
-    var timeCreated: Date = Date()
+    init(user1: User, index: Int) {
+        self.users = [user1]
+        self.index = index
+        self.timeCreated = Date()
+    }
     
+    var state: State = .waitingForPlayers
+    var index: Int
+    var timeCreated: Date
+    var users: [User]
     
 }

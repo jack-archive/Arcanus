@@ -13,12 +13,6 @@ import PerfectLogger
 public let log = SwiftyBeaver.self
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
 
-public func DEBUG(_ code: () -> Void) {
-    if _isDebugAssertConfiguration() {
-        code()
-    }
-}
-
 public class Log {
     
     
@@ -54,7 +48,7 @@ public class ArcanusController: ArcanusUIController {
     public enum Error: Swift.Error {
         case badJSON
     }
-    
+    /*
     // MARK: Instance functionality
     var ui: ArcanusUI
     var queue: DispatchQueue
@@ -117,10 +111,11 @@ public class ArcanusController: ArcanusUIController {
             }
         }
     }
+ */
 }
 
 public protocol ArcanusUIController: class {
-    func mainMenuOptionSelected(_ opt: ArcanusController.MainMenuOption)
+    // func mainMenuOptionSelected(_ opt: ArcanusController.MainMenuOption)
 }
 
 public protocol ArcanusUI {
@@ -128,16 +123,14 @@ public protocol ArcanusUI {
     var controller: ArcanusUIController! { get set }
     
     
-    
+    /*
     func initUI()
     func mainMenu()
     func endUI()
+ */
 }
 
-func namespaceAsString() -> String {
-    return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
-}
-
+/*
 public class ArcanusClient {
     var socket: Socket
     var queue: DispatchQueue
@@ -165,7 +158,8 @@ public class ArcanusClient {
         }
     }
 }
-
+*/
+/*
 public class ArcanusGameServer {
     var port: Int
     var socket: Socket
@@ -194,7 +188,6 @@ public class ArcanusGameServer {
         
         try socket = Socket.create()
         queue = DispatchQueue(label: "Arcanus Server")
-        game = Game()
     }
     
     public func startServer() {
@@ -241,4 +234,4 @@ public class ArcanusGameServer {
     
     
 }
-
+*/

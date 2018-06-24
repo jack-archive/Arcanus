@@ -16,7 +16,7 @@ public class ArcanusCLI : ArcanusUI {
     public func initUI() {
         
     }
-    
+    /*
     public func mainMenu() {
         let option = ArcanusController.MainMenuOption.all[menu(title: "Main Menu", options: ArcanusController.MainMenuOption.allAsStrings)]
         switch option {
@@ -37,6 +37,7 @@ public class ArcanusCLI : ArcanusUI {
         }
         
     }
+ */
     
     public func endUI() {
         
