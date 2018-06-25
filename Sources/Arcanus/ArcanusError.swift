@@ -10,14 +10,14 @@ import PerfectHTTP
 public enum ArcanusError: Int, Error {
     case unknownError = 99
     case jsonError = 100
-    
+
     case unregisteredUsername
     case usernameInUse
-    
+
     case gameNotFound
     case alreadyInGame
     case gameNotAvaliable
-    
+
     func statusCode() -> HTTPResponseStatus {
         switch self {
         case .jsonError: return .badRequest
@@ -29,8 +29,9 @@ public enum ArcanusError: Int, Error {
         case .gameNotAvaliable: return .custom(code: 422, message: "Unprocessable Entity")
         }
     }
-    
-    func setError(_ res: HTTPResponse, info: [String: Any] = [:], status: HTTPResponseStatus? = nil, complete: Bool = true) {
+
+    func setError(_ res: HTTPResponse, info: [String: Any] = [:],
+                  status: HTTPResponseStatus? = nil, complete: Bool = true) {
         let dict: [String: Any] = ["error": self.rawValue, "info": info]
         if let str = try? dict.jsonEncodedString() {
             res.appendBody(string: str)

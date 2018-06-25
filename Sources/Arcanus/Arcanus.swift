@@ -14,27 +14,25 @@ public let log = SwiftyBeaver.self
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
 
 public class Log {
-    
-    
-    
+
 }
 
 public class ArcanusController: ArcanusUIController {
     // MARK: Static functionality
     public static let console: ConsoleDestination = ConsoleDestination()
     public static var logFiles: [FileDestination] = []
-    
+
     public class func initLog() {
-        
+
     }
-    
+
     public class func addConsole(_ level: SwiftyBeaver.Level = .info) {
         console.asynchronously = false
         console.minLevel = level
         log.addDestination(console)
         log.info("Logging to Console")
     }
-    
+
     public class func addLogFile(path: String, minLevel: SwiftyBeaver.Level = .verbose) {
         let dest = FileDestination()
         dest.asynchronously = false
@@ -44,7 +42,7 @@ public class ArcanusController: ArcanusUIController {
         log.addDestination(dest)
         log.info("Logging to file at \(path)")
     }
-    
+
     public enum Error: Swift.Error {
         case badJSON
     }
@@ -78,7 +76,8 @@ public class ArcanusController: ArcanusUIController {
             }
         }
         
-        public static let all: [MainMenuOption] = [.playAgent, .startServer(0), .joinServer(nil, 0), .simulate, .collection, .options]
+        public static let all: [MainMenuOption] = [.playAgent, .startServer(0),
+                                                    .joinServer(nil, 0), .simulate, .collection, .options]
         public static var allAsStrings: [String] { return all.map({ return $0.description }) }
     }
     
@@ -121,8 +120,7 @@ public protocol ArcanusUIController: class {
 public protocol ArcanusUI {
     // Should be Weak!
     var controller: ArcanusUIController! { get set }
-    
-    
+
     /*
     func initUI()
     func mainMenu()

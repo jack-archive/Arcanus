@@ -19,7 +19,7 @@ func namespaceAsString() -> String {
     return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
 }
 
-func errorWrapper<T>(res: HTTPResponse, _ code: () throws -> T) -> T? {
+func errorWrapper<T>(_ res: HTTPResponse, _ code: () throws -> T) -> T? {
     do {
         let rv = try code()
         return rv

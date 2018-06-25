@@ -8,17 +8,18 @@ import Foundation
 import Rainbow
 import Arcanus
 
-public class ArcanusCLI : ArcanusUI {
+public class ArcanusCLI: ArcanusUI {
     public var controller: ArcanusUIController!
-    
+
     public init() {}
-    
+
     public func initUI() {
-        
+
     }
     /*
     public func mainMenu() {
-        let option = ArcanusController.MainMenuOption.all[menu(title: "Main Menu", options: ArcanusController.MainMenuOption.allAsStrings)]
+        let option = ArcanusController.MainMenuOption.all[menu(title: "Main Menu",
+     options: ArcanusController.MainMenuOption.allAsStrings)]
         switch option {
         case .playAgent: break
         case .startServer:
@@ -38,57 +39,58 @@ public class ArcanusCLI : ArcanusUI {
         
     }
  */
-    
+
     public func endUI() {
-        
+
     }
-    
+
     func boolPrompt(_ prompt: String) -> Bool? {
         while true {
             print(prompt, terminator: "? ")
             print("[y/n]: ".bold, terminator: "")
-            
+
             guard let line = readLine() else {
                 return nil
             }
-            
+
             switch line {
-            case "y", "Y", "yes", "Yes","YES":
+            case "y", "Y", "yes", "Yes", "YES":
                 return true
-            case "n", "N", "no", "No","NO":
+            case "n", "N", "no", "No", "NO":
                 return false
             default:
-                continue;
+                continue
             }
         }
     }
-    
-    func intPrompt(arrow: Bool = true, _ prompt: String, _ range: Range<Int> = Range<Int>(Int.min...Int.max), def: Int? = nil) -> Int {
+
+    func intPrompt(arrow: Bool = true, _ prompt: String,
+                   _ range: Range<Int> = Range<Int>(Int.min...Int.max), def: Int? = nil) -> Int {
         while true {
             if arrow {
                 print("==>".blue, terminator: " ")
             }
-            
+
             print(prompt.bold, terminator: " ")
-            
+
             if def != nil {
                 print("(default: \(def!))", terminator: " ")
             }
-            
+
             log.debug("Range: \(range)")
-            
+
             if range.lowerBound != Int.min && range.upperBound != Int.max {
                 print("[\(range.lowerBound)-\(range.upperBound)]:".bold, terminator: " ")
             }
-            
+
             guard let line = readLine() else {
                 continue
             }
-            
+
             if line == "" && def != nil {
                 return def!
             }
-            
+
             let rv = Int(line)
             if rv == nil || rv! < range.lowerBound || rv! > range.upperBound {
                 continue
@@ -97,41 +99,41 @@ public class ArcanusCLI : ArcanusUI {
             }
         }
     }
-    
+
     func stringPrompt(arrow: Bool = true, _ prompt: String, def: String? = nil) -> String {
         while true {
             if arrow {
                 print("==>".blue, terminator: " ")
             }
-            
+
             print(prompt.bold, terminator: " ")
-            
+
             if def != nil {
                 print("(default: \(def!))", terminator: "")
             }
             print(":".bold, terminator: "")
-            
+
             guard let line = readLine() else {
                 continue
             }
-            
+
             if line == "" && def != nil {
                 return def!
             }
-            
+
             return line
         }
     }
-    
+
     func menu(title: String? = nil, _ options: String...) -> Int {
         return menu(title: title, options: options)
     }
-    
+
     func menu(title: String? = nil, options: [String]) -> Int {
         if title != nil {
             print("==> ".blue + title!.bold)
         }
-        
+
         for (i, opt) in options.enumerated() {
             print("\(i) ".bold + opt)
         }
@@ -140,7 +142,7 @@ public class ArcanusCLI : ArcanusUI {
             guard let line = readLine() else {
                 continue
             }
-            
+
             let rv = Int(line)
             if rv == nil || rv! < 0 || rv! > options.count - 1 {
                 continue
@@ -149,5 +151,5 @@ public class ArcanusCLI : ArcanusUI {
             }
         }
     }
-    
+
 }

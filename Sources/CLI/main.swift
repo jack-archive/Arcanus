@@ -19,6 +19,7 @@ let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 
 let cli = CommandLineKit.CommandLine()
 
+// swiftlint:disable line_length
 let serverOption = BoolOption(shortFlag: "s", longFlag: "server", helpMessage: "Start a server.")
 
 let logPathOption = StringOption(shortFlag: "l", longFlag: "log", required: false,
@@ -29,6 +30,7 @@ let helpOption = BoolOption(shortFlag: "h", longFlag: "help",
                             helpMessage: "Prints a help message.")
 let verbosityOption = CounterOption(shortFlag: "v", longFlag: "verbose",
                                     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
+// swiftlint:enable line_length
 
 cli.addOptions(serverOption, logPathOption, cardsPathOption, helpOption, verbosityOption)
 
@@ -52,7 +54,7 @@ ArcanusController.initLog()
 
 Arcanus.DEBUG {
     let logDirectory = "./Arcanus Logs"
-    
+
     let fileManager = FileManager.default
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
@@ -61,19 +63,22 @@ Arcanus.DEBUG {
     ArcanusController.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
     ArcanusController.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
 
+    // swiftlint:disable identifier_name
     let COLOR_RED = "\u{001b}[31;1m"
     let COLOR_RESET = "\u{001b}[0m"
+    // swiftlint:enable identifier_name
 
-    /// Use `tail -f Arcanus\ Logs/last` to watch a constant log of all runs live
+    // swiftlint:disable line_length
+    // Use `tail -f Arcanus\ Logs/last` to watch a constant log of all runs live
     log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
     log.info("\(COLOR_RED)========================== NEW LOG \(dateFormatter.string(from: Date())) ===========================\(COLOR_RESET)")
     log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
-    
+    // swiftlint:enable line_length
+
     if !fileManager.fileExists(atPath: logDirectory, isDirectory: nil) {
         do {
             try fileManager.createDirectory(atPath: logDirectory, withIntermediateDirectories: true, attributes: nil)
-        }
-        catch {
+        } catch {
             fatalError("Couldn't Create Logs Directory at ./\(logDirectory)")
         }
     }
@@ -87,12 +92,11 @@ ArcanusController.addConsole(.verbose)
 
 if serverOption.value {
     log.info("Server-Side")
-    Arcanus.ServerMain()
+    Arcanus.serverMain()
 } else {
     log.info("Client-Side")
+    Arcanus.clientMain()
 }
-
-
 
 /*
 let hs = ArcanusController(ui: ArcanusCLI())
@@ -112,4 +116,3 @@ try client2.main()
 
 sleep(10)
 */
-

@@ -22,13 +22,13 @@ let package = Package(
         .package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", from: "17.0.0"),
         .package(url: "https://github.com/mxcl/PromiseKit", from: "6.2.9"),
         .package(url: "https://github.com/onevcat/Rainbow", from: "3.0.0"),
-        
+
         .package(url: "https://github.com/PerfectlySoft/PerfectLib.git", from: "3.0.0"),
         .package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", from: "3.0.0"),
         .package(url: "https://github.com/SwiftORM/Postgres-Storm.git", from: "3.0.0"),
         .package(url: "https://github.com/PerfectlySoft/Perfect-Logger.git", from :"3.0.0"),
         .package(url: "https://github.com/PerfectlySoft/Perfect-LocalAuthentication-PostgreSQL.git", from: "3.0.0")
-        
+
         /*
         
         .package(url: "https://github.com/jmmaloney4/Squall.git", from: "1.2.3"),
@@ -38,9 +38,11 @@ let package = Package(
         */
     ],
     targets: [
-        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket", "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib", "PerfectHTTPServer", "PerfectLogger", "Perfect-LocalAuthentication-PostgreSQL" ]),
-        .target(name: "CLI", dependencies: [ "Arcanus", "SwiftyBeaver", "CommandLine"]),
+        .target(name: "Arcanus", dependencies: [ "SwiftyBeaver", "SigmaSwiftStatistics", "Socket",
+                                                 "SwiftyJSON", "Rainbow", "PromiseKit", "PerfectLib",
+                                                 "PerfectHTTPServer", "PerfectLogger",
+                                                 "Perfect-LocalAuthentication-PostgreSQL" ]),
+        .target(name: "CLI", dependencies: [ "Arcanus", "SwiftyBeaver", "CommandLine"])
     ],
     swiftLanguageVersions: [4]
 )
-

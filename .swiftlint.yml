@@ -1,2 +1,10 @@
 excluded:
  - .build/
+
+identifier_name:
+  excluded:
+    - i
+    - id
+    - rv
+
+force_try: warning
