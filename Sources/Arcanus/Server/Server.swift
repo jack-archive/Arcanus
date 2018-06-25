@@ -18,26 +18,14 @@ import PostgresStORM
 import JSONConfig
 import Foundation
 
-let apiRoutes = Route(method: .get, uri: "/ping", handler: {
-    request, response in
-    response.setHeader(.contentType, value: "application/json")
-    response.appendBody(string: "{ \"text\": \"Hello, World!\" }")
-    response.completed()
-})
-
 public func ServerMain() {
     log.warning("*** Starting Server ***")
-    do {
-        try GameServer.shared.start()
-    } catch {
-        fatalError()
-    }
+    Server.shared.start()
 }
 
-public class GameServer {
-    
+public class Server {
     // Singleton, lazy
-    public static var shared = GameServer()
+    public static var shared = Server()
     
     var server: HTTPServer = HTTPServer()
     var queue: DispatchQueue
@@ -45,84 +33,27 @@ public class GameServer {
     
     init() {
         queue = DispatchQueue(label: "Arcanus Game Server")
-        
-        var routes = Routes()
-        routes.add(method: .get, uri: "/games", handler: getGames)
-        routes.add(method: .post, uri: "/games", handler: createGame)
-        routes.add(method: .get, uri: "/games/{id}", handler: getGameInfo)
-        routes.add(method: .post, uri: "/register", handler: register)
-        
         server.serverPort = 8181
-        server.addRoutes(routes)
+        server.addRoutes(initRoutes())
     }
     
-    func start() throws {
-        try server.start()
-    }
-    
-    func register(req: HTTPRequest, res: HTTPResponse) {
-        if req.postBodyString == nil {
-            ArcanusError.jsonError.setError(res)
-        }
-        if User.forUsername(req.postBodyString!) != nil {
-            ArcanusError.usernameInUse.setError(res)
-        }
-        if User.registerUsername(req.postBodyString!) != nil {
-            log.info("Registered: \(req.postBodyString!)")
-            res.completed()
-        } else {
-            ArcanusError.unknownError.setError(res)
-        }
-    }
-    
-    func getGames(req: HTTPRequest, res: HTTPResponse) {
+    func start() {
         do {
-            res.setHeader(.contentType, value: "application/json")
-            let json = try games.map({ $0.state.description }).jsonEncodedString()
-            res.appendBody(string: json)
-            res.completed()
-        } catch {
-            ArcanusError.unknownError.setError(res)
-        }
-    }
-    
-    func createGame(req: HTTPRequest, res: HTTPResponse) {
-        do {
-            let username = req.headers.filter({ $0.0 == HTTPRequestHeader.Name.authorization })[0].1
-            
-            guard let user = User.forUsername(username) else {
-                ArcanusError.unregisteredUsername.setError(res)
-                return
-            }
-            log.info("user: \(user.username)")
-            
-            let game = Game(user1: user, index: games.count)
-            game.state = .waitingForPlayers
-            log.info("Created game")
-            res.appendBody(string: try ["id": game.index].jsonEncodedString())
-            games.append(game)
-            res.completed()
-        } catch {
-            
-        }
-    }
-    
-    func getGameInfo(req: HTTPRequest, res: HTTPResponse) {
-        guard let str = req.urlVariables["id"], let id = Int(str) else {
-            log.warning("Bad ID / Request")
-            ArcanusError.jsonError.setError(res)
-            return
-        }
-        log.info("id: \(id)")
-        do {
-            if id < 0 || id >= games.count {
-                ArcanusError.gameNotFound.setError(res, info: ["id": id])
-            }
-            res.appendBody(string: try ["state": games[id].state].jsonEncodedString())
-            res.completed()
+            try self.server.start()
         } catch {
             fatalError()
         }
+    }
+    
+    func gameFromRequest(_ req: HTTPRequest) throws -> Game? {
+        guard let str = req.urlVariables["id"], let id = Int(str) else {
+            log.warning("Bad ID / Request")
+            return nil
+        }
+        if id < 0 || id >= games.count {
+            throw ArcanusError.gameNotFound
+        }
+        return games[id]
     }
 }
 
@@ -148,12 +79,15 @@ public class User {
         return player
     }
     
-    func joinGame(_ game: Game) -> Bool {
-        if self.game == nil {
-            self.game = game
-            return true
+    static func fromRequest(_ req: HTTPRequest) throws -> User {
+        let username = req.headers.filter({ $0.0 == HTTPRequestHeader.Name.authorization })[0].1
+        
+        guard let user = User.forUsername(username) else {
+            throw ArcanusError.unregisteredUsername
         }
-        return false
+        log.info("user: \(user.username)")
+        
+        return user
     }
 }
 
@@ -176,15 +110,28 @@ public class Game {
         }
     }
     
+    var state: State = .waitingForPlayers
+    var index: Int
+    var timeCreated: Date
+    var users: [User]
+    
     init(user1: User, index: Int) {
         self.users = [user1]
         self.index = index
         self.timeCreated = Date()
     }
     
-    var state: State = .waitingForPlayers
-    var index: Int
-    var timeCreated: Date
-    var users: [User]
-    
+    func join(asUser user: User) throws {
+        if user.game != nil {
+            throw ArcanusError.alreadyInGame
+        }
+        if state != .waitingForPlayers || users.count >= 2 {
+            throw ArcanusError.gameNotAvaliable
+        }
+        users.append(user)
+        
+        if users.count == 2 {
+            state = .running
+        }
+    }
 }
