@@ -11,43 +11,40 @@ public class Card {
         return name.replacingOccurrences(of: " ", with: "")
                    .replacingOccurrences(of: "'", with: "")
     }
-    
+
     public static func classForName(_ name: String) -> Card.Type? {
         let readyName = makeNameClassReady(name)
         return NSClassFromString("\(namespaceAsString()).\(readyName)") as? Card.Type
     }
-    
-    public enum Class {
-        case neutral
-        case druid, hunter, mage, paladin, priest, rouge, shaman, warlock, warrior
-        
-        static func fromJSON(_ string: String) -> Class? {
-            switch string {
-            case "NEUTRAL": return .neutral
-            default: return nil
-            }
-        }
+
+    public enum Class: String {
+        case neutral = "NEUTRAL"
+        case druid = "DRUID"
+        case hunter = "HUNTER"
+        case mage = "MAGE"
+        case paladin = "PALADIN"
+        case priest = "PRIEST"
+        case rouge = "ROUGE"
+        case shaman = "SHAMAN"
+        case warlock = "WARLOCK"
+        case warrior = "WARRIOR"
     }
-    
-    public enum CardType {
-        case minion, spell, weapon, enchantment
-        
-        static func fromJSON(_ string: String) -> CardType? {
-            switch string {
-            case "MINION": return .minion
-            case "SPELL": return .spell
-            case "WEAPON": return .weapon
-            case "ENCHANTMENT": return .enchantment
-            default: return nil
-            }
-        }
+
+    public enum CardType: String {
+        case minion = "MINION"
+        case spell = "SPELL"
+        case weapon = "WEAPON"
+        case enchantment = "ENCHANTMENT"
     }
-    
-    public enum Mechanics {
-        case charge, taunt, windfury
-        case battlecry, deathrattle
+
+    public enum Mechanics: String {
+        case charge = "CHARGE"
+        case taunt = "TAUNT"
+        case windfury = "WINDFURY"
+        case battlecry = "BATTLECRY"
+        case deathrattle = "DEATHRATTLE"
     }
-    
+
     var id: String
     var dbfId: Int
     public var name: String

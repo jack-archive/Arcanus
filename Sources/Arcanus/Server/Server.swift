@@ -18,7 +18,7 @@ import PostgresStORM
 import JSONConfig
 import Foundation
 
-public func ServerMain() {
+public func serverMain() {
     log.warning("*** Starting Server ***")
     Server.shared.start()
 }
@@ -26,17 +26,17 @@ public func ServerMain() {
 public class Server {
     // Singleton, lazy
     public static var shared = Server()
-    
+
     var server: HTTPServer = HTTPServer()
     var queue: DispatchQueue
     var games: [Game] = []
-    
+
     init() {
         queue = DispatchQueue(label: "Arcanus Game Server")
         server.serverPort = 8181
         server.addRoutes(initRoutes())
     }
-    
+
     func start() {
         do {
             try self.server.start()
@@ -44,7 +44,7 @@ public class Server {
             fatalError()
         }
     }
-    
+
     func gameFromRequest(_ req: HTTPRequest) throws -> Game? {
         guard let str = req.urlVariables["id"], let id = Int(str) else {
             log.warning("Bad ID / Request")
@@ -59,17 +59,17 @@ public class Server {
 
 // User ID / Auth, Player stores game related data
 public class User {
-    static var index: [String:User] = [:]
-    
+    static var index: [String: User] = [:]
+
     var username: String
     weak var game: Game?
-    
+
     private init(username: String) { self.username = username }
-    
+
     public static func forUsername(_ username: String) -> User? {
         return index[username]
     }
-    
+
     public static func registerUsername(_ username: String) -> User? {
         if index[username] != nil {
             return nil
@@ -78,15 +78,15 @@ public class User {
         index[username] = player
         return player
     }
-    
+
     static func fromRequest(_ req: HTTPRequest) throws -> User {
         let username = req.headers.filter({ $0.0 == HTTPRequestHeader.Name.authorization })[0].1
-        
+
         guard let user = User.forUsername(username) else {
             throw ArcanusError.unregisteredUsername
         }
         log.info("user: \(user.username)")
-        
+
         return user
     }
 }
@@ -94,33 +94,35 @@ public class User {
 public class Game {
     public enum State: CustomStringConvertible, JSONConvertible {
         case waitingForPlayers
+        case full
         case running
         case finished
-        
+
         public var description: String {
             switch self {
             case .waitingForPlayers: return "Waiting for Players"
             case .running: return "Running"
             case .finished: return "Finished"
+            case .full: return "Full"
             }
         }
-        
+
         public func jsonEncodedString() throws -> String {
             return self.description
         }
     }
-    
+
     var state: State = .waitingForPlayers
     var index: Int
     var timeCreated: Date
     var users: [User]
-    
+
     init(user1: User, index: Int) {
         self.users = [user1]
         self.index = index
         self.timeCreated = Date()
     }
-    
+
     func join(asUser user: User) throws {
         if user.game != nil {
             throw ArcanusError.alreadyInGame
@@ -129,9 +131,13 @@ public class Game {
             throw ArcanusError.gameNotAvaliable
         }
         users.append(user)
-        
+
         if users.count == 2 {
-            state = .running
+            state = .full
         }
+    }
+
+    func start() {
+        state = .running
     }
 }
