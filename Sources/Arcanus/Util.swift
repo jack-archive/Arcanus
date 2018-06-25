@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import PerfectHTTP
 
 /// Code will only run in Debug configuration
 public func DEBUG(_ code: () -> Void) {
@@ -16,4 +17,16 @@ public func DEBUG(_ code: () -> Void) {
 /// Will get the Arcanus namespace as a string
 func namespaceAsString() -> String {
     return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
+}
+
+func errorWrapper<T>(res: HTTPResponse, _ code: () throws -> T) -> T? {
+    do {
+        let rv = try code()
+        return rv
+    } catch let err as ArcanusError {
+        err.setError(res)
+        return nil
+    } catch {
+        return nil
+    }
 }
