@@ -6,5 +6,4 @@
 
 public func clientMain() {
     log.warning("*** Starting Client ***")
-
 }

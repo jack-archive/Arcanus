@@ -4,11 +4,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Foundation
-import CommandLineKit
-import SwiftyBeaver
 import Arcanus
 import cncurses
+import CommandLineKit
+import Foundation
+import SwiftyBeaver
 import SwiftyJSON
 
 // MARK: Commmand Line Parsing
@@ -22,13 +22,19 @@ let cli = CommandLineKit.CommandLine()
 // swiftlint:disable line_length
 let serverOption = BoolOption(shortFlag: "s", longFlag: "server", helpMessage: "Start a server.")
 
-let logPathOption = StringOption(shortFlag: "l", longFlag: "log", required: false,
+let logPathOption = StringOption(shortFlag: "l",
+                                 longFlag: "log",
+                                 required: false,
                                  helpMessage: "Path to the log file.")
-let cardsPathOption = StringOption(shortFlag: "c", longFlag: "cardfile", required: false,
-                                 helpMessage: "Path to the cards.json file.")
-let helpOption = BoolOption(shortFlag: "h", longFlag: "help",
+let cardsPathOption = StringOption(shortFlag: "c",
+                                   longFlag: "cardfile",
+                                   required: false,
+                                   helpMessage: "Path to the cards.json file.")
+let helpOption = BoolOption(shortFlag: "h",
+                            longFlag: "help",
                             helpMessage: "Prints a help message.")
-let verbosityOption = CounterOption(shortFlag: "v", longFlag: "verbose",
+let verbosityOption = CounterOption(shortFlag: "v",
+                                    longFlag: "verbose",
                                     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 // swiftlint:enable line_length
 

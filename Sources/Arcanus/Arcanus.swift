@@ -5,31 +5,31 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import SwiftyBeaver
-import Socket
-import SwiftyJSON
 import PerfectLogger
+import Socket
+import SwiftyBeaver
+import SwiftyJSON
 
 public let log = SwiftyBeaver.self
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
 
 public class Log {
-
 }
 
 public class ArcanusController: ArcanusUIController {
+
     // MARK: Static functionality
+
     public static let console: ConsoleDestination = ConsoleDestination()
     public static var logFiles: [FileDestination] = []
 
     public class func initLog() {
-
     }
 
     public class func addConsole(_ level: SwiftyBeaver.Level = .info) {
-        console.asynchronously = false
-        console.minLevel = level
-        log.addDestination(console)
+        self.console.asynchronously = false
+        self.console.minLevel = level
+        log.addDestination(self.console)
         log.info("Logging to Console")
     }
 
@@ -46,17 +46,18 @@ public class ArcanusController: ArcanusUIController {
     public enum Error: Swift.Error {
         case badJSON
     }
+
     /*
     // MARK: Instance functionality
     var ui: ArcanusUI
     var queue: DispatchQueue
-    
+
     public init(ui: ArcanusUI) {
         self.ui = ui
         self.queue = DispatchQueue(label: "Arcanus Controller Queue")
         self.ui.controller = self
     }
-    
+
     public enum MainMenuOption: CustomStringConvertible {
         case playAgent
         case startServer(Int)
@@ -64,7 +65,7 @@ public class ArcanusController: ArcanusUIController {
         case simulate
         case collection
         case options
-        
+
         public var description: String {
             switch self {
             case .playAgent: return "Play Agents"
@@ -75,18 +76,18 @@ public class ArcanusController: ArcanusUIController {
             case .options: return "Options"
             }
         }
-        
+
         public static let all: [MainMenuOption] = [.playAgent, .startServer(0),
                                                     .joinServer(nil, 0), .simulate, .collection, .options]
         public static var allAsStrings: [String] { return all.map({ return $0.description }) }
     }
-    
+
     public func start() {
         ui.initUI()
         ui.mainMenu()
         ui.endUI()
     }
-    
+
     public func mainMenuOptionSelected(_ opt: MainMenuOption) {
         queue.async {
             switch opt {
@@ -96,7 +97,7 @@ public class ArcanusController: ArcanusUIController {
                     fatalError("Couldn't open Server")
                 }
                 server.startServer()
-                
+
                 guard let client = try? ArcanusClient(port: port) else {
                     fatalError("Couldn't connect client")
                 }
@@ -132,17 +133,17 @@ public protocol ArcanusUI {
 public class ArcanusClient {
     var socket: Socket
     var queue: DispatchQueue
-    
+
     public init(server: String = "127.0.0.1", port: Int) throws {
         try self.socket = Socket.create()
         self.queue = DispatchQueue(label: "Arcanus Client")
-        
+
         log.debug("Connecting to Server @ \(server) on port \(port)")
         try self.socket.connect(to: server, port: Int32(port))
         log.debug("Connected to Server @ \(server) on port \(port)")
         self.main()
     }
-    
+
     func main() {
         queue.async {
             do {
@@ -164,30 +165,30 @@ public class ArcanusGameServer {
     var sockets: [Socket] = []
     var queue: DispatchQueue
     var game: Game
-    
+
     enum Message {
         case startGame
-        
+
         var json: JSON {
             switch self {
             case .startGame: return JSON(data: "{ msg: \"\(self.key )\" }".data(using: .utf8)!)
             }
         }
-        
+
         var key: String {
             switch self {
             case .startGame: return "START_GAME"
             }
         }
     }
-    
+
     public init(_ port: Int) throws {
         self.port = port
-        
+
         try socket = Socket.create()
         queue = DispatchQueue(label: "Arcanus Server")
     }
-    
+
     public func startServer() {
         queue.async {
             do {
@@ -198,7 +199,7 @@ public class ArcanusGameServer {
             }
         }
     }
-    
+
     func sendMsg(player: Int? = nil, json: JSON) throws {
         switch player {
         case nil:
@@ -212,12 +213,12 @@ public class ArcanusGameServer {
             fatalError()
         }
     }
-    
+
     func startGame() throws {
         try sendMsg(json: Message.startGame.json)
-        
+
     }
-    
+
     func connectClients() throws {
         log.debug("Starting Server")
         try socket.listen(on: port)
@@ -229,7 +230,6 @@ public class ArcanusGameServer {
         log.debug("Second Client Connected")
         socket.close()
     }
-    
-    
+
 }
 */

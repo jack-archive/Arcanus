@@ -9,7 +9,7 @@ import Foundation
 public class Card {
     public static func makeNameClassReady(_ name: String) -> String {
         return name.replacingOccurrences(of: " ", with: "")
-                   .replacingOccurrences(of: "'", with: "")
+            .replacingOccurrences(of: "'", with: "")
     }
 
     public static func classForName(_ name: String) -> Card.Type? {

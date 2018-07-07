@@ -4,9 +4,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import Arcanus
 import Foundation
 import Rainbow
-import Arcanus
 
 public class ArcanusCLI: ArcanusUI {
     public var controller: ArcanusUIController!
@@ -14,7 +14,6 @@ public class ArcanusCLI: ArcanusUI {
     public init() {}
 
     public func initUI() {
-
     }
     /*
     public func mainMenu() {
@@ -36,12 +35,11 @@ public class ArcanusCLI: ArcanusUI {
         case .collection: break
         case .options: break
         }
-        
+
     }
  */
 
     public func endUI() {
-
     }
 
     func boolPrompt(_ prompt: String) -> Bool? {
@@ -64,8 +62,10 @@ public class ArcanusCLI: ArcanusUI {
         }
     }
 
-    func intPrompt(arrow: Bool = true, _ prompt: String,
-                   _ range: Range<Int> = Range<Int>(Int.min...Int.max), def: Int? = nil) -> Int {
+    func intPrompt(arrow: Bool = true,
+                   _ prompt: String,
+                   _ range: Range<Int> = Range<Int>(Int.min...Int.max),
+                   def: Int? = nil) -> Int {
         while true {
             if arrow {
                 print("==>".blue, terminator: " ")
@@ -126,7 +126,7 @@ public class ArcanusCLI: ArcanusUI {
     }
 
     func menu(title: String? = nil, _ options: String...) -> Int {
-        return menu(title: title, options: options)
+        return self.menu(title: title, options: options)
     }
 
     func menu(title: String? = nil, options: [String]) -> Int {
@@ -151,5 +151,4 @@ public class ArcanusCLI: ArcanusUI {
             }
         }
     }
-
 }

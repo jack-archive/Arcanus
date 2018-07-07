@@ -30,8 +30,10 @@ public enum ArcanusError: Int, Error {
         }
     }
 
-    func setError(_ res: HTTPResponse, info: [String: Any] = [:],
-                  status: HTTPResponseStatus? = nil, complete: Bool = true) {
+    func setError(_ res: HTTPResponse,
+                  info: [String: Any] = [:],
+                  status: HTTPResponseStatus? = nil,
+                  complete: Bool = true) {
         let dict: [String: Any] = ["error": self.rawValue, "info": info]
         if let str = try? dict.jsonEncodedString() {
             res.appendBody(string: str)
