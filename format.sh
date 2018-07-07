@@ -1,15 +1,15 @@
 #!/bin/bash
 
 swiftformat --allman false \
-    --wraparguments enabled \
-    --wrapelements beforefirst \
+    --wraparguments afterfirst \
+    --wrapelements afterfirst \
     --self insert \
     --header ignore \
-    --binarygrouping 4, 8 \
+    --binarygrouping 4,8 \
     --octalgrouping none \
     --indentcase false \
     --trimwhitespace always \
-    --decimalgrouping 3, 6 \
+    --decimalgrouping 3,6 \
     --patternlet hoist \
     --commas inline \
     --semicolons inline \
@@ -22,6 +22,6 @@ swiftformat --allman false \
     --hexliteralcase uppercase \
     --linebreaks lf \
     --hexgrouping none \
-    --comments ignore \
+    --comments indent \
     --ifdef noindent \
     --stripunusedargs closure-only .
