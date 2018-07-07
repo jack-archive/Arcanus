@@ -98,8 +98,7 @@ public class Log {
         return eid
     }
     
-    @discardableResult public class func critical(_ message: Any) {
-        var eid: String?
+    public class func critical(_ message: Any) {
         for file in files {
             if eid == nil {
                 eid = LogFile.critical("\(message)", logFile: file)
@@ -107,7 +106,6 @@ public class Log {
                 LogFile.critical("\(message)", eventid: eid!, logFile: file)
             }
         }
-        return eid
     }
 }
 

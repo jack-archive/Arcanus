@@ -16,7 +16,7 @@ Log.addFile("log2.log")
 Log.debug("Hello World!")
 
 // MARK: Commmand Line Parsing
-/*
+
 #if os(Linux)
 let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 #endif
@@ -126,4 +126,4 @@ try client2.main()
 
 sleep(10)
 */
- */
+
