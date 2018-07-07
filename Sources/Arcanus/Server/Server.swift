@@ -11,11 +11,6 @@ import PerfectCrypto
 import PerfectHTTP
 import PerfectHTTPServer
 import PerfectLib
-import PerfectLocalAuthentication
-import PerfectSession
-import PerfectSessionPostgreSQL
-import PostgresStORM
-import StORM
 
 public func serverMain() {
     log.warning("*** Starting Server ***")

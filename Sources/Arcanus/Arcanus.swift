@@ -6,9 +6,7 @@
 
 import Foundation
 import PerfectLogger
-import Socket
 import SwiftyBeaver
-import SwiftyJSON
 
 public let log = SwiftyBeaver.self
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
