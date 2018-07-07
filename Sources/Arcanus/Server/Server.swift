@@ -6,7 +6,6 @@
 
 import Dispatch
 import Foundation
-import JSONConfig
 import PerfectCrypto
 import PerfectHTTP
 import PerfectHTTPServer
@@ -122,7 +121,7 @@ public class Game {
             throw ArcanusError.alreadyInGame
         }
         if self.state != .waitingForPlayers || self.users.count >= 2 {
-            throw ArcanusError.gameNotAvaliable
+            throw ArcanusError.gameAlreadyFull
         }
         self.users.append(user)
 
