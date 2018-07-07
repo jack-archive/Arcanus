@@ -8,7 +8,7 @@ import Foundation
 import PerfectHTTP
 
 /// Code will only run in Debug configuration
-public func DEBUG(_ code: () -> Void) {
+public func DEBUG(_ code: () -> ()) {
     if _isDebugAssertConfiguration() {
         code()
     }

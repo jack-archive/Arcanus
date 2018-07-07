@@ -4,19 +4,18 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import Dispatch
+import Foundation
+import JSONConfig
+import PerfectCrypto
 import PerfectHTTP
 import PerfectHTTPServer
-import Dispatch
 import PerfectLib
+import PerfectLocalAuthentication
 import PerfectSession
 import PerfectSessionPostgreSQL
-import PerfectCrypto
-import PerfectLocalAuthentication
-import PerfectLib
-import StORM
 import PostgresStORM
-import JSONConfig
-import Foundation
+import StORM
 
 public func serverMain() {
     log.warning("*** Starting Server ***")
@@ -32,9 +31,9 @@ public class Server {
     var games: [Game] = []
 
     init() {
-        queue = DispatchQueue(label: "Arcanus Game Server")
-        server.serverPort = 8181
-        server.addRoutes(initRoutes())
+        self.queue = DispatchQueue(label: "Arcanus Game Server")
+        self.server.serverPort = 8181
+        self.server.addRoutes(initRoutes())
     }
 
     func start() {
@@ -50,10 +49,10 @@ public class Server {
             log.warning("Bad ID / Request")
             return nil
         }
-        if id < 0 || id >= games.count {
+        if id < 0 || id >= self.games.count {
             throw ArcanusError.gameNotFound
         }
-        return games[id]
+        return self.games[id]
     }
 }
 
@@ -67,11 +66,11 @@ public class User {
     private init(username: String) { self.username = username }
 
     public static func forUsername(_ username: String) -> User? {
-        return index[username]
+        return self.index[username]
     }
 
     public static func registerUsername(_ username: String) -> User? {
-        if index[username] != nil {
+        if self.index[username] != nil {
             return nil
         }
         let player = User(username: username)
@@ -127,17 +126,17 @@ public class Game {
         if user.game != nil {
             throw ArcanusError.alreadyInGame
         }
-        if state != .waitingForPlayers || users.count >= 2 {
+        if self.state != .waitingForPlayers || self.users.count >= 2 {
             throw ArcanusError.gameNotAvaliable
         }
-        users.append(user)
+        self.users.append(user)
 
-        if users.count == 2 {
-            state = .full
+        if self.users.count == 2 {
+            self.state = .full
         }
     }
 
     func start() {
-        state = .running
+        self.state = .running
     }
 }

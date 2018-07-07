@@ -20,8 +20,8 @@ struct Option {
 
     static var id = 0
     static func getNextID() -> Int {
-        id += 1
-        return id
+        self.id += 1
+        return self.id
     }
 
     init(_ value: Value, _ title: String, _ description: String) {

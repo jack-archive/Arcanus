@@ -56,7 +56,7 @@ func getGames(req: HTTPRequest, res: HTTPResponse) {
 
 func createGame(req: HTTPRequest, res: HTTPResponse) {
     do {
-        guard let user = errorWrapper(res, { try User.fromRequest(req) })  else {
+        guard let user = errorWrapper(res, { try User.fromRequest(req) }) else {
             return
         }
 
@@ -77,7 +77,7 @@ func joinGame(req: HTTPRequest, res: HTTPResponse) {
 
         let tmp = try Server.shared.gameFromRequest(req)
         guard let game = tmp else {
-                return
+            return
         }
 
         try game.join(asUser: user)
@@ -114,6 +114,5 @@ func startGame(req: HTTPRequest, res: HTTPResponse) {
         guard let game = tmp else {
             return
         }
-
     }
 }
