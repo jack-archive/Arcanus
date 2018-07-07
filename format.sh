@@ -22,6 +22,6 @@ swiftformat --allman false \
     --hexliteralcase uppercase \
     --linebreaks lf \
     --hexgrouping none \
-    --comments indent \
+    --comments ignore \
     --ifdef noindent \
     --stripunusedargs closure-only .
