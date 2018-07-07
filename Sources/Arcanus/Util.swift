@@ -5,7 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import PerfectHTTP
+// import PerfectHTTP
 
 /// Code will only run in Debug configuration
 public func DEBUG(_ code: () -> ()) {
@@ -19,6 +19,7 @@ func namespaceAsString() -> String {
     return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
 }
 
+/*
 func errorWrapper<T>(_ res: HTTPResponse, _ code: () throws -> T) -> T? {
     do {
         let rv = try code()
@@ -30,3 +31,4 @@ func errorWrapper<T>(_ res: HTTPResponse, _ code: () throws -> T) -> T? {
         return nil
     }
 }
+*/

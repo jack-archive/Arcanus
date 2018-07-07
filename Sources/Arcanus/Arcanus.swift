@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import PerfectLogger
 import SwiftyBeaver
 
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
@@ -16,40 +15,20 @@ public class Arcanus {
     public enum Side {
         case client, server
     }
-    
+
     public static let log = SwiftyBeaver.self
     public static var side: Side!;
-    public static let console: ConsoleDestination = ConsoleDestination()
-    public static var logFiles: [FileDestination] = []
-    
-    public class func initLog() {
-    }
-    
-    public class func addConsole(_ level: SwiftyBeaver.Level = .info) {
-        self.console.asynchronously = false
-        self.console.minLevel = level
-        log.addDestination(self.console)
-        log.info("Logging to Console")
-    }
-    
-    public class func addLogFile(path: String, minLevel: SwiftyBeaver.Level = .verbose) {
-        let dest = FileDestination()
-        dest.asynchronously = false
-        dest.logFileURL = URL(fileURLWithPath: path)
-        dest.minLevel = minLevel
-        logFiles.append(dest)
-        log.addDestination(dest)
-        log.info("Logging to file at \(path)")
-    }
+
 }
 */
+/*
 public class Log {
     static var files: [String] = []
-    
+
     public class func addFile(_ filename: String) {
         files.append(filename)
     }
-    
+
     @discardableResult public class func debug(_ message: Any) -> String? {
         var eid: String?
         for file in files {
@@ -61,7 +40,7 @@ public class Log {
         }
         return eid
     }
-    
+
     @discardableResult public class func info(_ message: Any) -> String? {
         var eid: String?
         for file in files {
@@ -73,7 +52,7 @@ public class Log {
         }
         return eid
     }
-    
+
     @discardableResult public class func warning(_ message: Any) -> String? {
         var eid: String?
         for file in files {
@@ -85,7 +64,7 @@ public class Log {
         }
         return eid
     }
-    
+
     @discardableResult public class func error(_ message: Any) -> String? {
         var eid: String?
         for file in files {
@@ -97,7 +76,7 @@ public class Log {
         }
         return eid
     }
-    
+
      public class func critical(_ message: Any) {
         var eid: String?
         for file in files {
@@ -109,11 +88,33 @@ public class Log {
         }
     }
 }
-
+*/
 public class ArcanusController: ArcanusUIController {
 
     // MARK: Static functionality
 
+    public static let console: ConsoleDestination = ConsoleDestination()
+    public static var logFiles: [FileDestination] = []
+
+    public class func initLog() {
+    }
+
+    public class func addConsole(_ level: SwiftyBeaver.Level = .info) {
+        self.console.asynchronously = false
+        self.console.minLevel = level
+        log.addDestination(self.console)
+        log.info("Logging to Console")
+    }
+
+    public class func addLogFile(path: String, minLevel: SwiftyBeaver.Level = .verbose) {
+        let dest = FileDestination()
+        dest.asynchronously = false
+        dest.logFileURL = URL(fileURLWithPath: path)
+        dest.minLevel = minLevel
+        logFiles.append(dest)
+        log.addDestination(dest)
+        log.info("Logging to file at \(path)")
+    }
 
     /*
     // MARK: Instance functionality

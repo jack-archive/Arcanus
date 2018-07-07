@@ -6,16 +6,13 @@
 
 import Dispatch
 import Foundation
-import PerfectCrypto
-import PerfectHTTP
-import PerfectHTTPServer
-import PerfectLib
 
 public func serverMain() {
     log.warning("*** Starting Server ***")
-    Server.shared.start()
+    // Server.shared.start()
 }
 
+/*
 public class Server {
     // Singleton, lazy
     public static var shared = Server()
@@ -134,3 +131,4 @@ public class Game {
         self.state = .running
     }
 }
+ */
