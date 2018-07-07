@@ -11,7 +11,7 @@ import SwiftyBeaver
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
 
 public let log = SwiftyBeaver.self
-
+/*
 public class Arcanus {
     public enum Side {
         case client, server
@@ -42,7 +42,7 @@ public class Arcanus {
         log.info("Logging to file at \(path)")
     }
 }
-
+*/
 public class Log {
     static var files: [String] = []
     
@@ -98,7 +98,8 @@ public class Log {
         return eid
     }
     
-    public class func critical(_ message: Any) {
+     public class func critical(_ message: Any) {
+        var eid: String?
         for file in files {
             if eid == nil {
                 eid = LogFile.critical("\(message)", logFile: file)
