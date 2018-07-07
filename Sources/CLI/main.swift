@@ -9,7 +9,6 @@ import cncurses
 import CommandLineKit
 import Foundation
 import SwiftyBeaver
-import SwiftyJSON
 
 // MARK: Commmand Line Parsing
 

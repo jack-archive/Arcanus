@@ -16,17 +16,19 @@ public enum ArcanusError: Int, Error {
 
     case gameNotFound
     case alreadyInGame
-    case gameNotAvaliable
+    case gameAlreadyFull
 
     func statusCode() -> HTTPResponseStatus {
         switch self {
+        case .unknownError: return .internalServerError
         case .jsonError: return .badRequest
+            
         case .unregisteredUsername: return .custom(code: 422, message: "Unprocessable Entity")
         case .usernameInUse: return .custom(code: 422, message: "Unprocessable Entity")
-        case .unknownError: return .internalServerError
+            
         case .gameNotFound: return .notFound
         case .alreadyInGame: return .custom(code: 422, message: "Unprocessable Entity")
-        case .gameNotAvaliable: return .custom(code: 422, message: "Unprocessable Entity")
+        case .gameAlreadyFull: return .custom(code: 422, message: "Unprocessable Entity")
         }
     }
 
@@ -34,7 +36,7 @@ public enum ArcanusError: Int, Error {
                   info: [String: Any] = [:],
                   status: HTTPResponseStatus? = nil,
                   complete: Bool = true) {
-        let dict: [String: Any] = ["error": self.rawValue, "info": info]
+        let dict: [String: Any] = ["error": self.rawValue, "description": self.getErrorDescription(), "info": info]
         if let str = try? dict.jsonEncodedString() {
             res.appendBody(string: str)
             if complete {
@@ -46,6 +48,20 @@ public enum ArcanusError: Int, Error {
             }
         } else {
             fatalError("Couldn't convert JSON")
+        }
+    }
+    
+    func getErrorDescription() -> String {
+        switch self {
+        case .unknownError: return "Unknown error"
+        case .jsonError: return "JSON Error"
+        
+        case .unregisteredUsername: return "Username has not been registered yet"
+        case .usernameInUse: return "Username is already in use"
+        
+        case .gameNotFound: return "Game not found"
+        case .alreadyInGame: return "Already in a game"
+        case .gameAlreadyFull: return "Game is already full"
         }
     }
 }
