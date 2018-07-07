@@ -9,11 +9,6 @@ import CommandLineKit
 import Foundation
 import SwiftyBeaver
 
-Log.addFile("log.log")
-Log.addFile("log2.log")
-
-Log.debug("Hello World!")
-
 // MARK: Commmand Line Parsing
 
 #if os(Linux)
@@ -125,4 +120,3 @@ try client2.main()
 
 sleep(10)
 */
-

@@ -5,8 +5,9 @@
 //  Created by Jack Maloney on 6/24/18.
 //
 
+/*
 import Foundation
-import PerfectHTTP
+//import PerfectHTTP
 
 func initRoutes() -> Routes {
     var routes = Routes()
@@ -116,3 +117,4 @@ func startGame(req: HTTPRequest, res: HTTPResponse) {
         }
     }
 }
+*/
