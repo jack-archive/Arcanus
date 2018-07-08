@@ -5,11 +5,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import SwiftyBeaver
 
 //public let globalRng = Gust(seed: UInt32(Date().timeIntervalSinceReferenceDate))
 
-public let log = SwiftyBeaver.self
+// public let log = SwiftyBeaver.self
+
 /*
 public class Arcanus {
     public enum Side {
@@ -93,6 +93,7 @@ public class ArcanusController: ArcanusUIController {
 
     // MARK: Static functionality
 
+/*
     public static let console: ConsoleDestination = ConsoleDestination()
     public static var logFiles: [FileDestination] = []
 
@@ -115,6 +116,7 @@ public class ArcanusController: ArcanusUIController {
         log.addDestination(dest)
         log.info("Logging to file at \(path)")
     }
+    */
 
     /*
     // MARK: Instance functionality

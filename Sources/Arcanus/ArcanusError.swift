@@ -8,7 +8,9 @@ import Foundation
 
 public enum ArcanusError: Int, Error {
     case unknownError = 99
-    case jsonError = 100
+    case badPath
+    case failedToConvertData
+    case jsonError
 
     case unregisteredUsername
     case usernameInUse
@@ -53,6 +55,8 @@ public enum ArcanusError: Int, Error {
     func getErrorDescription() -> String {
         switch self {
         case .unknownError: return "Unknown error"
+        case .badPath: return "Bad path"
+        case .failedToConvertData: return "Failed to convert data"
         case .jsonError: return "JSON Error"
 
         case .unregisteredUsername: return "Username has not been registered yet"

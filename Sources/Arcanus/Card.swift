@@ -18,31 +18,31 @@ public class Card {
     }
 
     public enum Class: String {
-        case neutral = "NEUTRAL"
-        case druid = "DRUID"
-        case hunter = "HUNTER"
-        case mage = "MAGE"
-        case paladin = "PALADIN"
-        case priest = "PRIEST"
-        case rouge = "ROUGE"
-        case shaman = "SHAMAN"
-        case warlock = "WARLOCK"
-        case warrior = "WARRIOR"
+        case neutral
+        case druid
+        case hunter
+        case mage
+        case paladin
+        case priest
+        case rouge
+        case shaman
+        case warlock
+        case warrior
     }
 
     public enum CardType: String {
-        case minion = "MINION"
-        case spell = "SPELL"
-        case weapon = "WEAPON"
-        case enchantment = "ENCHANTMENT"
+        case minion
+        case spell
+        case weapon
+        case enchantment
     }
 
     public enum Mechanics: String {
-        case charge = "CHARGE"
-        case taunt = "TAUNT"
-        case windfury = "WINDFURY"
-        case battlecry = "BATTLECRY"
-        case deathrattle = "DEATHRATTLE"
+        case charge
+        case taunt
+        case windfury
+        case battlecry
+        case deathrattle
     }
 
     var id: String
@@ -51,12 +51,14 @@ public class Card {
     var cardClass: Class
     var cardType: CardType
     var cost: Int
+
     /*
     public init() {
         log.error("Shouldn't use Card.init(), implement subclass, or use other initializer")
         fatalError("Should not be an instance of Card created with this")
     }
     */
+
     public init(_ id: String, _ dbfId: Int, _ name: String, _ cardClass: Class, _ cardType: CardType, _ cost: Int) {
         self.id = id
         self.dbfId = dbfId
@@ -69,12 +71,14 @@ public class Card {
 
 public class Minion: Card {
     var attack, health: Int
+
     /*
     public required init() {
         log.error("Shouldn't use Minion.init(), implement subclass, or use other initializer")
         fatalError("Should not be an instance of Minion created with this")
     }
     */
+
     // Call this init from subclasses
     public required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
         self.attack = attack
