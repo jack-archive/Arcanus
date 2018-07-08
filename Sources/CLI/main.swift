@@ -7,7 +7,7 @@
 import Arcanus
 import CommandLineKit
 import Foundation
-import SwiftyBeaver
+import LoggerAPI
 
 // MARK: Commmand Line Parsing
 
@@ -54,69 +54,32 @@ let logPath = logPathOption.value // optional
 let cardPath = cardsPathOption.value ?? "cards.json" // default value
 let verbosity = verbosityOption.value
 
-ArcanusController.initLog()
-
-Arcanus.DEBUG {
-    let logDirectory = "./Arcanus Logs"
-
+try Arcanus.DEBUG {
+    let logDirectory = "./Logs"
     let fileManager = FileManager.default
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
 
-    // try! fileManager.removeItem(atPath: "\(logDirectory)/last")
-    ArcanusController.addLogFile(path: "\(logDirectory)/last", minLevel: .debug)
-    ArcanusController.addLogFile(path: "\(logDirectory)/log-\(dateFormatter.string(from: Date()))")
+    if !fileManager.fileExists(atPath: logDirectory, isDirectory: nil) {
+        try fileManager.createDirectory(atPath: logDirectory, withIntermediateDirectories: true, attributes: nil)
+    }
 
-    // swiftlint:disable identifier_name
-    let COLOR_RED = "\u{001b}[31;1m"
-    let COLOR_RESET = "\u{001b}[0m"
-    // swiftlint:enable identifier_name
+    if logPath != nil {
+        try ArcanusLog.setLogFile(logPath!)
+    } else {
+        try ArcanusLog.setLogFile("./log.log")
+    }
 
     // swiftlint:disable line_length
     // Use `tail -f Arcanus\ Logs/last` to watch a constant log of all runs live
-    log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
-    log.info("\(COLOR_RED)========================== NEW LOG \(dateFormatter.string(from: Date())) ===========================\(COLOR_RESET)")
-    log.info("\(COLOR_RED)================================================================================\(COLOR_RESET)")
+    Log.info("================================================================================".red)
+    Log.info("========================== ".red + "NEW LOG \(dateFormatter.string(from: Date()))".white.bold + " ===========================".red)
+    Log.info("================================================================================".red)
     // swiftlint:enable line_length
-
-    if !fileManager.fileExists(atPath: logDirectory, isDirectory: nil) {
-        do {
-            try fileManager.createDirectory(atPath: logDirectory, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            fatalError("Couldn't Create Logs Directory at ./\(logDirectory)")
-        }
-    }
 }
-
-if logPath != nil {
-    ArcanusController.addLogFile(path: logPath!)
-}
-
-ArcanusController.addConsole(.verbose)
 
 if serverOption.value {
-    log.info("Server-Side")
     Arcanus.serverMain()
 } else {
-    log.info("Client-Side")
     Arcanus.clientMain()
 }
-
-/*
-let hs = ArcanusController(ui: ArcanusCLI())
-hs.start()
-*/
-/*
-let server = try ArcanusGameServer(25565)
-server.startServer()
-
-sleep(1)
-
-let client1 = try ArcanusClient()
-let client2 = try ArcanusClient()
-
-try client1.main()
-try client2.main()
-
-sleep(10)
-*/

@@ -6,6 +6,7 @@
 
 import Arcanus
 import Foundation
+import LoggerAPI
 import Rainbow
 
 public class ArcanusCLI: ArcanusUI {
@@ -15,6 +16,7 @@ public class ArcanusCLI: ArcanusUI {
 
     public func initUI() {
     }
+
     /*
     public func mainMenu() {
         let option = ArcanusController.MainMenuOption.all[menu(title: "Main Menu",
@@ -77,7 +79,7 @@ public class ArcanusCLI: ArcanusUI {
                 print("(default: \(def!))", terminator: " ")
             }
 
-            log.debug("Range: \(range)")
+            Log.debug("Range: \(range)")
 
             if range.lowerBound != Int.min && range.upperBound != Int.max {
                 print("[\(range.lowerBound)-\(range.upperBound)]:".bold, terminator: " ")

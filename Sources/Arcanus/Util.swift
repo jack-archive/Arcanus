@@ -8,9 +8,9 @@ import Foundation
 // import PerfectHTTP
 
 /// Code will only run in Debug configuration
-public func DEBUG(_ code: () -> ()) {
+public func DEBUG(_ code: () throws -> ()) throws {
     if _isDebugAssertConfiguration() {
-        code()
+        try code()
     }
 }
 
@@ -18,17 +18,3 @@ public func DEBUG(_ code: () -> ()) {
 func namespaceAsString() -> String {
     return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
 }
-
-/*
-func errorWrapper<T>(_ res: HTTPResponse, _ code: () throws -> T) -> T? {
-    do {
-        let rv = try code()
-        return rv
-    } catch let err as ArcanusError {
-        err.setError(res)
-        return nil
-    } catch {
-        return nil
-    }
-}
-*/
