@@ -8,6 +8,7 @@ import Foundation
 import HeliumLogger
 import LoggerAPI
 
+// TODO: Make this support more than one output
 private struct LogFile: TextOutputStream {
     var file: FileHandle
 
@@ -44,5 +45,9 @@ private struct LogFile: TextOutputStream {
 public class ArcanusLog {
     public class func setLogFile(_ path: String, minLevel: LoggerMessageType = .verbose) throws {
         Log.logger = HeliumStreamLogger(minLevel, outputStream: try LogFile(path))
+    }
+
+    public class func setConsole(minLevel: LoggerMessageType = .verbose) {
+        HeliumLogger.use(minLevel)
     }
 }

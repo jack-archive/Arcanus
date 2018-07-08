@@ -1,6 +1,11 @@
 .build/
 Package.resolved
 .DS_Store
+
 Arcanus.xcodeproj/
-Arcanus\ Logs/
-cards.json
+Build/
+Index/
+DerivedData/
+
+*.log
+*.db

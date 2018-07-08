@@ -10,6 +10,7 @@ public enum ArcanusError: Int, Error {
     case unknownError = 99
     case badPath
     case failedToConvertData
+    case failedToOpenDatabase
     case jsonError
 
     case unregisteredUsername
@@ -57,6 +58,7 @@ public enum ArcanusError: Int, Error {
         case .unknownError: return "Unknown error"
         case .badPath: return "Bad path"
         case .failedToConvertData: return "Failed to convert data"
+        case .failedToOpenDatabase: return "Failed to open database"
         case .jsonError: return "JSON Error"
 
         case .unregisteredUsername: return "Username has not been registered yet"

@@ -14,7 +14,9 @@ public func DEBUG(_ code: () throws -> ()) throws {
     }
 }
 
+private class GetNamespaceClass {}
+
 /// Will get the Arcanus namespace as a string
 func namespaceAsString() -> String {
-    return String(reflecting: ArcanusController.self).components(separatedBy: ".")[0]
+    return String(reflecting: GetNamespaceClass.self).components(separatedBy: ".")[0]
 }
