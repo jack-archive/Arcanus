@@ -9,11 +9,11 @@ import CommandLineKit
 import Foundation
 import LoggerAPI
 
-// MARK: Commmand Line Parsing
-
 #if os(Linux)
 let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 #endif
+
+// MARK: Commmand Line Parsing
 
 let cli = CommandLineKit.CommandLine()
 
@@ -24,6 +24,9 @@ let logPathOption = StringOption(shortFlag: "l",
                                  longFlag: "log",
                                  required: false,
                                  helpMessage: "Path to the log file.")
+let logConsoleOption = BoolOption(longFlag: "console",
+                                  required: false,
+                                  helpMessage: "Log to the console.")
 let cardsPathOption = StringOption(shortFlag: "c",
                                    longFlag: "cardfile",
                                    required: false,
@@ -36,7 +39,7 @@ let verbosityOption = CounterOption(shortFlag: "v",
                                     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 // swiftlint:enable line_length
 
-cli.addOptions(serverOption, logPathOption, cardsPathOption, helpOption, verbosityOption)
+cli.addOptions(serverOption, logPathOption, logConsoleOption, cardsPathOption, helpOption, verbosityOption)
 
 do {
     try cli.parse()
@@ -50,33 +53,37 @@ if helpOption.wasSet {
     exit(0)
 }
 
+var console = logConsoleOption.value
 let logPath = logPathOption.value // optional
 let cardPath = cardsPathOption.value ?? "cards.json" // default value
 let verbosity = verbosityOption.value
 
-try Arcanus.DEBUG {
-    let logDirectory = "./Logs"
-    let fileManager = FileManager.default
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
-
-    if !fileManager.fileExists(atPath: logDirectory, isDirectory: nil) {
-        try fileManager.createDirectory(atPath: logDirectory, withIntermediateDirectories: true, attributes: nil)
-    }
-
-    if logPath != nil {
-        try ArcanusLog.setLogFile(logPath!)
-    } else {
-        try ArcanusLog.setLogFile("./log.log")
-    }
-
-    // swiftlint:disable line_length
-    // Use `tail -f Arcanus\ Logs/last` to watch a constant log of all runs live
-    Log.info("================================================================================".red)
-    Log.info("========================== ".red + "NEW LOG \(dateFormatter.string(from: Date()))".white.bold + " ===========================".red)
-    Log.info("================================================================================".red)
-    // swiftlint:enable line_length
+if console && logPath != nil {
+    ArcanusLog.setConsole()
+    Log.warning("Both log file and console option set, log file overriding.")
+    console = false
 }
+
+if console {
+    ArcanusLog.setConsole()
+}
+
+let dateFormatter = DateFormatter()
+dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
+
+if logPath != nil {
+    try ArcanusLog.setLogFile(logPath!)
+} else {
+    try ArcanusLog.setConsole() 
+    //try ArcanusLog.setLogFile("./log.log")
+}
+
+// swiftlint:disable line_length
+// Use `tail -f log.log` to watch a constant log of all runs live
+Log.info("================================================================================".red)
+Log.info("========================== ".red + "NEW LOG \(dateFormatter.string(from: Date()))".white.bold + " ===========================".red)
+Log.info("================================================================================".red)
+// swiftlint:enable line_length
 
 if serverOption.value {
     Arcanus.serverMain()
