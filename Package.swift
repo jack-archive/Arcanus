@@ -19,8 +19,7 @@ let package = Package(name: "Arcanus",
                                      .package(url: "https://github.com/IBM-Swift/CloudEnvironment.git", from: "8.0.0"),
                                      .package(url: "https://github.com/IBM-Swift/Kitura-CredentialsHTTP.git", from: "2.1.0"),
                                      .package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", from: "17.0.0"),
-                                     .package(url: "https://github.com/IBM-Swift/Swift-Kuery-SQLite.git", from: "1.1.0"),
-
+                                     .package(url: "https://github.com/IBM-Swift/Swift-Kuery-SQLite.git", from: "1.1.0")
 
                         /*
                          .package(url: "https://github.com/jmmaloney4/Squall.git", from: "1.2.3"),

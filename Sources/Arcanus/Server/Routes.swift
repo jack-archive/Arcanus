@@ -8,6 +8,7 @@ import Foundation
 import Health
 import KituraContracts
 import LoggerAPI
+import SwiftyJSON
 
 func initializeHealthRoutes(app: Server) {
     app.router.get("/health") { (respondWith: (Status?, RequestError?) -> ()) -> () in
@@ -23,5 +24,20 @@ func initializeAuthenticationRoutes(app: Server) {
     app.router.get("/user") { (userProfile: BasicAuth, respondWith: (BasicAuth?, RequestError?) -> ()) -> () in
         Log.info("authenticated \(userProfile.id) using \(userProfile.provider)")
         respondWith(userProfile, nil)
+    }
+    
+    app.router.post("/user") { request, response, next in
+        guard let str = try? request.readString(), let data = str?.data(using: .utf8) else {
+            return
+        }
+        let json = JSON(data: data)
+        
+        guard let username = json["username"].string, let password = json["password"].string else {
+            return
+        }
+        
+        
+        
+        Log.verbose("Creating user \(username)")
     }
 }

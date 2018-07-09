@@ -74,7 +74,7 @@ dateFormatter.dateFormat = "yyyyMMdd-HH:mm:ss"
 if logPath != nil {
     try ArcanusLog.setLogFile(logPath!)
 } else {
-    try ArcanusLog.setConsole() 
+    ArcanusLog.setConsole()
     //try ArcanusLog.setLogFile("./log.log")
 }
 
