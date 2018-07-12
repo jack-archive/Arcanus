@@ -9,8 +9,19 @@ import LoggerAPI
 import SwiftKuery
 import SwiftKuerySQLite
 
+public class User {
+    // var id: Int
+    var username: String
+    private var password: String
+    
+    init(username: String, password: String) {
+        self.username = username
+        self.password = password
+    }
+}
+
 public class Database {
-    class User: Table {
+    class UserTable: Table {
         enum Columns: String {
             case id
             case username
@@ -43,7 +54,7 @@ public class Database {
             Log.info("Database is connected!")
         }
 
-        let userTable = User()
+        let userTable = UserTable()
         let des = try userTable.description(connection: db)
         Log.info(des)
         userTable.create(connection: db) { result in
@@ -70,7 +81,7 @@ public class Database {
     }
     
     func addUser(name: String, password: String) {
-        let userTable = User()
+        let userTable = UserTable()
         let insert = Insert(into: userTable, columns: [userTable.username, userTable.password], values: [name, password], returnID: true)
         db.execute(query: insert) { (res) in
             if res.success {
@@ -82,13 +93,12 @@ public class Database {
     }
     
     func getUser(name: String) -> User {
-        let userTable = User()
+        let userTable = UserTable()
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).order(by: .ASC(userTable.id))
         db.execute(query: query) { (res) in
             if res.success {
-                return 
+                
             }
         }
-        
     }
 }
