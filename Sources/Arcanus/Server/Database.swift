@@ -9,17 +9,6 @@ import LoggerAPI
 import SwiftKuery
 import SwiftKuerySQLite
 
-public class User {
-    // var id: Int
-    var username: String
-    private var password: String
-    
-    init(username: String, password: String) {
-        self.username = username
-        self.password = password
-    }
-}
-
 public class Database {
     class UserTable: Table {
         enum Columns: String {
@@ -64,20 +53,6 @@ public class Database {
                 Log.error("Failed to create User table: \(err)")
             }
         }
-        
-        let titleQuery = Select(userTable.id, userTable.username, userTable.password, from: userTable).order(by: .ASC(userTable.id))
-        let str = try titleQuery.build(queryBuilder: db.queryBuilder)
-        Log.info("\(str)")
-
-        db.execute(query: titleQuery) { result in
-            if let rows = result.asRows {
-                for row in rows {
-                    Log.verbose("Got \(row)")
-                }
-            } else {
-                Log.warning("Bad Query")
-            }
-        }
     }
     
     func addUser(name: String, password: String) {
@@ -92,13 +67,29 @@ public class Database {
         }
     }
     
-    func getUser(name: String) -> User {
+    func userExists(name: String) -> Bool {
         let userTable = UserTable()
-        let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).order(by: .ASC(userTable.id))
+        var rv = false
+        // TODO: Filter usernames
+        let query = Select(userTable.id, userTable.username, userTable.password, from: userTable)// .order(by: .ASC(userTable.id))
         db.execute(query: query) { (res) in
             if res.success {
-                
+                rv = true
             }
         }
+        return rv
     }
+    
+    func authenticateUser(name: String, password: String) -> Bool {
+        let userTable = UserTable()
+        var rv = false
+        let query = Select(userTable.id, userTable.username, userTable.password, from: userTable)// .order(by: .ASC(userTable.id))
+        db.execute(query: query) { (res) in
+            if res.success {
+                rv = true
+            }
+        }
+        return rv
+    }
+    
 }
