@@ -30,7 +30,7 @@ public class Server {
         initializeMetrics(router: self.router)
         // Open database
         // try BasicAuth.initUserDatabase()
-        let db = try Database()
+        try Database.openSharedDatabase()
     }
 
     func postInit() throws {
