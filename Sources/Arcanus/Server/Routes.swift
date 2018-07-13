@@ -25,19 +25,17 @@ func initializeAuthenticationRoutes(app: Server) {
         Log.info("authenticated \(userProfile.id) using \(userProfile.provider)")
         respondWith(userProfile, nil)
     }
-    
-    app.router.post("/user") { request, response, next in
+
+    app.router.post("/user") { request, _, _ in
         guard let str = try? request.readString(), let data = str?.data(using: .utf8) else {
             return
         }
         let json = JSON(data: data)
-        
+
         guard let username = json["username"].string, let password = json["password"].string else {
             return
         }
-        
-        
-        
+
         Log.verbose("Creating user \(username)")
     }
 }
