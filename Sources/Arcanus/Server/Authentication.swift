@@ -15,15 +15,14 @@ public struct BasicAuth: TypeSafeHTTPBasic {
     public let id: String
     var password: String?
 
-    static let users = ["jmmaloney4": "12345"]
-
     init(id: String, password: String? = nil) {
         self.id = id
         self.password = password
     }
 
     public static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> ()) {
-        if let storedPassword = users[username], storedPassword == password {
+        
+        if Database.shared.authenticateUser(name: username, password: password) {
             callback(BasicAuth(id: username))
         } else {
             callback(nil)

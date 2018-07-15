@@ -5,8 +5,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import KituraNet
+import Kitura
+import SwiftyJSON
 
-public enum ArcanusError: Int, Error {
+public enum ArcanusError: Int, Swift.Error {
     case unknownError = 99
     case badPath
     case failedToConvertData
@@ -19,40 +22,43 @@ public enum ArcanusError: Int, Error {
     case gameNotFound
     case alreadyInGame
     case gameAlreadyFull
- /*
-    func statusCode() -> HTTPResponseStatus {
+ 
+    func statusCode() -> HTTPStatusCode {
         switch self {
         case .unknownError: return .internalServerError
+        case .badPath: return .internalServerError
+        case .failedToConvertData: return .internalServerError
+        case .failedToOpenDatabase: return .internalServerError
         case .jsonError: return .badRequest
 
-        case .unregisteredUsername: return .custom(code: 422, message: "Unprocessable Entity")
-        case .usernameInUse: return .custom(code: 422, message: "Unprocessable Entity")
+        case .unregisteredUsername: return .unprocessableEntity
+        case .usernameInUse: return .unprocessableEntity
 
         case .gameNotFound: return .notFound
-        case .alreadyInGame: return .custom(code: 422, message: "Unprocessable Entity")
-        case .gameAlreadyFull: return .custom(code: 422, message: "Unprocessable Entity")
+        case .alreadyInGame: return .unprocessableEntity
+        case .gameAlreadyFull: return .unprocessableEntity
         }
     }
+    
 
-    func setError(_ res: HTTPResponse,
+    func setError(_ res: RouterResponse,
                   info: [String: Any] = [:],
-                  status: HTTPResponseStatus? = nil,
-                  complete: Bool = true) {
+                  status: HTTPStatusCode? = nil)
+    {
+        if status != nil {
+            res.statusCode = status!
+        } else {
+            res.statusCode = self.statusCode()
+        }
+        
         let dict: [String: Any] = ["error": self.rawValue, "description": self.getErrorDescription(), "info": info]
-        if let str = try? dict.jsonEncodedString() {
-            res.appendBody(string: str)
-            if complete {
-                if status == nil {
-                    res.completed(status: self.statusCode())
-                } else {
-                    res.completed(status: status!)
-                }
-            }
+        if let str = JSON(dict).rawString(encoding: .utf8) {
+            res.send(str)
         } else {
             fatalError("Couldn't convert JSON")
         }
     }
-    */
+    
     func getErrorDescription() -> String {
         switch self {
         case .unknownError: return "Unknown error"
