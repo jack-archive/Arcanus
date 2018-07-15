@@ -65,7 +65,7 @@ public class Database {
             }
         }
 
-        addUser(name: "jmmaloney4", password: "12345")
+        // addUser(name: "jmmaloney4", password: "12345")
         if self.authenticateUser(name: "jmmaloney4", password: "12345") {
             Log.info("Authenticated")
         } else {
@@ -73,7 +73,7 @@ public class Database {
         }
     }
 
-    func addUser(name: String, password: String) -> Bool {
+    @discardableResult func addUser(name: String, password: String) -> Bool {
         if self.userExists(name: name) {
             return false
         }
@@ -98,7 +98,7 @@ public class Database {
         // TODO: Filter usernames
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
         db.execute(query: query) { res in
-            if res.success {
+            if res.success, let rows = res.asRows {
                 rv = true
             }
         }
@@ -108,11 +108,10 @@ public class Database {
     func authenticateUser(name: String, password: String) -> Bool {
         let userTable = UserTable()
         var rv = false
-        let query = Select(userTable.id, userTable.username, userTable.password, from: userTable)
+        let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
         db.execute(query: query) { res in
-            if res.success {
-                let row = res.asRows![0]
-                rv = row[UserTable.Columns.password.rawValue] as! String == password
+            if res.success, let rows = res.asRows {
+                rv = true
             }
         }
         return rv

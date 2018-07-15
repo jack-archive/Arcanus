@@ -29,7 +29,6 @@ public class Server {
         // Run the metrics initializer
         initializeMetrics(router: self.router)
         // Open database
-        // try BasicAuth.initUserDatabase()
         try Database.openSharedDatabase()
     }
 

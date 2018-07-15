@@ -7,6 +7,7 @@
 import Foundation
 import Health
 import KituraContracts
+import KituraNet
 import LoggerAPI
 import SwiftyJSON
 
@@ -26,8 +27,9 @@ func initializeAuthenticationRoutes(app: Server) {
         respondWith(userProfile, nil)
     }
 
-    app.router.post("/user") { request, _, _ in
+    app.router.post("/user") { request, response, next in
         guard let str = try? request.readString(), let data = str?.data(using: .utf8) else {
+            ArcanusError.failedToConvertData.setError(response)
             return
         }
         let json = JSON(data: data)
@@ -37,5 +39,19 @@ func initializeAuthenticationRoutes(app: Server) {
         }
 
         Log.verbose("Creating user \(username)")
+        
+        if Database.shared.userExists(name: username) {
+            ArcanusError.usernameInUse.setError(response)
+            return
+        }
+        
+        Database.shared.addUser(name: username, password: password)
+        response.statusCode = .OK
+        
+        next()
     }
+}
+
+func initializeGameRoutes(app: Server) {
+    
 }

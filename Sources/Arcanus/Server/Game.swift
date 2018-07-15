@@ -6,5 +6,6 @@
 
 import Foundation
 
-public class Game: Codable {
+public class Game {
+    
 }
