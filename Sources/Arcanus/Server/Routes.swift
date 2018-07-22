@@ -44,9 +44,12 @@ func initializeAuthenticationRoutes(app: Server) {
             ArcanusError.usernameInUse.setError(response)
             return
         }
-        
+        do {
         Database.shared.addUser(name: username, password: password)
-        response.statusCode = .OK
+            response.statusCode = .OK
+        } catch Error {
+            
+        }
         
         next()
     }
