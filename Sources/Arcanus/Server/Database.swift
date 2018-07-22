@@ -34,8 +34,32 @@ public class Database {
         let password = Column(Columns.password.rawValue, String.self, notNull: true)
     }
 
+    class GamesIndex: Table {
+        enum Columns: String {
+            case id
+            case user1
+            case user2
+            case state
+            case config
+        }
+    }
+    
+    class GameTable: Table {
+        
+    }
+    
     let db: SQLiteConnection
 
+    private func checkTableCreated(_ table: Table) {
+        table.create(connection: db) { result in
+            if result.success {
+                Log.info("Created \(table.nameInQuery)")
+            } else if let err = result.asError {
+                Log.error("Failed to create \(table.nameInQuery): \(err)")
+            }
+        }
+    }
+    
     init(path: String = "arcanus.db") throws {
         self.db = SQLiteConnection(filename: path)
 
@@ -55,39 +79,31 @@ public class Database {
         }
 
         let userTable = UserTable()
-        let des = try userTable.description(connection: db)
-        Log.info(des)
-        userTable.create(connection: db) { result in
-            if result.success {
-                Log.info("Created User table")
-            } else if let err = result.asError {
-                Log.error("Failed to create User table: \(err)")
-            }
-        }
-
-        // addUser(name: "jmmaloney4", password: "12345")
-        if self.authenticateUser(name: "jmmaloney4", password: "12345") {
-            Log.info("Authenticated")
-        } else {
-            Log.error("Failed to Authenticate")
-        }
+        let gamesIndex = GamesIndex()
+        checkTableCreated(userTable)
+        checkTableCreated(gamesIndex)
     }
 
-    @discardableResult func addUser(name: String, password: String) -> Bool {
+    @discardableResult func addUser(name: String, password: String) throws -> Bool {
         if self.userExists(name: name) {
             return false
         }
         var rv = false
+        var err: Error!
         let userTable = UserTable()
         let insert = Insert(into: userTable, columns: [userTable.username, userTable.password], values: [name, password], returnID: true)
         db.execute(query: insert) { res in
             if res.success {
                 Log.info("Successfully added User \(name)")
                 rv = true
-            } else if let err = res.asError {
+            } else if res.asError != nil {
+                err = res.asError!
                 Log.error("Failed to create user \(name): \(err)")
                 rv = false
             }
+        }
+        if err != nil {
+            throw err
         }
         return rv
     }
@@ -95,11 +111,12 @@ public class Database {
     func userExists(name: String) -> Bool {
         let userTable = UserTable()
         var rv = false
-        // TODO: Filter usernames
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
         db.execute(query: query) { res in
             if res.success, let rows = res.asRows {
-                rv = true
+                if rows.count == 1 && rows[0][UserTable.Columns.username.rawValue] as? String == name {
+                    rv = true
+                }
             }
         }
         return rv
@@ -110,7 +127,8 @@ public class Database {
         var rv = false
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
         db.execute(query: query) { res in
-            if res.success, let rows = res.asRows {
+            if res.success, let rows = res.asRows,
+                rows.count == 1, rows[0][UserTable.Columns.password.rawValue] as? String == password {
                 rv = true
             }
         }

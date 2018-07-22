@@ -24,7 +24,7 @@ public let health = Health()
 public class Server {
     let router = Router()
     let cloudEnv = CloudEnv()
-
+    
     public init() throws {
         // Run the metrics initializer
         initializeMetrics(router: self.router)
