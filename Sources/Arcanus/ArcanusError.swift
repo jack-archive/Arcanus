@@ -9,12 +9,13 @@ import KituraNet
 import Kitura
 import SwiftyJSON
 
-public enum ArcanusError: Int, Swift.Error {
-    case unknownError = 99
+public enum ArcanusError: Swift.Error {
+    case unknownError
     case badPath
     case failedToConvertData
     case failedToOpenDatabase
     case jsonError
+    case databaseError(Swift.Error?)
 
     case unregisteredUsername
     case usernameInUse
@@ -30,6 +31,7 @@ public enum ArcanusError: Int, Swift.Error {
         case .failedToConvertData: return .internalServerError
         case .failedToOpenDatabase: return .internalServerError
         case .jsonError: return .badRequest
+        case .databaseError: return .internalServerError
 
         case .unregisteredUsername: return .unprocessableEntity
         case .usernameInUse: return .unprocessableEntity
@@ -42,7 +44,7 @@ public enum ArcanusError: Int, Swift.Error {
     
 
     func setError(_ res: RouterResponse,
-                  info: [String: Any] = [:],
+                  info: Info = [:],
                   status: HTTPStatusCode? = nil)
     {
         if status != nil {
@@ -51,12 +53,28 @@ public enum ArcanusError: Int, Swift.Error {
             res.statusCode = self.statusCode()
         }
         
-        let dict: [String: Any] = ["error": self.rawValue, "description": self.getErrorDescription(), "info": info]
-        if let str = JSON(dict).rawString(encoding: .utf8) {
+        
+        if let str = JSON(self.json(info: info)).rawString(encoding: .utf8) {
             res.send(str)
         } else {
             fatalError("Couldn't convert JSON")
         }
+    }
+    
+    typealias Info = [String:String]
+    
+    struct Json: Codable {
+        let error: String
+        let desciption: String
+        let info: Info
+    }
+    
+    func json(info: Info = [:]) -> Json {
+        return Json(error: "\(self)", desciption: self.getErrorDescription(), info: info)
+    }
+    
+    func requestError(info: Info = [:]) -> RequestError {
+        return RequestError(RequestError.init(httpCode: self.statusCode().rawValue), body: self.json(info: info))
     }
     
     func getErrorDescription() -> String {
@@ -66,6 +84,7 @@ public enum ArcanusError: Int, Swift.Error {
         case .failedToConvertData: return "Failed to convert data"
         case .failedToOpenDatabase: return "Failed to open database"
         case .jsonError: return "JSON Error"
+        case .databaseError(let err): return "Database error\(err == nil ? ": \(err!)" : "")"
 
         case .unregisteredUsername: return "Username has not been registered yet"
         case .usernameInUse: return "Username is already in use"
@@ -74,5 +93,9 @@ public enum ArcanusError: Int, Swift.Error {
         case .alreadyInGame: return "Already in a game"
         case .gameAlreadyFull: return "Game is already full"
         }
+    }
+    
+    var localizedDescription: String {
+        return self.getErrorDescription()
     }
 }

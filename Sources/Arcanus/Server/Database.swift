@@ -28,13 +28,13 @@ public class Database {
             case password
         }
 
-        let tableName = "User"
+        let tableName = "Users"
         let id = Column(Columns.id.rawValue, Int32.self, primaryKey: true)
         let username = Column(Columns.username.rawValue, String.self, unique: true)
         let password = Column(Columns.password.rawValue, String.self, notNull: true)
     }
 
-    class GamesIndex: Table {
+    class GameIndex: Table {
         enum Columns: String {
             case id
             case user1
@@ -42,6 +42,13 @@ public class Database {
             case state
             case config
         }
+        
+        let tableName = "GameIndex"
+        let id = Column(Columns.id.rawValue, Int32.self, primaryKey: true)
+        let user1 = Column(Columns.user1.rawValue, String.self)
+        let user2 = Column(Columns.user2.rawValue, String.self)
+        let state = Column(Columns.state.rawValue, String.self)
+        let config = Column(Columns.config.rawValue, String.self)
     }
     
     class GameTable: Table {
@@ -79,59 +86,91 @@ public class Database {
         }
 
         let userTable = UserTable()
-        let gamesIndex = GamesIndex()
+        let gameIndex = GameIndex()
         checkTableCreated(userTable)
-        checkTableCreated(gamesIndex)
+        checkTableCreated(gameIndex)
     }
 
-    @discardableResult func addUser(name: String, password: String) throws -> Bool {
-        if self.userExists(name: name) {
-            return false
+    func executeQuery(_ query: Query, handler: @escaping (QueryResult) throws -> ()) throws {
+        var error: Error? = nil
+        db.execute(query: query) { res in
+            if res.success {
+                do {
+                    try handler(res)
+                } catch let err {
+                    error = err
+                }
+            } else if let err = res.asError {
+                error = err
+                return
+            } else {
+                error = ArcanusError.unknownError
+            }
         }
-        var rv = false
-        var err: Error!
+        if error != nil {
+            throw error!
+        }
+    }
+    
+    func addUser(name: String, password: String) throws {
+        if try self.userExists(name: name) {
+            throw ArcanusError.usernameInUse
+        }
+        
         let userTable = UserTable()
         let insert = Insert(into: userTable, columns: [userTable.username, userTable.password], values: [name, password], returnID: true)
-        db.execute(query: insert) { res in
-            if res.success {
-                Log.info("Successfully added User \(name)")
-                rv = true
-            } else if res.asError != nil {
-                err = res.asError!
-                Log.error("Failed to create user \(name): \(err)")
-                rv = false
-            }
+        
+        try executeQuery(insert) { res in
+            let user = try self.userInfo(name: name)
+            Log.info("Created User '\(name)' [id:\(user.id)]")
         }
-        if err != nil {
-            throw err
-        }
-        return rv
     }
 
-    func userExists(name: String) -> Bool {
+    func userInfo(name: String) throws -> User {
         let userTable = UserTable()
-        var rv = false
+        var rv: User! = nil
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
-        db.execute(query: query) { res in
-            if res.success, let rows = res.asRows {
-                if rows.count == 1 && rows[0][UserTable.Columns.username.rawValue] as? String == name {
-                    rv = true
+        try executeQuery(query) { res in
+            if let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.username.rawValue] as? String == name {
+                guard let id = rows[0][UserTable.Columns.id.rawValue] as? Int32,
+                    let username = rows[0][UserTable.Columns.username.rawValue] as? String else {
+                    throw ArcanusError.databaseError(nil)
                 }
+                rv = User(id: id, username: username)
+            }
+        }
+        return rv
+    }
+    
+    func userExists(name: String) throws -> Bool {
+        let userTable = UserTable()
+        var rv = false
+        let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
+        try executeQuery(query) { res in
+            if let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.username.rawValue] as? String == name {
+                    rv = true
             }
         }
         return rv
     }
 
-    func authenticateUser(name: String, password: String) -> Bool {
+    func authenticateUser(name: String, password: String) throws -> Bool {
         let userTable = UserTable()
         var rv = false
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
-        db.execute(query: query) { res in
-            if res.success, let rows = res.asRows,
-                rows.count == 1, rows[0][UserTable.Columns.password.rawValue] as? String == password {
+        
+        try executeQuery(query) { res in
+            if let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.password.rawValue] as? String == password {
                 rv = true
             }
         }
         return rv
+    }
+    
+    func initGame(user: String) throws {
+        let gameIndex = GameIndex()
+        let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [user], returnID: true)
+
+        
     }
 }
