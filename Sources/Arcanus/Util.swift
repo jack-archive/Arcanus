@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-// import PerfectHTTP
 
 /// Code will only run in Debug configuration
 public func DEBUG(_ code: () throws -> ()) throws {
