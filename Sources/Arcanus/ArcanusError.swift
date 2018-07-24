@@ -43,7 +43,7 @@ public enum ArcanusError: Swift.Error {
     }
     
 
-    func setError(_ res: RouterResponse,
+    @available(*, deprecated) func setError(_ res: RouterResponse,
                   info: Info = [:],
                   status: HTTPStatusCode? = nil)
     {
@@ -60,7 +60,7 @@ public enum ArcanusError: Swift.Error {
             fatalError("Couldn't convert JSON")
         }
     }
-    
+  
     typealias Info = [String:String]
     
     struct Json: Codable {

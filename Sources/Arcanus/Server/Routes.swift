@@ -34,33 +34,28 @@ func initializeAuthenticationRoutes(app: Server) {
         }
     }
     
-    app.router.post("/user") { request, response, next in
+    struct UserPost: Codable {
+        let username: String
+        let password: String
+    }
+    
+    app.router.post("/user") { (user: UserPost, respondWith: (User?, RequestError?) -> Void) in
         do {
-            guard let str = try request.readString(), let data = str.data(using: .utf8) else {
-                ArcanusError.failedToConvertData.setError(response)
-                return
-            }
-            let json = JSON(data: data)
+            Log.verbose("Creating user \(user.username)")
             
-            guard let username = json["username"].string, let password = json["password"].string else {
-                return
-            }
-            
-            Log.verbose("Creating user \(username)")
-            
-            if try Database.shared.userExists(name: username) {
-                ArcanusError.usernameInUse.setError(response)
+            if try Database.shared.userExists(name: user.username) {
+                respondWith(nil, ArcanusError.usernameInUse.requestError())
                 return
             }
             do {
-                try Database.shared.addUser(name: username, password: password)
-                response.statusCode = .OK
+                try Database.shared.addUser(name: user.username, password: user.password)
+                respondWith(try Database.shared.userInfo(name: user.username), nil)
             }
+        } catch let error as ArcanusError {
+            respondWith(nil, error.requestError())
         } catch let error {
             Log.error(error.localizedDescription)
         }
-        
-        next()
     }
 }
 
