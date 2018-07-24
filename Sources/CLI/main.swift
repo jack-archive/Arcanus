@@ -18,7 +18,7 @@ let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 let cli = CommandLineKit.CommandLine()
 
 // swiftlint:disable line_length
-let serverOption = BoolOption(shortFlag: "s", longFlag: "server", helpMessage: "Start a server.")
+let serverOption = BoolOption(shortFlag: "s", longFlag: "server", helpMessage: "Start as a server.")
 
 let logPathOption = StringOption(shortFlag: "l",
                                  longFlag: "log",

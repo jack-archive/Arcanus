@@ -22,33 +22,42 @@ func initializeHealthRoutes(app: Server) {
 }
 
 func initializeAuthenticationRoutes(app: Server) {
-    app.router.get("/user") { (userProfile: BasicAuth, respondWith: (BasicAuth?, RequestError?) -> ()) -> () in
-        Log.info("authenticated \(userProfile.id) using \(userProfile.provider)")
-        respondWith(userProfile, nil)
-    }
-
-    app.router.post("/user") { request, response, next in
-        guard let str = try? request.readString(), let data = str?.data(using: .utf8) else {
-            ArcanusError.failedToConvertData.setError(response)
-            return
-        }
-        let json = JSON(data: data)
-
-        guard let username = json["username"].string, let password = json["password"].string else {
-            return
-        }
-
-        Log.verbose("Creating user \(username)")
-        
-        if Database.shared.userExists(name: username) {
-            ArcanusError.usernameInUse.setError(response)
-            return
-        }
+    app.router.get("/user") { (userProfile: BasicAuth, respondWith: (User?, RequestError?) -> Void) in
         do {
-        Database.shared.addUser(name: username, password: password)
-            response.statusCode = .OK
-        } catch Error {
+            Log.info("authenticated \(userProfile.id) using \(userProfile.provider)")
+            let user = try Database.shared.userInfo(name: userProfile.id)
+            respondWith(user, nil)
+        } catch let error as ArcanusError {
+            respondWith(nil, error.requestError())
+        } catch {
+            Log.error("Unhandled error!!")
+        }
+    }
+    
+    app.router.post("/user") { request, response, next in
+        do {
+            guard let str = try request.readString(), let data = str.data(using: .utf8) else {
+                ArcanusError.failedToConvertData.setError(response)
+                return
+            }
+            let json = JSON(data: data)
             
+            guard let username = json["username"].string, let password = json["password"].string else {
+                return
+            }
+            
+            Log.verbose("Creating user \(username)")
+            
+            if try Database.shared.userExists(name: username) {
+                ArcanusError.usernameInUse.setError(response)
+                return
+            }
+            do {
+                try Database.shared.addUser(name: username, password: password)
+                response.statusCode = .OK
+            }
+        } catch let error {
+            Log.error(error.localizedDescription)
         }
         
         next()
@@ -56,5 +65,10 @@ func initializeAuthenticationRoutes(app: Server) {
 }
 
 func initializeGameRoutes(app: Server) {
+    app.router.post("/games") { request, response, next in
+        
+    }
+    
+    
     
 }

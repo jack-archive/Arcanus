@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import VarInt
 
 public class Card {
     public static func makeNameClassReady(_ name: String) -> String {
