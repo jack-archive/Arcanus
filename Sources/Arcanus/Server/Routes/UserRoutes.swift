@@ -27,22 +27,22 @@ fileprivate struct UserPost: Codable {
 
 func initializeUserRoutes(app: Server) {
     app.router.get("/profile") { (auth: BasicAuth, respondWith: @escaping (User?, RequestError?) -> ()) in
-        handleErrors(respondWith: respondWith, code: { res in
+        handleErrors(respondWith: respondWith) { res in
             Log.info("authenticated \(auth.id) using \(auth.provider)")
             let user = try Database.shared.userInfo(name: auth.id)
             res(user, nil)
-        })
+        }
     }
 
     app.router.get("/users/:username") { (username: UsernameMiddleware, respondWith: @escaping (User?, RequestError?) -> ()) in
         Log.info("Getting profile for \(username.id)")
-        handleErrors(respondWith: respondWith, code: { _ in
+        handleErrors(respondWith: respondWith) { _ in
             respondWith(try Database.shared.userInfo(name: username.id), nil)
-        })
+        }
     }
 
     app.router.post("/users") { (user: UserPost, respondWith: @escaping (User?, RequestError?) -> ()) in
-        handleErrors(respondWith: respondWith, code: { res in
+        handleErrors(respondWith: respondWith) { res in
             Log.verbose("Creating user \(user.username)")
 
             if try Database.shared.userExists(name: user.username) {
@@ -52,6 +52,6 @@ func initializeUserRoutes(app: Server) {
 
             try Database.shared.addUser(name: user.username, password: user.password)
             res(try Database.shared.userInfo(name: user.username), nil)
-        })
+        }
     }
 }
