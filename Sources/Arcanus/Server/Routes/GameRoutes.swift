@@ -16,7 +16,17 @@ fileprivate struct GetGamesMiddleware: TypeSafeMiddleware, Codable {
     }
 }
 
-
+fileprivate struct GameIDMiddleware: TypeSafeMiddleware {
+    var id: Int
+    
+    static func handle(request: RouterRequest, response: RouterResponse, completion: @escaping (GameIDMiddleware?, RequestError?) -> ()) {
+        if let rv = request.parameters["game"]?.int {
+            completion(GameIDMiddleware(id: rv), nil)
+        } else {
+            completion(nil, ArcanusError.badPath.requestError())
+        }
+    }
+}
 
 func initializeGameRoutes(app: Server) {
     app.router.post("/games") { (auth: BasicAuth, respondWith: @escaping (Game?, RequestError?) -> ()) in
@@ -36,4 +46,31 @@ func initializeGameRoutes(app: Server) {
             }
         }
     }
+    
+    app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
+        handleErrors(respondWith: respondWith) { res in
+            
+        }
+    }
+    
+    app.router.get("/games/:game/players") { (auth: BasicAuth, game: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
+        handleErrors(respondWith: respondWith) { res in
+            print("\(auth.id)")
+            print("GAME: \(game.id)")
+        }
+    }
+    
+    /* /games/:gameid/players
+     * /games/:gameid/players/:id/
+     *
+     */
+    
+    /*
+    app.router.post("/games/:id/players") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
+        handleErrors(respondWith: respondWith) { res in
+            print("\(auth.id)")
+            
+        }
+    }
+ */
 }
