@@ -10,19 +10,23 @@ import LoggerAPI
 import SwiftKuery
 import SwiftKuerySQLite
 
-public struct User: Codable {
-    let id: Int32
-    let username: String
+public class User: Codable {
+//     let id: Int32
+    let id: String
+
+    init(_ name: String) {
+        self.id = name
+    }
 }
 
 public struct BasicAuth: TypeSafeHTTPBasic {
     /// AKA username
     public let id: String
-    
+
     init(id: String) {
         self.id = id
     }
-    
+
     public static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> ()) {
         do {
             if try Database.shared.authenticateUser(name: username, password: password) {
@@ -34,7 +38,7 @@ public struct BasicAuth: TypeSafeHTTPBasic {
             Log.error(error.localizedDescription)
         }
     }
-    
+
     public func user() throws -> User {
         return try Database.shared.userInfo(name: self.id)
     }
