@@ -42,7 +42,7 @@ public class Database {
             case state
             case config
         }
-        
+
         let tableName = "GameIndex"
         let id = Column(Columns.id.rawValue, Int32.self, primaryKey: true)
         let user1 = Column(Columns.user1.rawValue, String.self)
@@ -50,15 +50,14 @@ public class Database {
         let state = Column(Columns.state.rawValue, String.self)
         let config = Column(Columns.config.rawValue, String.self)
     }
-    
+
     class GameTable: Table {
-        
     }
-    
+
     let db: SQLiteConnection
 
     private func checkTableCreated(_ table: Table) {
-        table.create(connection: db) { result in
+        table.create(connection: self.db) { result in
             if result.success {
                 Log.info("Created \(table.nameInQuery)")
             } else if let err = result.asError {
@@ -66,7 +65,7 @@ public class Database {
             }
         }
     }
-    
+
     init(path: String = "arcanus.db") throws {
         self.db = SQLiteConnection(filename: path)
 
@@ -93,7 +92,7 @@ public class Database {
 
     // Execute query and handle errors
     func executeQuery(_ query: Query, handler: @escaping (QueryResult) throws -> ()) throws {
-        var error: Error? = nil
+        var error: Error?
         db.execute(query: query) { res in
             if res.success {
                 do {
@@ -112,46 +111,46 @@ public class Database {
             throw error!
         }
     }
-    
+
     // MARK: User
-    
+
     func addUser(name: String, password: String) throws {
         if try self.userExists(name: name) {
             throw ArcanusError.usernameInUse
         }
-        
+
         let userTable = UserTable()
         let insert = Insert(into: userTable, columns: [userTable.username, userTable.password], values: [name, password], returnID: true)
-        
-        try executeQuery(insert) { res in
-            let user = try self.userInfo(name: name)
-            Log.info("Created User '\(name)' [id:\(user.id)]")
+
+        try executeQuery(insert) { _ in
+            //let user = try self.userInfo(name: name)
+            Log.info("Created User '\(name)'")
         }
     }
 
     func userInfo(name: String) throws -> User {
         let userTable = UserTable()
-        var rv: User! = nil
+        var rv: User!
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
         try executeQuery(query) { res in
-            if let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.username.rawValue] as? String == name {
-                guard let id = rows[0][UserTable.Columns.id.rawValue] as? Int32,
-                    let username = rows[0][UserTable.Columns.username.rawValue] as? String else {
-                    throw ArcanusError.databaseError(nil)
-                }
-                rv = User(id: id, username: username)
+            guard let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.username.rawValue] as? String == name,
+                let username = rows[0][UserTable.Columns.username.rawValue] as? String else {
+                throw ArcanusError.databaseError(nil)
             }
+            rv = User(username)
         }
         return rv
     }
-    
+
     func userExists(name: String) throws -> Bool {
         let userTable = UserTable()
         var rv = false
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
         try executeQuery(query) { res in
-            if let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.username.rawValue] as? String == name {
-                    rv = true
+            if let rows = res.asRows,
+                rows.count == 1,
+                rows[0][UserTable.Columns.username.rawValue] as? String == name {
+                rv = true
             }
         }
         return rv
@@ -161,24 +160,26 @@ public class Database {
         let userTable = UserTable()
         var rv = false
         let query = Select(userTable.id, userTable.username, userTable.password, from: userTable).where(userTable.username == name)
-        
+
         try executeQuery(query) { res in
-            if let rows = res.asRows, rows.count == 1, rows[0][UserTable.Columns.password.rawValue] as? String == password {
+            if let rows = res.asRows,
+                rows.count == 1,
+                rows[0][UserTable.Columns.password.rawValue] as? String == password {
                 rv = true
             }
         }
         return rv
     }
-    
+
     // MARK: Game
-    
+
     func initGame(game: Game) throws {
         if game.user1 == nil {
             throw ArcanusError.databaseError(nil)
         }
-        
+
         let gameIndex = GameIndex()
         let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [game.user1], returnID: true)
-        try executeQuery(insert) { res in }
+        try executeQuery(insert) { _ in }
     }
 }
