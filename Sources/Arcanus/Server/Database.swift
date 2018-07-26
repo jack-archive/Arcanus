@@ -91,6 +91,7 @@ public class Database {
         checkTableCreated(gameIndex)
     }
 
+    // Execute query and handle errors
     func executeQuery(_ query: Query, handler: @escaping (QueryResult) throws -> ()) throws {
         var error: Error? = nil
         db.execute(query: query) { res in
@@ -111,6 +112,8 @@ public class Database {
             throw error!
         }
     }
+    
+    // MARK: User
     
     func addUser(name: String, password: String) throws {
         if try self.userExists(name: name) {
@@ -167,12 +170,15 @@ public class Database {
         return rv
     }
     
-    func initGame(user: String) throws {
-        let gameIndex = GameIndex()
-        let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [user], returnID: true)
-
-        try executeQuery(insert) { res in
-            
+    // MARK: Game
+    
+    func initGame(game: Game) throws {
+        if game.user1 == nil {
+            throw ArcanusError.databaseError(nil)
         }
+        
+        let gameIndex = GameIndex()
+        let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [game.user1], returnID: true)
+        try executeQuery(insert) { res in }
     }
 }

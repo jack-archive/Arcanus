@@ -6,6 +6,19 @@
 
 import Foundation
 
-public class Game {
+public class Game: Codable {
+    
+    var id: Int32! = nil
+    var user1: User! = nil
+    var user2: User! = nil
+    var state: String! = nil
+    var config: String! = nil
+    
+    public static func makeGame(user: User) throws -> Game {
+        let rv = Game()
+        rv.user1 = user
+        try Database.shared.initGame(game: rv)
+        return rv
+    }
     
 }
