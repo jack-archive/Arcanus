@@ -60,10 +60,14 @@ func initializeAuthenticationRoutes(app: Server) {
 }
 
 func initializeGameRoutes(app: Server) {
-    app.router.post("/games") { request, response, next in
-        
+    app.router.post("/games") { (userProfile: BasicAuth, respondWith: (Game?, RequestError?) -> Void) in
+        do {
+            let game = try Game.makeGame(user: try userProfile.user())
+            respondWith(game, nil)
+        } catch let error as ArcanusError {
+            respondWith(nil, error.requestError())
+        } catch {
+            respondWith(nil, ArcanusError.unknownError.requestError())
+        }
     }
-    
-    
-    
 }

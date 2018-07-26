@@ -18,11 +18,9 @@ public struct User: Codable {
 public struct BasicAuth: TypeSafeHTTPBasic {
     /// AKA username
     public let id: String
-    var password: String?
     
-    init(id: String, password: String? = nil) {
+    init(id: String) {
         self.id = id
-        self.password = password
     }
     
     public static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> ()) {
@@ -35,5 +33,9 @@ public struct BasicAuth: TypeSafeHTTPBasic {
         } catch let error {
             Log.error(error.localizedDescription)
         }
+    }
+    
+    public func user() throws -> User {
+        return try Database.shared.userInfo(name: self.id)
     }
 }
