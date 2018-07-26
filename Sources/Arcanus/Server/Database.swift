@@ -101,6 +101,7 @@ public class Database {
                     error = err
                 }
             } else if let err = res.asError {
+                Log.error("Database Error: \(err)")
                 error = err
                 return
             } else {
@@ -108,7 +109,7 @@ public class Database {
             }
         }
         if error != nil {
-            throw error!
+            throw ArcanusError.databaseError(error!)
         }
     }
 

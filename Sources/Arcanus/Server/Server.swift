@@ -36,6 +36,7 @@ public class Server {
         // Endpoints
         initializeHealthRoutes(app: self)
         initializeUserRoutes(app: self)
+        initializeGameRoutes(app: self)
     }
 
     public func run() throws {
