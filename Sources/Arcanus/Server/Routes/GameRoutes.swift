@@ -28,6 +28,18 @@ fileprivate struct GameIDMiddleware: TypeSafeMiddleware {
     }
 }
 
+fileprivate struct PlayerIDMiddleware: TypeSafeMiddleware {
+    var id: Int
+    
+    static func handle(request: RouterRequest, response: RouterResponse, completion: @escaping (PlayerIDMiddleware?, RequestError?) -> ()) {
+        if let rv = request.parameters["player"]?.int {
+            completion(PlayerIDMiddleware(id: rv), nil)
+        } else {
+            completion(nil, ArcanusError.badPath.requestError())
+        }
+    }
+}
+
 func initializeGameRoutes(app: Server) {
     app.router.post("/games") { (auth: BasicAuth, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
