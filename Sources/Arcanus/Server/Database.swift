@@ -180,7 +180,7 @@ public class Database {
         }
 
         let gameIndex = GameIndex()
-        let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [game.user1], returnID: true)
+        let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [game.user1.id], returnID: true)        
         try executeQuery(insert) { _ in }
     }
 }
