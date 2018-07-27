@@ -41,9 +41,10 @@ fileprivate struct PlayerIDMiddleware: TypeSafeMiddleware {
 }
 
 func initializeGameRoutes(app: Server) {
-    app.router.post("/games") { (auth: BasicAuth, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    struct emptyPost: Codable {}
+    app.router.post("/games") { (auth: BasicAuth, _: emptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            print("\(auth.id)")
+            Log.verbose("\(auth.id) initializing game")
             let game = try Game.makeGame(user: try auth.user())
             respondWith(game, nil)
         }
@@ -52,9 +53,9 @@ func initializeGameRoutes(app: Server) {
     app.router.get("/games") { (auth: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             if params.open {
-                Log.info("Getting open games")
+                Log.verbose("Getting open games")
             } else {
-                Log.info("Getting all games")
+                Log.verbose("Getting all games")
             }
         }
     }
