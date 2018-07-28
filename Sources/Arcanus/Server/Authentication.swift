@@ -8,15 +8,25 @@ import CredentialsHTTP
 import Foundation
 import LoggerAPI
 import SwiftKuery
+import SwiftKueryORM
 import SwiftKuerySQLite
 
-public class User: Codable {
+public final class User: Model {
 //     let id: Int32
     let id: String
 
     init(_ name: String) {
         self.id = name
+        
     }
+    
+    /*
+    static func forUsername(_ name: String) throws -> User {
+        User.findAll { (result: [User]?, error: RequestError?) in
+            
+        }
+    }
+     */
 }
 
 public struct BasicAuth: TypeSafeHTTPBasic {

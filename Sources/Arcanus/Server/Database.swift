@@ -9,6 +9,7 @@ import Foundation
 import LoggerAPI
 import SwiftKuery
 import SwiftKuerySQLite
+import SwiftKueryORM
 
 public class Database {
     static var shared: Database!
@@ -182,5 +183,21 @@ public class Database {
         let gameIndex = GameIndex()
         let insert = Insert(into: gameIndex, columns: [gameIndex.user1], values: [game.user1.id], returnID: true)        
         try executeQuery(insert) { _ in }
+    }
+    
+    func getGames(open: Bool = false) throws -> [Game] {
+        let gameIndex = GameIndex()
+        let query = Select(gameIndex.columns, from: gameIndex)
+        let rv: [Game] = []
+        
+        try executeQuery(query) { res in
+            guard let rows = res.asRows else {
+                throw ArcanusError.databaseError(nil)
+            }
+            
+            // let game = DatabaseDecoder().decode(Game.self, rows[0])
+        }
+        
+        return []
     }
 }
