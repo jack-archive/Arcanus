@@ -5,8 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import SwiftKueryORM
 
-public class Game: Codable {
+public final class Game: Model {
     var id: Int32! = nil
     var user1: User! = nil
     var user2: User! = nil

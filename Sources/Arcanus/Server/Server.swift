@@ -9,6 +9,7 @@ import Configuration
 import Foundation
 import Health
 import Kitura
+import SwiftKueryORM
 
 public func serverMain() {
     do {
@@ -30,6 +31,15 @@ public class Server {
         initializeMetrics(router: self.router)
         // Open database
         try Database.openSharedDatabase()
+        
+        SwiftKueryORM.Database.default = SwiftKueryORM.Database(single: Database.shared.db)
+        
+        do {
+            try User.createTableSync()
+            try Game.createTableSync()
+        } catch {
+            // Error, but table already created
+        }
     }
 
     func postInit() throws {
