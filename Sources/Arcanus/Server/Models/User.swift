@@ -18,7 +18,8 @@ struct BasicAuth: TypeSafeHTTPBasic {
     
     static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> Void) {
         do {
-            if let user = try User.get(username), let hash = try? User.hashPassword(password, salt: user.saltBytes), user.hashBytes == hash {
+            if let user = try User.get(username, keepHash: true), let hash = try? User.hashPassword(password, salt: user.saltBytes), user.hashBytes == hash {
+                user.clearSensitiveInfo()
                 callback(BasicAuth(id: user.id, user: user))
             } else {
                 callback(nil)
@@ -47,6 +48,17 @@ final class User: Model, QueryParams {
         let salt = try User.generateSalt()
         self.salt =  CryptoUtils.hexString(from: salt)
         self.hash =  CryptoUtils.hexString(from: try User.hashPassword(password, salt: salt))
+        defer {
+            self.clearSensitiveInfo()
+        }
+        
+        var error: Error?
+        self.save { (user, err) in
+            if err != nil {
+                error = err!
+            }
+        }
+        if error != nil { throw error! }
     }
     
     static func generateSalt() throws -> [UInt8] {
@@ -60,13 +72,14 @@ final class User: Model, QueryParams {
         return key
     }
     
+    // Hide password hash and salt
     func clearSensitiveInfo() {
         self.salt = ""
         self.hash = ""
     }
     
     /// Gets the user with the specified name out of the Database
-    static func get(_ username: String) throws -> User? {
+    static func get(_ username: String, keepHash: Bool = false) throws -> User? {
         struct IdParam: QueryParams {
             let id: String
             
@@ -92,6 +105,9 @@ final class User: Model, QueryParams {
         }
         
         if err == nil {
+            if !keepHash && rv != nil {
+                rv!.clearSensitiveInfo()
+            }
             return rv
         } else {
             throw err!
