@@ -18,7 +18,7 @@ struct BasicAuth: TypeSafeHTTPBasic {
     
     static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> Void) {
         do {
-            if let user = try User.get(username), let hash = try? User.hashPassword(password, salt: user.salt), user.hash == hash {
+            if let user = try User.get(username), let hash = try? User.hashPassword(password, salt: user.saltBytes), user.hashBytes == hash {
                 callback(BasicAuth(id: user.id, user: user))
             } else {
                 callback(nil)
@@ -29,26 +29,40 @@ struct BasicAuth: TypeSafeHTTPBasic {
     }
 }
 
-
-struct User: Model, QueryParams {
+final class User: Model, QueryParams {
     let id: String
-    let salt: [UInt8]
-    let hash: [UInt8]
+    private(set) var salt: String
+    private(set) var hash: String
+    
+    var saltBytes: [UInt8] {
+        get { return CryptoUtils.byteArray(fromHex: self.salt) }
+    }
+    
+    var hashBytes: [UInt8] {
+        get { return CryptoUtils.byteArray(fromHex: self.hash) }
+    }
     
     init(username: String, password: String) throws {
         self.id = username
-        self.salt = try User.generateSalt()
-        self.hash = try User.hashPassword(password, salt: salt)
+        let salt = try User.generateSalt()
+        self.salt =  CryptoUtils.hexString(from: salt)
+        self.hash =  CryptoUtils.hexString(from: try User.hashPassword(password, salt: salt))
     }
     
     static func generateSalt() throws -> [UInt8] {
-        return try Random.generate(byteCount: 32)
+        return try Random.generate(byteCount: PBKDFKeyLength)
     }
     
-    fileprivate static let PBKDFRounds: uint = 5
+    private static let PBKDFRounds: uint = 5
+    private static let PBKDFKeyLength: Int = 32
     static func hashPassword(_ password: String, salt: [UInt8]) throws -> [UInt8] {
-        let key = try PBKDF.deriveKey(fromPassword: password, salt: salt, prf: .sha256, rounds: PBKDFRounds, derivedKeyLength: 32)
+        let key = try PBKDF.deriveKey(fromPassword: password, salt: salt, prf: .sha256, rounds: PBKDFRounds, derivedKeyLength: UInt(PBKDFKeyLength))
         return key
+    }
+    
+    func clearSensitiveInfo() {
+        self.salt = ""
+        self.hash = ""
     }
     
     /// Gets the user with the specified name out of the Database

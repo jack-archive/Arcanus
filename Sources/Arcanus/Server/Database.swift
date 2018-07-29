@@ -15,6 +15,7 @@ public class Database {
     static var shared: Database!
 
     class func openSharedDatabase(path: String? = nil) throws {
+        Log.info("PATH: \(path)")
         if path != nil {
             self.shared = try Database(path: path!)
         } else {
@@ -70,6 +71,8 @@ public class Database {
     init(path: String = "arcanus.db") throws {
         self.db = SQLiteConnection(filename: path)
 
+        Log.info("Attempting to open database at \(path)")
+        
         self.db.connect(onCompletion: { err in
             if err == nil {
                 Log.verbose("Successfully opened database connection to \(path)")

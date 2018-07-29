@@ -19,6 +19,10 @@ let cli = CommandLineKit.CommandLine()
 
 // swiftlint:disable line_length
 let serverOption = BoolOption(shortFlag: "s", longFlag: "server", helpMessage: "Start as a server.")
+let databasePathOption = StringOption(shortFlag: "d",
+                                      longFlag: "database",
+                                      required: false,
+                                      helpMessage: "Path to the database file.")
 
 let logPathOption = StringOption(shortFlag: "l",
                                  longFlag: "log",
@@ -39,7 +43,7 @@ let verbosityOption = CounterOption(shortFlag: "v",
                                     helpMessage: "Print verbose messages. Specify multiple times to increase verbosity.")
 // swiftlint:enable line_length
 
-cli.addOptions(serverOption, logPathOption, logConsoleOption, cardsPathOption, helpOption, verbosityOption)
+cli.addOptions(serverOption, databasePathOption, logPathOption, logConsoleOption, cardsPathOption, helpOption, verbosityOption)
 
 do {
     try cli.parse()
@@ -55,6 +59,7 @@ if helpOption.wasSet {
 
 var console = logConsoleOption.value
 let logPath = logPathOption.value // optional
+let dbPath = databasePathOption.value // ^
 let cardPath = cardsPathOption.value ?? "cards.json" // default value
 let verbosity = verbosityOption.value
 
@@ -86,7 +91,7 @@ Log.info("======================================================================
 // swiftlint:enable line_length
 
 if serverOption.value {
-    Arcanus.serverMain()
+    Arcanus.serverMain(dbPath: dbPath)
 } else {
     Arcanus.clientMain()
 }

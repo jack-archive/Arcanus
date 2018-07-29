@@ -28,6 +28,7 @@ fileprivate struct UserPost: Codable {
 func initializeUserRoutes(app: Server) {
     app.router.get("/user") { (auth: BasicAuth, respondWith: @escaping (User?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
+            auth.user.clearSensitiveInfo() // Hide hash and salt
             respondWith(auth.user, nil)
         }
     }
