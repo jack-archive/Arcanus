@@ -50,19 +50,6 @@ public class Server {
         
         do { try User.createTableSync() } catch {}
         do { try Game.createTableSync() } catch {}
-        
-        do {
-            let user = try User(username: "jmmaloney4", password: "12345")
-            user.save { (user, err) in
-                if err != nil {
-                    Log.error("ERROR!! \(err!)")
-                } else {
-                    Log.info("\(user!)")
-                }
-            }
-        } catch let err {
-            Log.error("\(err)")
-        }
     }
 
     func postInit() throws {
