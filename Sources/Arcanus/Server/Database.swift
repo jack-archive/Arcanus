@@ -10,7 +10,7 @@ import LoggerAPI
 import SwiftKuery
 import SwiftKuerySQLite
 import SwiftKueryORM
-
+/*
 public class Database {
     static var shared: Database!
 
@@ -118,7 +118,7 @@ public class Database {
     }
 
     // MARK: User
-
+/*
     func addUser(name: String, password: String) throws {
         if try self.userExists(name: name) {
             throw ArcanusError.usernameInUse
@@ -175,9 +175,9 @@ public class Database {
         }
         return rv
     }
-
+*/
     // MARK: Game
-
+/*
     func initGame(game: Game) throws {
         if game.user1 == nil {
             throw ArcanusError.databaseError(nil)
@@ -204,5 +204,6 @@ public class Database {
         return []
     }
     
-    
+    */
 }
+*/

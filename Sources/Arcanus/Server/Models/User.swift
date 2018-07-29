@@ -18,7 +18,7 @@ struct BasicAuth: TypeSafeHTTPBasic {
     
     static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> Void) {
         do {
-            if let user = try User.get(username, keepHash: true), let hash = try? User.hashPassword(password, salt: user.saltBytes), user.hashBytes == hash {
+            if var user = try User.get(username, keepHash: true), let hash = try? User.hashPassword(password, salt: user.saltBytes), user.hashBytes == hash {
                 user.clearSensitiveInfo()
                 callback(BasicAuth(id: user.id, user: user))
             } else {
@@ -30,7 +30,7 @@ struct BasicAuth: TypeSafeHTTPBasic {
     }
 }
 
-final class User: Model, QueryParams {
+struct User: Model, QueryParams {
     let id: String
     private(set) var salt: String
     private(set) var hash: String
@@ -73,9 +73,15 @@ final class User: Model, QueryParams {
     }
     
     // Hide password hash and salt
-    func clearSensitiveInfo() {
+    mutating func clearSensitiveInfo() {
         self.salt = ""
         self.hash = ""
+    }
+    
+    func withoutSensitiveInfo() -> User {
+        var rv = self
+        rv.clearSensitiveInfo()
+        return rv
     }
     
     /// Gets the user with the specified name out of the Database
