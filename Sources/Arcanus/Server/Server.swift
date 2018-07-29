@@ -1,4 +1,4 @@
-// Copyright © 2018 Jack Maloney. All Rights Reserved.
+ // Copyright © 2018 Jack Maloney. All Rights Reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,10 +10,12 @@ import Foundation
 import Health
 import Kitura
 import SwiftKueryORM
+import LoggerAPI
+import SwiftKuerySQLite
 
-public func serverMain() {
+public func serverMain(dbPath: String? = nil) {
     do {
-        let server = try Server()
+        let server = try Server(path: dbPath)
         try server.run()
     } catch {
     }
@@ -26,19 +28,40 @@ public class Server {
     let router = Router()
     let cloudEnv = CloudEnv()
 
-    public init() throws {
+    public init(path: String? = nil) throws {
         // Run the metrics initializer
         initializeMetrics(router: self.router)
         // Open database
-        try Database.openSharedDatabase()
+        // try Database.openSharedDatabase(path: db)
         
-        SwiftKueryORM.Database.default = SwiftKueryORM.Database(single: Database.shared.db)
+        let db = SQLiteConnection(filename: path ?? "arcanus.db")
+        
+        Log.info("Attempting to open database at \(path)")
+        
+        db.connect(onCompletion: { err in
+            if err == nil {
+                Log.verbose("Successfully opened database connection to \(path)")
+            } else if let error = err {
+                Log.error("Failed to open database connection to \(path): \(error)")
+            }
+        })
+        
+        SwiftKueryORM.Database.default = SwiftKueryORM.Database(single: db)
+        
+        do { try User.createTableSync() } catch {}
+        do { try Game.createTableSync() } catch {}
         
         do {
-            try User.createTableSync()
-            try Game.createTableSync()
-        } catch {
-            // Error, but table already created
+            let user = try User(username: "jmmaloney4", password: "12345")
+            user.save { (user, err) in
+                if err != nil {
+                    Log.error("ERROR!! \(err!)")
+                } else {
+                    Log.info("\(user!)")
+                }
+            }
+        } catch let err {
+            Log.error("\(err)")
         }
     }
 
@@ -46,7 +69,7 @@ public class Server {
         // Endpoints
         initializeHealthRoutes(app: self)
         initializeUserRoutes(app: self)
-        initializeGameRoutes(app: self)
+        // initializeGameRoutes(app: self)
     }
 
     public func run() throws {
