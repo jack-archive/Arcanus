@@ -8,16 +8,31 @@ import Foundation
 import SwiftKueryORM
 
 final class Game: Model {
-    var id: Int32! = nil
-    var user1: User! = nil
-    var user2: User! = nil
-    var state: String! = nil
-    var config: String! = nil
+    // var id!: Int32
+    var user1: String // = nil
+    // var user2: String! // = nil
+    // var state: String! = nil
+    // var config: String! = nil
 
+    init(user1: String) throws {
+        self.user1 = user1
+        
+        var error: Error?
+        self.save { (game, err) in
+            if err != nil {
+                error = err
+            }
+        }
+        
+        if error != nil { throw error! }
+    }
+    
+    /*
     static func makeGame(user: User) throws -> Game {
         let rv = Game()
         rv.user1 = user
         try Database.shared.initGame(game: rv)
         return rv
     }
+    */
 }

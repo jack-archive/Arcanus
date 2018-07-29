@@ -8,8 +8,6 @@ import Foundation
 import Kitura
 import LoggerAPI
 
-/*
-
 fileprivate struct GetGamesMiddleware: TypeSafeMiddleware, Codable {
     let open: Bool
     
@@ -44,15 +42,15 @@ fileprivate struct PlayerIDMiddleware: TypeSafeMiddleware {
 
 func initializeGameRoutes(app: Server) {
     struct emptyPost: Codable {}
-    app.router.post("/games") { (user: User, _: emptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    app.router.post("/games") { (auth: BasicAuth, _: emptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             Log.verbose("\(auth.id) initializing game")
-            let game = try Game.makeGame(user: try auth.user())
+            let game = try Game(user1: auth.user.id)
             respondWith(game, nil)
         }
     }
     
-    app.router.get("/games") { (user: User, params: GetGamesMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
+    app.router.get("/games") { (auth: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping ([Game]?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             if params.open {
                 Log.verbose("Getting open games")
@@ -62,6 +60,7 @@ func initializeGameRoutes(app: Server) {
         }
     }
     
+    /*
     app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             
@@ -88,6 +87,6 @@ func initializeGameRoutes(app: Server) {
         }
     }
  */
+ */
  
 }
-*/

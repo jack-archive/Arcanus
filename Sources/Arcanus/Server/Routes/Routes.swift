@@ -17,7 +17,12 @@ func handleErrors<T>(respondWith: @escaping (T?, RequestError?) -> (),
     do {
         try code(respondWith)
     } catch let error as ArcanusError {
+        Log.error(error.localizedDescription)
         respondWith(nil, error.requestError())
+    } catch let error as RequestError {
+        let err = ArcanusError.kituraError(error)
+        Log.error(err.localizedDescription)
+        respondWith(nil, err.requestError())
     } catch let error {
         fatalError("Unhandled Exception! \(error)")
     }
