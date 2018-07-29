@@ -1,6 +1,7 @@
 .build/
 Package.resolved
-.DS_Store
+**/.DS_Store
+Packages/
 
 Arcanus.xcodeproj/
 Build/

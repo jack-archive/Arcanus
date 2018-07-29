@@ -8,8 +8,6 @@ import Foundation
 import Kitura
 import LoggerAPI
 
-/*
-
 fileprivate struct GetGamesMiddleware: TypeSafeMiddleware, Codable {
     let open: Bool
     
@@ -43,16 +41,38 @@ fileprivate struct PlayerIDMiddleware: TypeSafeMiddleware {
 }
 
 func initializeGameRoutes(app: Server) {
-    struct emptyPost: Codable {}
-    app.router.post("/games") { (user: User, _: emptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    struct EmptyPost: Codable {}
+    app.router.post("/games") { (auth: BasicAuth, _: EmptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             Log.verbose("\(auth.id) initializing game")
-            let game = try Game.makeGame(user: try auth.user())
+            let game = try Game(user1: auth.user.id)
             respondWith(game, nil)
         }
     }
     
-    app.router.get("/games") { (user: User, params: GetGamesMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
+    struct JoinGamePost: Codable {
+        
+    }
+    app.router.post("/games/:game/players") { (auth: BasicAuth, id: GameIDMiddleware, post: JoinGamePost, respondWith: @escaping (Game?, RequestError?) -> ()) in
+        handleErrors(respondWith: respondWith) { res in
+            Game.find(id: id.id, { (game, error) in
+                if error != nil || game == nil {
+                    respondWith(nil, ArcanusError.databaseError(error).requestError())
+                    return
+                }
+                
+                // game!.user2 = auth.id
+                game!.update( id: id.id, { (game, error) in
+                    if error != nil {
+                        respondWith(nil, ArcanusError.databaseError(error).requestError())
+                    }
+                })
+            })
+        }
+    }
+    
+    /*
+    app.router.get("/games") { (auth: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping ([Game]?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             if params.open {
                 Log.verbose("Getting open games")
@@ -61,19 +81,15 @@ func initializeGameRoutes(app: Server) {
             }
         }
     }
-    
+    */
+    /*
     app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             
         }
     }
     
-    app.router.get("/games/:game/players") { (auth: BasicAuth, game: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
-        handleErrors(respondWith: respondWith) { res in
-            print("\(auth.id)")
-            print("GAME: \(game.id)")
-        }
-    }
+    
     
     /* /games/:gameid/players
      * /games/:gameid/players/:id/
@@ -88,6 +104,6 @@ func initializeGameRoutes(app: Server) {
         }
     }
  */
+ */
  
 }
-*/
