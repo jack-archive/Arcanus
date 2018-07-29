@@ -139,7 +139,7 @@ public class Database {
                 let username = rows[0][UserTable.Columns.username.rawValue] as? String else {
                 throw ArcanusError.databaseError(nil)
             }
-            rv = User(username)
+            // rv = User(username)
         }
         return rv
     }
@@ -200,4 +200,6 @@ public class Database {
         
         return []
     }
+    
+    
 }

@@ -7,18 +7,18 @@
 import Foundation
 import VarInt
 
-public class Card {
-    public static func makeNameClassReady(_ name: String) -> String {
+open class Card {
+    static func makeNameClassReady(_ name: String) -> String {
         return name.replacingOccurrences(of: " ", with: "")
             .replacingOccurrences(of: "'", with: "")
     }
 
-    public static func classForName(_ name: String) -> Card.Type? {
+    static func classForName(_ name: String) -> Card.Type? {
         let readyName = makeNameClassReady(name)
         return NSClassFromString("\(namespaceAsString()).\(readyName)") as? Card.Type
     }
 
-    public enum Class: String {
+    enum Class: String {
         case neutral
         case druid
         case hunter
@@ -31,14 +31,14 @@ public class Card {
         case warrior
     }
 
-    public enum CardType: String {
+    enum CardType: String {
         case minion
         case spell
         case weapon
         case enchantment
     }
 
-    public enum Mechanics: String {
+    enum Mechanics: String {
         case charge
         case taunt
         case windfury
@@ -48,7 +48,7 @@ public class Card {
 
     var id: String
     var dbfId: Int
-    public var name: String
+    var name: String
     var cardClass: Class
     var cardType: CardType
     var cost: Int
@@ -60,7 +60,7 @@ public class Card {
     }
     */
 
-    public init(_ id: String, _ dbfId: Int, _ name: String, _ cardClass: Class, _ cardType: CardType, _ cost: Int) {
+    init(_ id: String, _ dbfId: Int, _ name: String, _ cardClass: Class, _ cardType: CardType, _ cost: Int) {
         self.id = id
         self.dbfId = dbfId
         self.name = name
@@ -70,7 +70,7 @@ public class Card {
     }
 }
 
-public class Minion: Card {
+class Minion: Card {
     var attack, health: Int
 
     /*
@@ -81,15 +81,15 @@ public class Minion: Card {
     */
 
     // Call this init from subclasses
-    public required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
+    required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
         self.attack = attack
         self.health = health
         super.init(id, 0, name, cardClass, .minion, cost)
     }
 }
 
-public class BloodfenRaptor: Minion {
-    public required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
+class BloodfenRaptor: Minion {
+    required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
         super.init(id, "Bloodfen Raptor", cardClass, cost, attack, health)
     }
 }

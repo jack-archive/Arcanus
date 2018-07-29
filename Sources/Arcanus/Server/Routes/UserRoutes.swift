@@ -27,15 +27,13 @@ fileprivate struct UserPost: Codable {
 
 func initializeUserRoutes(app: Server) {
     app.router.get("/user") { (auth: BasicAuth, respondWith: @escaping (User?, RequestError?) -> ()) in
-        
-        
         handleErrors(respondWith: respondWith) { res in
-            Log.info("authenticated \(auth.id) using \(auth.provider)")
-            
-            // res(user, nil)
+            respondWith(auth.user, nil)
         }
     }
-
+    
+    /*
+    
     app.router.get("/users/:username") { (username: UsernameMiddleware, respondWith: @escaping (User?, RequestError?) -> ()) in
         Log.info("Getting profile for \(username.id)")
         handleErrors(respondWith: respondWith) { _ in
@@ -56,4 +54,5 @@ func initializeUserRoutes(app: Server) {
             res(try Database.shared.userInfo(name: user.username), nil)
         }
     }
+ */
 }

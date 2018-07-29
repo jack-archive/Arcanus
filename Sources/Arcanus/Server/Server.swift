@@ -10,6 +10,7 @@ import Foundation
 import Health
 import Kitura
 import SwiftKueryORM
+import LoggerAPI
 
 public func serverMain() {
     do {
@@ -37,8 +38,19 @@ public class Server {
         do {
             try User.createTableSync()
             try Game.createTableSync()
-        } catch {
+            
+            let user = try User(username: "jmmaloney4", password: "12345")
+            user.save { (user, err) in
+                if err != nil {
+                    Log.error("ERROR!! \(err!)")
+                } else {
+                    Log.info("\(user!)")
+                }
+            }
+            // try Auth.createTableSync()
+        } catch let err {
             // Error, but table already created
+            Log.error("\(err)")
         }
     }
 
@@ -46,7 +58,7 @@ public class Server {
         // Endpoints
         initializeHealthRoutes(app: self)
         initializeUserRoutes(app: self)
-        initializeGameRoutes(app: self)
+        // initializeGameRoutes(app: self)
     }
 
     public func run() throws {
