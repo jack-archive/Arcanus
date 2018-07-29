@@ -8,8 +8,9 @@ import Foundation
 import SwiftKueryORM
 
 final class Game: Model {
-    // var id!: Int32
+    var id: Int!
     var user1: String // = nil
+    var user2: String!
     // var user2: String! // = nil
     // var state: String! = nil
     // var config: String! = nil
@@ -18,12 +19,18 @@ final class Game: Model {
         self.user1 = user1
         
         var error: Error?
-        self.save { (game, err) in
+        self.save { (id: Int?, game, err) in
+            if id == nil {
+                error = ArcanusError.databaseError(err)
+                return
+            }
+            
+            self.id = id
+            
             if err != nil {
                 error = err
             }
         }
-        
         if error != nil { throw error! }
     }
     
