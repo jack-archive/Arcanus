@@ -46,22 +46,6 @@ public enum ArcanusError: Swift.Error {
         }
     }
 
-    @available(*, deprecated) func setError(_ res: RouterResponse,
-                                            info: Info = [:],
-                                            status: HTTPStatusCode? = nil) {
-        if status != nil {
-            res.statusCode = status!
-        } else {
-            res.statusCode = self.statusCode()
-        }
-
-        if let str = JSON(self.json(info: info)).rawString(encoding: .utf8) {
-            res.send(str)
-        } else {
-            fatalError("Couldn't convert JSON")
-        }
-    }
-
     typealias Info = [String: String]
 
     struct Json: Codable {
@@ -81,12 +65,12 @@ public enum ArcanusError: Swift.Error {
     func getErrorDescription() -> String {
         switch self {
         case .unknownError: return "Unknown error"
-        case .kituraError(let err): return "Kitura error: \(err.localizedDescription)"
+        case .kituraError(let err): return "Kitura error: \(err.localizedDescription): \(err.body.debugDescription)"
         case .badPath: return "Bad path"
         case .failedToConvertData: return "Failed to convert data"
         case .failedToOpenDatabase: return "Failed to open database"
         case .jsonError: return "JSON Error"
-        case let .databaseError(err): return "Database error\(err == nil ? ": \(err!)" : "")"
+        case let .databaseError(err): return "Database error\(err == nil ? ": \(err!)" : "nil")"
 
         case .doesNotExist: return "Requested resource does not exist"
 
@@ -99,6 +83,7 @@ public enum ArcanusError: Swift.Error {
     }
 
     var localizedDescription: String {
-        return self.getErrorDescription()
+        return "\(self.json())"
     }
+    
 }

@@ -35,6 +35,12 @@
         catch let error {
             Log.error("\(cls) Table Error: \(error)")
         }
+        do {
+            let string = "\(try cls.getTable().description(connection: SwiftKueryORM.Database.default!.getConnection()!))"
+            Log.info(string)
+        } catch let error {
+            Log.error("\(cls) Table Error: \(error)")
+        }
     }
     
     public init(path: String? = nil) throws {
@@ -43,11 +49,15 @@
         // Open database
         // try Database.openSharedDatabase(path: db)
         
-        let db = SQLiteConnection(filename: path ?? "arcanus.db")
+        // let db = SQLiteConnection(filename: path ?? "arcanus.db")
+        Database.default = Database(generator: { () -> SQLiteConnection? in
+            return SQLiteConnection(filename: path ?? "arcanus.db")
+        })
+        print("\(Database.default!.getConnection()!)")
         
         Log.info("Attempting to open database at \(path)")
         
-        db.connect(onCompletion: { err in
+        Database.default!.getConnection()!.connect(onCompletion: { err in
             if err == nil {
                 Log.verbose("Successfully opened database connection to \(path)")
             } else if let error = err {
@@ -55,7 +65,7 @@
             }
         })
         
-        SwiftKueryORM.Database.default = SwiftKueryORM.Database(single: db)
+        
         
         initModelTable(User.self)
         initModelTable(Game.self)

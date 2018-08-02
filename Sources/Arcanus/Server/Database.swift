@@ -10,7 +10,7 @@ import LoggerAPI
 import SwiftKuery
 import SwiftKuerySQLite
 import SwiftKueryORM
-
+/*
 public class Database {
     static var shared: Database!
 
@@ -206,3 +206,4 @@ public class Database {
     
     */
 }
+*/

@@ -61,8 +61,8 @@ func initializeGameRoutes(app: Server) {
                     return
                 }
                 
-                game!.user2 = auth.id
-                game!.save( { (game, error) in
+                // game!.user2 = auth.id
+                game!.update( id: id.id, { (game, error) in
                     if error != nil {
                         respondWith(nil, ArcanusError.databaseError(error).requestError())
                     }

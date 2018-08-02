@@ -8,24 +8,26 @@ import Foundation
 import SwiftKueryORM
 
 final class Game: Model {
-    var id: Int!
+    var id: Int
     var user1: String // = nil
-    var user2: String!
+    // var user2: String
     // var user2: String! // = nil
     // var state: String! = nil
     // var config: String! = nil
 
     init(user1: String) throws {
+        self.id = 1
         self.user1 = user1
+        // self.user2 = ""
         
         var error: Error?
-        self.save { (id: Int?, game, err) in
-            if id == nil {
-                error = ArcanusError.databaseError(err)
+        self.save { (game, err) in
+            if game == nil {
+                error = ArcanusError.kituraError(err!)
                 return
             }
             
-            self.id = id
+            // self.id = id!
             
             if err != nil {
                 error = err
