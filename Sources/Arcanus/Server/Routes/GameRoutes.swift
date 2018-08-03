@@ -77,13 +77,11 @@ func initializeGameRoutes(app: Server) {
         }
     }
     
-    /*
-    app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
+    app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            
+            respondWith(try Game.get(id: id.id), nil)
         }
     }
-    
     
     
     /* /games/:gameid/players
@@ -98,7 +96,6 @@ func initializeGameRoutes(app: Server) {
             
         }
     }
- */
  */
  
 }
