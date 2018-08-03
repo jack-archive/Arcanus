@@ -50,17 +50,20 @@ func initializeGameRoutes(app: Server) {
         }
     }
 
-    struct JoinGamePost: Codable {
-    }
-    app.router.post("/games/:game/players") { (_: BasicAuth, id: GameIDMiddleware, _: JoinGamePost, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    app.router.post("/games/:game/players") { (auth: BasicAuth, id: GameIDMiddleware, _: EmptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { _ in
             Game.find(id: id.id, { game, error in
                 if error != nil || game == nil {
                     respondWith(nil, ArcanusError.databaseError(error).requestError())
                     return
                 }
-
-                // game!.user2 = auth.id
+                
+                if !game!.open {
+                    respondWith(nil, ArcanusError.gameAlreadyFull.requestError())
+                }
+                
+                game!.user2 = auth.id
+                
                 game!.update(id: id.id, { _, error in
                     if error != nil {
                         respondWith(nil, ArcanusError.databaseError(error).requestError())
@@ -81,18 +84,17 @@ func initializeGameRoutes(app: Server) {
             respondWith(try Game.get(id: id.id), nil)
         }
     }
-
-    /* /games/:gameid/players
-     * /games/:gameid/players/:id/
-     *
-     */
-
-    /*
-    app.router.post("/games/:id/players") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
-        handleErrors(respondWith: respondWith) { res in
-            print("\(auth.id)")
-
+    
+    app.router.get("/games/:game/players") { (_: BasicAuth, id: GameIDMiddleware, respondWith: @escaping ([User?]?, RequestError?) -> ()) in
+        handleErrors(respondWith: respondWith) { _ in
+            guard let game = try Game.get(id: id.id) else {
+                throw ArcanusError.doesNotExist
+            }
+            
+            var rv: [User?] = []
+            rv.append(try User.get(game.user1))
+            rv.append(try User.get(game.user2))
+            respondWith(rv, nil)
         }
     }
- */
 }
