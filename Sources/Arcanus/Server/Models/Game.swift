@@ -52,6 +52,37 @@ final class Game: Model, CustomStringConvertible {
         return String(format: "%04X-%04X", try Random.generateUInt16(), try Random.generateUInt16())
     }
     
+    static func get(id: String) throws -> Game? {
+        struct IdParam: QueryParams {
+            let id: String
+            init(_ id: String) {
+                self.id = id
+            }
+        }
+        
+        var rv: Game?
+        var error: RequestError?
+        Game.findAll(matching: IdParam(id)) { (results: [Game]?, err: RequestError?) in
+            if results != nil {
+                if results!.count == 1 {
+                    rv = results![0]
+                } else if results!.count == 0 {
+                    rv = nil
+                } else {
+                    error = ArcanusError.databaseError(nil).requestError()
+                }
+            } else {
+                error = err
+            }
+        }
+        
+        if error == nil {
+            return rv
+        } else {
+            throw ArcanusError.kituraError(error!)
+        }
+    }
+    
     static func getGames(open: Bool = false) throws -> [Game] {
         struct OpenParam: QueryParams {
             let user2: String

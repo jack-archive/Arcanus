@@ -88,35 +88,34 @@ struct User: Model, QueryParams {
     static func get(_ username: String, keepHash: Bool = false) throws -> User? {
         struct IdParam: QueryParams {
             let id: String
-            
             init(_ id: String) {
                 self.id = id
             }
         }
         
         var rv: User?
-        var err: RequestError?
-        User.findAll(matching: IdParam(username)) { (results: [User]?, error: RequestError?) in
+        var error: RequestError?
+        User.findAll(matching: IdParam(username)) { (results: [User]?, err: RequestError?) in
             if results != nil {
                 if results!.count == 1 {
                     rv = results![0]
                 } else if results!.count == 0 {
                     rv = nil
                 } else {
-                    err = ArcanusError.databaseError(nil).requestError()
+                    error = ArcanusError.databaseError(nil).requestError()
                 }
             } else {
-                err = error
+                error = err
             }
         }
         
-        if err == nil {
+        if error == nil {
             if !keepHash && rv != nil {
                 rv!.clearSensitiveInfo()
             }
             return rv
         } else {
-            throw err!
+            throw error!
         }
     }
 }
