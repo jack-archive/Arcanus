@@ -48,6 +48,8 @@ public class ArcanusLog {
     }
 
     public class func setConsole(minLevel: LoggerMessageType = .verbose) {
-        HeliumLogger.use(minLevel)
+        let logger = HeliumLogger()
+        logger.colored = true
+        Log.logger = logger
     }
 }

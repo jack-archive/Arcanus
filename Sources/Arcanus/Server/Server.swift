@@ -65,8 +65,6 @@
             }
         })
         
-        
-        
         initModelTable(User.self)
         initModelTable(Game.self)
         
@@ -89,7 +87,7 @@
             }
         }
         
-        Game.findAll { (results: [Int: Game]?, error) in
+        Game.findAll { (results: [Game]?, error) in
             if results != nil {
                 Log.info("Games: \(results!)")
             } else {
