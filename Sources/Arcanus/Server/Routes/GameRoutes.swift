@@ -17,10 +17,10 @@ fileprivate struct GetGamesMiddleware: TypeSafeMiddleware, Codable {
 }
 
 fileprivate struct GameIDMiddleware: TypeSafeMiddleware {
-    var id: Int
+    var id: String
     
     static func handle(request: RouterRequest, response: RouterResponse, completion: @escaping (GameIDMiddleware?, RequestError?) -> ()) {
-        if let rv = request.parameters["game"]?.int {
+        if let rv = request.parameters["game"]?.string {
             completion(GameIDMiddleware(id: rv), nil)
         } else {
             completion(nil, ArcanusError.badPath.requestError())
@@ -71,17 +71,12 @@ func initializeGameRoutes(app: Server) {
         }
     }
     
-    /*
     app.router.get("/games") { (auth: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping ([Game]?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            if params.open {
-                Log.verbose("Getting open games")
-            } else {
-                Log.verbose("Getting all games")
-            }
+            respondWith(try Game.getGames(open: params.open), nil)
         }
     }
-    */
+    
     /*
     app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
