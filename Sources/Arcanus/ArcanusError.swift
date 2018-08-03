@@ -29,7 +29,7 @@ public enum ArcanusError: Swift.Error {
     func statusCode() -> HTTPStatusCode {
         switch self {
         case .unknownError: return .internalServerError
-        case .kituraError(let err): return HTTPStatusCode.init(rawValue: err.httpCode) ?? .internalServerError
+        case let .kituraError(err): return HTTPStatusCode(rawValue: err.httpCode) ?? .internalServerError
         case .badPath: return .internalServerError
         case .failedToConvertData: return .internalServerError
         case .failedToOpenDatabase: return .internalServerError
@@ -65,7 +65,7 @@ public enum ArcanusError: Swift.Error {
     func getErrorDescription() -> String {
         switch self {
         case .unknownError: return "Unknown error"
-        case .kituraError(let err): return "Kitura error: \(err.localizedDescription): \(err.body.debugDescription)"
+        case let .kituraError(err): return "Kitura error: \(err.localizedDescription): \(err.body.debugDescription)"
         case .badPath: return "Bad path"
         case .failedToConvertData: return "Failed to convert data"
         case .failedToOpenDatabase: return "Failed to open database"
@@ -85,5 +85,4 @@ public enum ArcanusError: Swift.Error {
     var localizedDescription: String {
         return "\(self.json())"
     }
-    
 }

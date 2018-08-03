@@ -22,11 +22,11 @@ fileprivate struct UsernameMiddleware: TypeSafeMiddleware {
 
 func initializeUserRoutes(app: Server) {
     app.router.get("/user") { (auth: BasicAuth, respondWith: @escaping (User?, RequestError?) -> ()) in
-        handleErrors(respondWith: respondWith) { res in
+        handleErrors(respondWith: respondWith) { _ in
             respondWith(auth.user, nil)
         }
     }
-    
+
     app.router.get("/users/:username") { (username: UsernameMiddleware, respondWith: @escaping (User?, RequestError?) -> ()) in
         Log.info("Getting profile for \(username.id)")
         handleErrors(respondWith: respondWith) { _ in
@@ -37,8 +37,7 @@ func initializeUserRoutes(app: Server) {
             }
         }
     }
-    
-    
+
     struct UserPost: Codable {
         let username: String
         let password: String

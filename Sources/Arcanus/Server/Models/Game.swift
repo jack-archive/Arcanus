@@ -4,25 +4,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Foundation
-import SwiftKueryORM
 import Cryptor
+import Foundation
 import LoggerAPI
+import SwiftKueryORM
 
 final class Game: Model, CustomStringConvertible {
     enum Access: String {
         case pub = "Public"
         case priv = "Private"
     }
-    
+
     var id: String
-    
+
     var description: String {
-        return "Game [\(id)]"
+        return "Game [\(self.id)]"
     }
-    
+
     // var passwordToJoin: String?
-    
+
     var user1: String
     static let GameOpenUser2: String = "GAME_OPEN"
     var user2: String = GameOpenUser2
@@ -35,9 +35,9 @@ final class Game: Model, CustomStringConvertible {
     init(user1: String) throws {
         self.id = try Game.generateRandomID()
         self.user1 = user1
-        
+
         var error: Error?
-        self.save { (game, err) in
+        self.save { game, err in
             if game == nil {
                 error = ArcanusError.kituraError(err!)
                 return
@@ -46,12 +46,12 @@ final class Game: Model, CustomStringConvertible {
         if error != nil { throw error! }
         Log.verbose("Saved game with id: \(self.id)")
     }
-    
+
     fileprivate static let RANDID_BYTES = 8
     public static func generateRandomID() throws -> String {
         return String(format: "%04X-%04X", try Random.generateUInt16(), try Random.generateUInt16())
     }
-    
+
     static func get(id: String) throws -> Game? {
         struct IdParam: QueryParams {
             let id: String
@@ -59,7 +59,7 @@ final class Game: Model, CustomStringConvertible {
                 self.id = id
             }
         }
-        
+
         var rv: Game?
         var error: RequestError?
         Game.findAll(matching: IdParam(id)) { (results: [Game]?, err: RequestError?) in
@@ -75,22 +75,22 @@ final class Game: Model, CustomStringConvertible {
                 error = err
             }
         }
-        
+
         if error == nil {
             return rv
         } else {
             throw ArcanusError.kituraError(error!)
         }
     }
-    
+
     static func getGames(open: Bool = false) throws -> [Game] {
         struct OpenParam: QueryParams {
             let user2: String
             init() {
-                user2 = Game.GameOpenUser2
+                self.user2 = Game.GameOpenUser2
             }
         }
-        
+
         var rv: [Game] = []
         var error: RequestError?
         let handler = { (results: [Game]?, err: RequestError?) in
@@ -100,17 +100,17 @@ final class Game: Model, CustomStringConvertible {
             }
             rv = results!
         }
-        
+
         if open {
             Game.findAll(matching: OpenParam(), handler)
         } else {
             Game.findAll(handler)
         }
-        
+
         if error != nil {
             throw ArcanusError.kituraError(error!)
         }
-        
+
         return rv
     }
 }

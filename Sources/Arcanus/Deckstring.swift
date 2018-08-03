@@ -14,12 +14,12 @@ public func decodeDeckstring(_ input: String) throws -> [UInt64] {
     guard var data = Data(base64Encoded: input) else {
         throw ArcanusError.failedToConvertData
     }
-    
+
     // Setup bytes to hold data
     var bytes: [UInt8] = Array(repeating: 0, count: data.count)
     data.copyBytes(to: UnsafeMutablePointer(&bytes), count: data.count)
     var ints: [UInt64] = []
-    
+
     while true {
         let (int, count) = uVarInt(bytes)
         if count <= 0 {
@@ -28,7 +28,7 @@ public func decodeDeckstring(_ input: String) throws -> [UInt64] {
         ints.append(int)
         bytes.removeFirst(count)
     }
-    
+
     return ints
 }
 
@@ -37,6 +37,6 @@ public func encodeDeckstring(_ input: [UInt64]) -> String {
     for val in input {
         bytes.append(contentsOf: putUVarInt(val))
     }
-    
+
     return Data(bytes: bytes).base64EncodedString()
 }

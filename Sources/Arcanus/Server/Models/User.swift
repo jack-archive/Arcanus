@@ -9,14 +9,14 @@ import Cryptor
 import Foundation
 import LoggerAPI
 import SwiftKuery
-import SwiftKuerySQLite
 import SwiftKueryORM
+import SwiftKuerySQLite
 
 struct BasicAuth: TypeSafeHTTPBasic {
     var id: String
     var user: User
-    
-    static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> Void) {
+
+    static func verifyPassword(username: String, password: String, callback: @escaping (BasicAuth?) -> ()) {
         do {
             if var user = try User.get(username, keepHash: true), let hash = try? User.hashPassword(password, salt: user.saltBytes), user.hashBytes == hash {
                 user.clearSensitiveInfo()
@@ -34,56 +34,52 @@ struct User: Model, QueryParams {
     let id: String
     private(set) var salt: String
     private(set) var hash: String
-    
-    var saltBytes: [UInt8] {
-        get { return CryptoUtils.byteArray(fromHex: self.salt) }
-    }
-    
-    var hashBytes: [UInt8] {
-        get { return CryptoUtils.byteArray(fromHex: self.hash) }
-    }
-    
+
+    var saltBytes: [UInt8] { return CryptoUtils.byteArray(fromHex: self.salt) }
+
+    var hashBytes: [UInt8] { return CryptoUtils.byteArray(fromHex: self.hash) }
+
     init(username: String, password: String) throws {
         self.id = username
         let salt = try User.generateSalt()
-        self.salt =  CryptoUtils.hexString(from: salt)
-        self.hash =  CryptoUtils.hexString(from: try User.hashPassword(password, salt: salt))
+        self.salt = CryptoUtils.hexString(from: salt)
+        self.hash = CryptoUtils.hexString(from: try User.hashPassword(password, salt: salt))
         defer {
             self.clearSensitiveInfo()
         }
-        
+
         var error: Error?
-        self.save { (user, err) in
+        self.save { _, err in
             if err != nil {
                 error = err!
             }
         }
         if error != nil { throw error! }
     }
-    
+
     static func generateSalt() throws -> [UInt8] {
-        return try Random.generate(byteCount: PBKDFKeyLength)
+        return try Random.generate(byteCount: self.PBKDFKeyLength)
     }
-    
+
     private static let PBKDFRounds: uint = 5
     private static let PBKDFKeyLength: Int = 32
     static func hashPassword(_ password: String, salt: [UInt8]) throws -> [UInt8] {
         let key = try PBKDF.deriveKey(fromPassword: password, salt: salt, prf: .sha256, rounds: PBKDFRounds, derivedKeyLength: UInt(PBKDFKeyLength))
         return key
     }
-    
+
     // Hide password hash and salt
     mutating func clearSensitiveInfo() {
         self.salt = ""
         self.hash = ""
     }
-    
+
     func withoutSensitiveInfo() -> User {
         var rv = self
         rv.clearSensitiveInfo()
         return rv
     }
-    
+
     /// Gets the user with the specified name out of the Database
     static func get(_ username: String, keepHash: Bool = false) throws -> User? {
         struct IdParam: QueryParams {
@@ -92,7 +88,7 @@ struct User: Model, QueryParams {
                 self.id = id
             }
         }
-        
+
         var rv: User?
         var error: RequestError?
         User.findAll(matching: IdParam(username)) { (results: [User]?, err: RequestError?) in
@@ -108,7 +104,7 @@ struct User: Model, QueryParams {
                 error = err
             }
         }
-        
+
         if error == nil {
             if !keepHash && rv != nil {
                 rv!.clearSensitiveInfo()
