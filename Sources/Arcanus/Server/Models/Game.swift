@@ -10,12 +10,20 @@ import Cryptor
 import LoggerAPI
 
 public struct Game: Model {
+    enum Access: String {
+        case pub = "Public"
+        case priv = "Private"
+    }
+    
     var id: String
-    var user1: String // = nil
+    
+    var passwordToJoin: String = ""
+    
+    var user1: String
     // var user2: String
-    // var user2: String! // = nil
-    // var state: String! = nil
-    // var config: String! = nil
+    // var user2: String!
+    // var state: String!
+    // var config: String!
 
     init(user1: String) throws {
         self.id = try Game.generateRandomID()
