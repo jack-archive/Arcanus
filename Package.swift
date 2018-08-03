@@ -23,7 +23,7 @@ let package = Package(name: "Arcanus",
                                      .package(url: "https://github.com/IBM-Swift/SwiftyJSON.git", from: "17.0.0"),
                                      .package(url: "https://github.com/IBM-Swift/Swift-Kuery-SQLite.git", from: "1.1.0"),
                                      .package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", from: "0.3.0"),
-                                     .package(url: "https://github.com/jmmaloney4/VarInt.git", from: "0.3.0"),
+                                     .package(url: "https://github.com/NeoTeo/VarInt.git", .branch("master")),
 
                         /*
                           .package(url: "https://github.com/davecom/SwiftPriorityQueue.git", from: "1.2.1"),
