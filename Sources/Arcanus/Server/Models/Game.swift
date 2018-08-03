@@ -6,9 +6,11 @@
 
 import Foundation
 import SwiftKueryORM
+import Cryptor
+import LoggerAPI
 
-final class Game: Model {
-    var id: Int
+public struct Game: Model {
+    var id: String
     var user1: String // = nil
     // var user2: String
     // var user2: String! // = nil
@@ -16,9 +18,8 @@ final class Game: Model {
     // var config: String! = nil
 
     init(user1: String) throws {
-        self.id = 1
+        self.id = try Game.generateRandomID()
         self.user1 = user1
-        // self.user2 = ""
         
         var error: Error?
         self.save { (game, err) in
@@ -26,22 +27,13 @@ final class Game: Model {
                 error = ArcanusError.kituraError(err!)
                 return
             }
-            
-            // self.id = id!
-            
-            if err != nil {
-                error = err
-            }
         }
         if error != nil { throw error! }
+        Log.verbose("Saved game with id: \(self.id)")
     }
     
-    /*
-    static func makeGame(user: User) throws -> Game {
-        let rv = Game()
-        rv.user1 = user
-        try Database.shared.initGame(game: rv)
-        return rv
+    fileprivate static let RANDID_BYTES = 8
+    public static func generateRandomID() throws -> String {
+        return String(format: "%02X-%02X", try Random.generateUInt16(), try Random.generateUInt16())
     }
-    */
 }

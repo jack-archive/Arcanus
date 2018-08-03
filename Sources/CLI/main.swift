@@ -8,10 +8,13 @@ import Arcanus
 import CommandLineKit
 import Foundation
 import LoggerAPI
+import Cryptor
 
 #if os(Linux)
 let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 #endif
+
+print("\(try! Game.generateRandomID())")
 
 // MARK: Commmand Line Parsing
 
