@@ -14,7 +14,7 @@ import Cryptor
 let EX_USAGE: Int32 = 64 // swiftlint:disable:this identifier_name
 #endif
 
-print("\(try! Game.generateRandomID())")
+// print("\(try! Game.generateRandomID())")
 
 // MARK: Commmand Line Parsing
 
