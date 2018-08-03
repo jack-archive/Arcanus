@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt-get update
-sudo apt-get install -y git clang libpython2.7-dev libncurses-dev libicu-dev libcurl4-openssl-dev libssl-dev libcurl4-openssl-dev openssl sqlite3 libsqlite3-dev
+sudo apt-get install -y git clang libpython2.7-dev gcc-mozilla libncurses-dev libicu-dev libcurl4-openssl-dev libssl-dev libcurl4-openssl-dev openssl sqlite3 libsqlite3-dev
 
 git clone https://github.com/kylef/swiftenv.git ~/.swiftenv
 echo 'export SWIFTENV_ROOT="$HOME/.swiftenv"' >> ~/.bashrc
