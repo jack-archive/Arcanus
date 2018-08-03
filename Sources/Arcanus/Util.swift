@@ -25,7 +25,7 @@ extension Random {
     fileprivate static func generateInt<T: Any>() throws -> T {
         let pointer = UnsafeMutablePointer<T>.allocate(capacity: 1)
         let byteCount = MemoryLayout<T>.size / MemoryLayout<UInt8>.stride
-        pointer.withMemoryRebound(to: UInt8.self, capacity: byteCount) { ptr in
+        _ = pointer.withMemoryRebound(to: UInt8.self, capacity: byteCount) { ptr in
             Random.generate(bytes: ptr, byteCount: byteCount)
         }
         return pointer.pointee

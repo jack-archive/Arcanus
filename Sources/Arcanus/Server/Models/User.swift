@@ -12,6 +12,7 @@ import SwiftKuery
 import SwiftKueryORM
 import SwiftKuerySQLite
 
+/// Basic Authentication TypeSafeMiddleware
 struct BasicAuth: TypeSafeHTTPBasic {
     var id: String
     var user: User
@@ -68,12 +69,13 @@ struct User: Model, QueryParams {
         return key
     }
 
-    // Hide password hash and salt
+    /// Hide password hash and salt
     mutating func clearSensitiveInfo() {
         self.salt = ""
         self.hash = ""
     }
-
+    
+    /// Get a copy of self, without hash and salt
     func withoutSensitiveInfo() -> User {
         var rv = self
         rv.clearSensitiveInfo()

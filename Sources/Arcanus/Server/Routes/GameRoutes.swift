@@ -57,13 +57,13 @@ func initializeGameRoutes(app: Server) {
                     respondWith(nil, ArcanusError.databaseError(error).requestError())
                     return
                 }
-                
+
                 if !game!.open {
                     respondWith(nil, ArcanusError.gameAlreadyFull.requestError())
                 }
-                
+
                 game!.user2 = auth.id
-                
+
                 game!.update(id: id.id, { _, error in
                     if error != nil {
                         respondWith(nil, ArcanusError.databaseError(error).requestError())
@@ -84,13 +84,13 @@ func initializeGameRoutes(app: Server) {
             respondWith(try Game.get(id: id.id), nil)
         }
     }
-    
+
     app.router.get("/games/:game/players") { (_: BasicAuth, id: GameIDMiddleware, respondWith: @escaping ([User?]?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { _ in
             guard let game = try Game.get(id: id.id) else {
                 throw ArcanusError.doesNotExist
             }
-            
+
             var rv: [User?] = []
             rv.append(try User.get(game.user1))
             rv.append(try User.get(game.user2))

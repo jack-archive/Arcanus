@@ -15,7 +15,7 @@ import SwiftKuerySQLite
 
 public func serverMain(dbPath: String? = nil) {
     do {
-        let server = try Server(path: dbPath)
+        let server = try Server(dbPath: dbPath)
         try server.run()
     } catch {
     }
@@ -38,35 +38,22 @@ public class Server {
             let string = "\(try cls.getTable().description(connection: SwiftKueryORM.Database.default!.getConnection()!))"
             Log.info(string)
         } catch let error {
-            Log.error("\(cls) Table Error: \(error)")
+            Log.warning("\(cls) Table Error: \(error)")
         }
     }
 
-    public init(path: String? = nil) throws {
-        // Run the metrics initializer
+    public init(dbPath: String? = nil) throws {
         initializeMetrics(router: self.router)
-        // Open database
-        // try Database.openSharedDatabase(path: db)
 
-        // let db = SQLiteConnection(filename: path ?? "arcanus.db")
+        Log.info("Database path passed was \(dbPath ?? "nil")")
         Database.default = Database(generator: { () -> SQLiteConnection? in
-            SQLiteConnection(filename: path ?? "arcanus.db")
-        })
-        print("\(Database.default!.getConnection()!)")
-
-        Log.info("Attempting to open database at \(path)")
-
-        Database.default!.getConnection()!.connect(onCompletion: { err in
-            if err == nil {
-                Log.verbose("Successfully opened database connection to \(path)")
-            } else if let error = err {
-                Log.error("Failed to open database connection to \(path): \(error)")
-            }
+            SQLiteConnection(filename: dbPath ?? "arcanus.db")
         })
 
         self.initModelTable(User.self)
         self.initModelTable(Game.self)
 
+        // Create dev/dev user
         do {
             if try User.get("dev") == nil {
                 _ = try User(username: "dev", password: "dev")
@@ -78,6 +65,7 @@ public class Server {
             Log.error("Failed to initialize dev/dev: \(error)")
         }
 
+        // Print all Users currently registered at startup
         User.findAll { (results: [User]?, error) in
             if results != nil {
                 Log.info("Users: \(results!.map({ $0.withoutSensitiveInfo() }))")
@@ -86,6 +74,7 @@ public class Server {
             }
         }
 
+        // Print all Games currently registered at startup
         Game.findAll { (results: [Game]?, error) in
             if results != nil {
                 Log.info("Games: \(results!)")
@@ -96,7 +85,6 @@ public class Server {
     }
 
     func postInit() throws {
-        // Endpoints
         initializeHealthRoutes(app: self)
         initializeUserRoutes(app: self)
         initializeGameRoutes(app: self)

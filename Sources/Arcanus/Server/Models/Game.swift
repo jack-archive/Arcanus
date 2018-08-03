@@ -24,7 +24,7 @@ final class Game: Model, CustomStringConvertible {
     var open: Bool {
         return self.user2 == Game.GameOpenUser2
     }
-    
+
     // var passwordToJoin: String?
 
     var user1: String
