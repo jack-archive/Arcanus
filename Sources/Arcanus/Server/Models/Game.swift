@@ -9,7 +9,7 @@ import SwiftKueryORM
 import Cryptor
 import LoggerAPI
 
-public struct Game: Model {
+final class Game: Model, CustomStringConvertible {
     enum Access: String {
         case pub = "Public"
         case priv = "Private"
@@ -17,9 +17,16 @@ public struct Game: Model {
     
     var id: String
     
-    var passwordToJoin: String = ""
+    var description: String {
+        return "Game [\(id)]"
+    }
+    
+    // var passwordToJoin: String?
     
     var user1: String
+    static let GameOpenUser2: String = "GAME_OPEN"
+    var user2: String = GameOpenUser2
+    // var user2: String?
     // var user2: String
     // var user2: String!
     // var state: String!
@@ -42,6 +49,37 @@ public struct Game: Model {
     
     fileprivate static let RANDID_BYTES = 8
     public static func generateRandomID() throws -> String {
-        return String(format: "%02X-%02X", try Random.generateUInt16(), try Random.generateUInt16())
+        return String(format: "%04X-%04X", try Random.generateUInt16(), try Random.generateUInt16())
+    }
+    
+    static func getGames(open: Bool = false) throws -> [Game] {
+        struct OpenParam: QueryParams {
+            let user2: String
+            init() {
+                user2 = Game.GameOpenUser2
+            }
+        }
+        
+        var rv: [Game] = []
+        var error: RequestError?
+        let handler = { (results: [Game]?, err: RequestError?) in
+            if err != nil {
+                error = err
+                return
+            }
+            rv = results!
+        }
+        
+        if open {
+            Game.findAll(matching: OpenParam(), handler)
+        } else {
+            Game.findAll(handler)
+        }
+        
+        if error != nil {
+            throw ArcanusError.kituraError(error!)
+        }
+        
+        return rv
     }
 }
