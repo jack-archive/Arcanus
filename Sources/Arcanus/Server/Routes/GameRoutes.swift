@@ -17,10 +17,10 @@ fileprivate struct GetGamesMiddleware: TypeSafeMiddleware, Codable {
 }
 
 fileprivate struct GameIDMiddleware: TypeSafeMiddleware {
-    var id: Int
+    var id: String
     
     static func handle(request: RouterRequest, response: RouterResponse, completion: @escaping (GameIDMiddleware?, RequestError?) -> ()) {
-        if let rv = request.parameters["game"]?.int {
+        if let rv = request.parameters["game"]?.string {
             completion(GameIDMiddleware(id: rv), nil)
         } else {
             completion(nil, ArcanusError.badPath.requestError())
@@ -28,37 +28,61 @@ fileprivate struct GameIDMiddleware: TypeSafeMiddleware {
     }
 }
 
+fileprivate struct PlayerIDMiddleware: TypeSafeMiddleware {
+    var id: Int
+    
+    static func handle(request: RouterRequest, response: RouterResponse, completion: @escaping (PlayerIDMiddleware?, RequestError?) -> ()) {
+        if let rv = request.parameters["player"]?.int {
+            completion(PlayerIDMiddleware(id: rv), nil)
+        } else {
+            completion(nil, ArcanusError.badPath.requestError())
+        }
+    }
+}
+
 func initializeGameRoutes(app: Server) {
-    app.router.post("/games") { (auth: BasicAuth, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    struct EmptyPost: Codable {}
+    app.router.post("/games") { (auth: BasicAuth, _: EmptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            print("\(auth.id)")
-            let game = try Game.makeGame(user: try auth.user())
+            Log.verbose("\(auth.id) initializing game")
+            let game = try Game(user1: auth.user.id)
             respondWith(game, nil)
         }
     }
     
-    app.router.get("/games") { (auth: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
+    struct JoinGamePost: Codable {
+        
+    }
+    app.router.post("/games/:game/players") { (auth: BasicAuth, id: GameIDMiddleware, post: JoinGamePost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            if params.open {
-                Log.info("Getting open games")
-            } else {
-                Log.info("Getting all games")
-            }
+            Game.find(id: id.id, { (game, error) in
+                if error != nil || game == nil {
+                    respondWith(nil, ArcanusError.databaseError(error).requestError())
+                    return
+                }
+                
+                // game!.user2 = auth.id
+                game!.update( id: id.id, { (game, error) in
+                    if error != nil {
+                        respondWith(nil, ArcanusError.databaseError(error).requestError())
+                    }
+                })
+            })
         }
     }
     
-    app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (BasicAuth?, RequestError?) -> ()) in
+    app.router.get("/games") { (auth: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping ([Game]?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            
+            respondWith(try Game.getGames(open: params.open), nil)
         }
     }
     
-    app.router.get("/games/:game/players") { (auth: BasicAuth, game: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    app.router.get("/games/:game") { (auth: BasicAuth, id: GameIDMiddleware, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            print("\(auth.id)")
-            print("GAME: \(game.id)")
+            respondWith(try Game.get(id: id.id), nil)
         }
     }
+    
     
     /* /games/:gameid/players
      * /games/:gameid/players/:id/
@@ -73,4 +97,5 @@ func initializeGameRoutes(app: Server) {
         }
     }
  */
+ 
 }

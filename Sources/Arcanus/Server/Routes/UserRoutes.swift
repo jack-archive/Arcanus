@@ -20,38 +20,40 @@ fileprivate struct UsernameMiddleware: TypeSafeMiddleware {
     }
 }
 
-fileprivate struct UserPost: Codable {
-    let username: String
-    let password: String
-}
-
 func initializeUserRoutes(app: Server) {
     app.router.get("/user") { (auth: BasicAuth, respondWith: @escaping (User?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            Log.info("authenticated \(auth.id) using \(auth.provider)")
-            let user = try Database.shared.userInfo(name: auth.id)
-            res(user, nil)
+            respondWith(auth.user, nil)
         }
     }
-
+    
     app.router.get("/users/:username") { (username: UsernameMiddleware, respondWith: @escaping (User?, RequestError?) -> ()) in
         Log.info("Getting profile for \(username.id)")
         handleErrors(respondWith: respondWith) { _ in
-            respondWith(try Database.shared.userInfo(name: username.id), nil)
+            if let user = try User.get(username.id) {
+                respondWith(user, nil)
+            } else {
+                throw ArcanusError.doesNotExist
+            }
         }
     }
-
-    app.router.post("/users") { (user: UserPost, respondWith: @escaping (User?, RequestError?) -> ()) in
+    
+    
+    struct UserPost: Codable {
+        let username: String
+        let password: String
+    }
+    app.router.post("/users") { (post: UserPost, respondWith: @escaping (User?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
-            Log.verbose("Creating user \(user.username)")
+            Log.verbose("Creating user \(post.username)")
 
-            if try Database.shared.userExists(name: user.username) {
+            if try User.get(post.username) != nil {
                 res(nil, ArcanusError.usernameInUse.requestError())
                 return
             }
 
-            try Database.shared.addUser(name: user.username, password: user.password)
-            res(try Database.shared.userInfo(name: user.username), nil)
+            let user = try User(username: post.username, password: post.password)
+            res(user, nil)
         }
     }
 }
