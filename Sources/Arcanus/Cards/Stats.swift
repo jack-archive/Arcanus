@@ -8,27 +8,29 @@
 import Foundation
 
 protocol CardStats {
-    var dbfId: Int { get }
-    var name: String { get }
-    var cls: CardClass { get }
-    var cost: Int { get }
+    var dbfId: Int { get set }
+    var name: String { get set }
+    var cls: CardClass { get set }
+    var cost: Int { get set }
+    var mechanics: [CardMechanic] { get set }
+
 }
 
-protocol MinionStats: CardStats {
-    var attack: Int { get }
-    var health: Int { get }
+protocol MinionStats {
+    var attack: Int { get set }
+    var health: Int { get set }
 }
 
-protocol SpellStats: CardStats {
+protocol SpellStats {
     
 }
 
-protocol WeaponStats: CardStats {
+protocol WeaponStats {
     var attack: Int { get }
     var durability: Int { get }
 }
 
-protocol EnchantmentStats: CardStats {
+protocol EnchantmentStats {
     
 }
 
