@@ -6,18 +6,28 @@
 
 import Foundation
 import SwiftKueryORM
+import LoggerAPI
 
-struct Player: Model {
-    var game: String
-    var pid: Int
-
-    var id: String {
-        return "\(self.game):\(self.pid)"
+final class Player: StringIDModel {
+    var id: String
+    var game: String {
+        return String(id.split(separator: ":")[0])
+    }
+    var pid: Int {
+         return Int(id.split(separator: ":")[1])!
+    }
+    var user: String
+    
+    static let P1ID = 0
+    static let P2ID = 1
+    
+    static func joinID(_ game: String, _ pid: Int) -> String {
+        return "\(game):\(pid)"
     }
 
     // Deckstring encoded in DB
-    var handStorage: String
-    var deckStorage: String
+    var handStorage: String = ""
+    var deckStorage: String = ""
 
     var hand: [Card] {
         return []
@@ -25,5 +35,20 @@ struct Player: Model {
 
     var deck: [Card] {
         return []
+    }
+    
+    init(game: String, pid: Int) throws {
+        self.id = "\(game):\(pid)"
+        self.user = Game.GameOpenUsername
+        
+        var error: Error?
+        self.save { player, err in
+            if player == nil || err != nil {
+                error = ArcanusError.kituraError(err!)
+                return
+            }
+        }
+        if error != nil { throw error! }
+        Log.verbose("Saved Player with id: \(self.id)")
     }
 }
