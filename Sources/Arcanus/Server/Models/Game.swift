@@ -64,7 +64,7 @@ final class Game: StringIDModel, GetAllModel, CustomStringConvertible {
         Log.verbose("Saved Game with id: \(self.id)")
     }
 
-    fileprivate static let RANDID_BYTES = 8
+    fileprivate static let RandIDBytes = 8
     public static func generateRandomID() throws -> String {
         return String(format: "%04X-%04X", try Random.generateUInt16(), try Random.generateUInt16())
     }

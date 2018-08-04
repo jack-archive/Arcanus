@@ -9,6 +9,7 @@ import Foundation
 /// Anything in the game is an entity, has a uid, unique from any other entity *in the game*.
 /// Entities recieve events.
 protocol Entity: AnyObject {
+    var uid: Int { get }
 }
 
 extension Entity {
@@ -19,6 +20,19 @@ extension Entity {
 }
 
 // MARK: Card
+
+enum CardRarity: String {
+    case free, common, rare, epic, legendary
+}
+
+enum CardSet: String {
+    case basic, classic
+}
+
+// http://hearthstone.wikia.com/wiki/Race
+enum CardRace: String {
+    case neutral
+}
 
 enum CardClass: String {
     case neutral
@@ -161,4 +175,35 @@ extension CardStats where Self: EnchantmentStats {
 }
 
 extension Enchantment {
+}
+
+// MARK: Hero
+
+protocol HeroStats {
+    var health: Int { get set }
+}
+
+protocol Hero: Card {
+    static var defaultHeroStats: HeroStats { get }
+    var heroStats: HeroStats { get set }
+}
+
+extension Hero {
+    var health: Int {
+        get { return self.heroStats.health }
+        set { self.heroStats.health = newValue }
+    }
+}
+
+// MARK: Hero Power
+
+protocol HeroPowerStats {
+}
+
+protocol HeroPower: Card {
+    static var defaultHeroPowerStats: HeroPowerStats { get }
+    var heroPowerStats: HeroPowerStats { get set }
+}
+
+extension HeroPower {
 }

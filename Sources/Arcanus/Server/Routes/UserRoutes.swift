@@ -42,6 +42,7 @@ func initializeUserRoutes(app: Server) {
         let username: String
         let password: String
     }
+
     app.router.post("/users") { (post: UserPost, respondWith: @escaping (User?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { res in
             Log.verbose("Creating user \(post.username)")

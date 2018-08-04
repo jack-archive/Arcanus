@@ -64,3 +64,40 @@ final class Inspired: Enchantment {
 
     var enchantments: [Enchantment] = []
 }
+
+final class JainaProudmoore: Hero {
+    struct Stats: CardStats, HeroStats {
+        var dbfId: Int = 637
+        var name: String = "Jaina Proudmoore"
+        var text: String = ""
+        var cls: CardClass = .mage
+        var cost: Int = 0
+        var mechanics: [CardMechanic] = []
+        var health: Int = 30
+    }
+
+    static var defaultCardStats: CardStats { return Stats() }
+    static var defaultHeroStats: HeroStats { return Stats() }
+    var cardStats: CardStats = Stats()
+    var heroStats: HeroStats = Stats()
+
+    var enchantments: [Enchantment] = []
+}
+
+final class Fireblast: HeroPower {
+    struct Stats: CardStats, HeroPowerStats {
+        var dbfId: Int = 807
+        var name: String = "Fireblast"
+        var text: String = "<b>Hero Power</b>\nDeal $1 damage."
+        var cls: CardClass = .mage
+        var cost: Int = 0
+        var mechanics: [CardMechanic] = []
+    }
+
+    static var defaultCardStats: CardStats { return Stats() }
+    static var defaultHeroPowerStats: HeroPowerStats { return Stats() }
+    var cardStats: CardStats = Stats()
+    var heroPowerStats: HeroPowerStats = Stats()
+
+    var enchantments: [Enchantment] = []
+}
