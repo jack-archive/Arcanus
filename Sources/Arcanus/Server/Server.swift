@@ -53,7 +53,14 @@ public class Server {
         self.initModelTable(User.self)
         self.initModelTable(Game.self)
         self.initModelTable(Player.self)
+        self.initModelTable(Test.self)
 
+        Test(id: 1, relate: 1234)
+        Test(id: 2, relate: 51)
+        
+        //Test(id: "hi", relate: "1234")
+        //Test(id: "hello", relate: "51")
+        
         // Create dev/dev user
         do {
             if try User.get("dev") == nil {
