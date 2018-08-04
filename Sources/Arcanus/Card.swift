@@ -5,119 +5,118 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import VarInt
 
-open class Card {
-    static func makeNameClassReady(_ name: String) -> String {
-        return name.replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: "'", with: "")
-    }
+/// Anything in the game is an entity, has a uid, unique from any other entity *in the game*.
+/// Entities recieve events.
+protocol Entity: AnyObject {
+    var uid: Int { get }
+}
 
-    static func classForName(_ name: String) -> Card.Type? {
-        let readyName = makeNameClassReady(name)
-        return NSClassFromString("\(namespaceAsString()).\(readyName)") as? Card.Type
-    }
+enum CardClass: String {
+    case neutral
+    case druid
+    case hunter
+    case mage
+    case paladin
+    case priest
+    case rouge
+    case shaman
+    case warlock
+    case warrior
+}
 
-    enum Class: String {
-        case neutral
-        case druid
-        case hunter
-        case mage
-        case paladin
-        case priest
-        case rouge
-        case shaman
-        case warlock
-        case warrior
-    }
+enum CardType: String {
+    case minion
+    case spell
+    case weapon
+    case enchantment
+}
 
-    enum CardType: String {
-        case minion
-        case spell
-        case weapon
-        case enchantment
-    }
+enum CardMechanics: String {
+    case charge
+    case taunt
+    case windfury
+    case battlecry
+    case deathrattle
+}
 
-    enum Mechanics: String {
-        case charge
-        case taunt
-        case windfury
-        case battlecry
-        case deathrattle
-    }
+protocol Card: Entity {
+    static var dbfId: Int { get }
+    static var name: String { get }
+    static var cls: CardClass { get }
+    static var type: CardType { get }
+    static var cost: Int { get }
+    static var mechanics: [CardMechanics] { get }
+    
+    var dbfId: Int { set get }
+    var name: String { set get }
+    var cls: CardClass { set get }
+    var type: CardType { set get }
+    var cost: Int { set get }
+    var mechanics: [CardMechanics] { set get }
+    
+    init()
+    
+    var enchantments: [Enchantment] { set get }
+}
 
-    var id: String
-    var dbfId: Int
-    var name: String
-    var cardClass: Class
-    var cardType: CardType
-    var cost: Int
-
-    /*
-    public init() {
-        log.error("Shouldn't use Card.init(), implement subclass, or use other initializer")
-        fatalError("Should not be an instance of Card created with this")
-    }
-    */
-
-    init(_ id: String, _ dbfId: Int, _ name: String, _ cardClass: Class, _ cardType: CardType, _ cost: Int) {
-        self.id = id
-        self.dbfId = dbfId
-        self.name = name
-        self.cardClass = cardClass
-        self.cardType = cardType
-        self.cost = cost
+extension Card {
+    init() {
+        self.dbfId = Self.dbfId
+        self.name = Self.name
+        self.cls = Self.cls
+        self.type = Self.type
+        self.cost = Self.cost
+        self.mechanics = Self.mechanics
+        
+        self.enchantments = []
     }
 }
 
-class Minion: Card {
-    var attack, health: Int
+protocol Minion: Card {
+    var attack: Int { get }
+    var health: Int { get }
+}
 
-    /*
-    public required init() {
-        log.error("Shouldn't use Minion.init(), implement subclass, or use other initializer")
-        fatalError("Should not be an instance of Minion created with this")
-    }
-    */
-
-    // Call this init from subclasses
-    required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
-        self.attack = attack
-        self.health = health
-        super.init(id, 0, name, cardClass, .minion, cost)
+extension Minion {
+    var type: CardType { return .minion }
+    
+    init() {
+        
     }
 }
 
-class BloodfenRaptor: Minion {
-    required init(_ id: String, _ name: String, _ cardClass: Class, _ cost: Int, _ attack: Int, _ health: Int) {
-        super.init(id, "Bloodfen Raptor", cardClass, cost, attack, health)
-    }
+protocol Spell: Card {
+    
 }
 
-/*
-public class BluegillWarrior: Minion {
-    public required init() {
-        super.init(id: "idk", name: "Bluegill Warrior", cardClass: .neutral)
-    }
+extension Spell {
+    var type: CardType { return .spell }
 }
 
-public class SenjinShieldmasta: Minion {
-    public required init() {
-        super.init(id: "idk", name: "Sen'jin Shieldmasta", cardClass: .neutral)
-    }
+protocol Weapon: Card {
+    var attack: Int { get }
+    var durability: Int { get }
 }
 
-public class Spell: Card {
-    public required init() {
-        log.error("Shouldn't use Minion.init(), implement subclass, or use other initializer")
-        fatalError("Should not be an instance of Minion created with this")
-    }
+extension Weapon {
+    var type: CardType { return .weapon }
 }
 
-public class Weapon: Card {
-    public required init() {
-        log.error("Shouldn't use Minion.init(), implement subclass, or use other initializer")
-        fatalError("Should not be an instance of Minion created with this")
-    }
+protocol Enchantment: Card {
+    
 }
-*/
+
+extension Enchantment {
+    var type: CardType { return .enchantment }
+}
+
+final class SenjinShieldmasta: Minion {    
+    var attack: Int = 3
+    var health: Int = 5
+    var dbfId: Int = 635
+    var name: String = "Sen'jin Shieldmasta"
+    var cls: CardClass = .neutral
+    var cost: Int = 4
+    
+}

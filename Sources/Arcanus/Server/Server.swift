@@ -32,13 +32,13 @@ public class Server {
         do {
             try cls.createTableSync()
         } catch let error {
-            Log.error("\(cls) Table Error: \(error)")
+            Log.warning("\(cls) Table Error: \(error)")
         }
         do {
             let string = "\(try cls.getTable().description(connection: SwiftKueryORM.Database.default!.getConnection()!))"
             Log.info(string)
         } catch let error {
-            Log.warning("\(cls) Table Error: \(error)")
+            Log.error("\(cls) Table Error: \(error)")
         }
     }
 
@@ -52,6 +52,7 @@ public class Server {
 
         self.initModelTable(User.self)
         self.initModelTable(Game.self)
+        self.initModelTable(Player.self)
 
         // Create dev/dev user
         do {

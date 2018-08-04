@@ -10,11 +10,6 @@ import LoggerAPI
 import SwiftKueryORM
 
 final class Game: Model, CustomStringConvertible {
-    enum Access: String {
-        case pub = "Public"
-        case priv = "Private"
-    }
-
     var id: String
 
     var description: String {
@@ -23,6 +18,12 @@ final class Game: Model, CustomStringConvertible {
 
     var open: Bool {
         return self.user2 == Game.GameOpenUser2
+    }
+    
+    var entityID: Int = 0
+    func nextEntityID() -> Int {
+        entityID += 1
+        return entityID
     }
 
     // var passwordToJoin: String?
@@ -116,5 +117,9 @@ final class Game: Model, CustomStringConvertible {
         }
 
         return rv
+    }
+    
+    func start() {
+        
     }
 }
