@@ -9,26 +9,22 @@ import Foundation
 /// Anything in the game is an entity, has a uid, unique from any other entity *in the game*.
 /// Entities recieve events.
 protocol Entity: AnyObject {
-    
 }
 
 extension Entity {
-    var uid: Int { get {
+    var uid: Int {
+        // TODO: Implement this
         return 1
-        }}
+    }
 }
+
+// MARK: Card
 
 enum CardClass: String {
     case neutral
-    case druid
-    case hunter
-    case mage
-    case paladin
-    case priest
-    case rouge
-    case shaman
-    case warlock
-    case warrior
+    case druid, hunter, mage,
+         paladin, priest, rouge,
+         shaman, warlock, warrior
 }
 
 enum CardMechanic: String {
@@ -37,11 +33,22 @@ enum CardMechanic: String {
     case windfury
     case battlecry
     case deathrattle
+    
+    case oneTurnEffect
+}
+
+protocol CardStats {
+    var dbfId: Int { get set }
+    var name: String { get set }
+    var text: String { get set }
+    var cls: CardClass { get set }
+    var cost: Int { get set }
+    var mechanics: [CardMechanic] { get set }
 }
 
 protocol Card: Entity {
-    var enchantments: [Enchantment] { set get }
-    
+    var enchantments: [Enchantment] { get set }
+
     static var defaultCardStats: CardStats { get }
     var cardStats: CardStats { get set }
 }
@@ -51,22 +58,38 @@ extension Card {
         set { cardStats.dbfId = newValue }
         get { return cardStats.dbfId }
     }
+
     var name: String {
         set { cardStats.name = newValue }
         get { return cardStats.name }
     }
+    
+    var text: String {
+        set { cardStats.text = newValue }
+        get { return cardStats.text }
+    }
+
     var cls: CardClass {
         set { cardStats.cls = newValue }
         get { return cardStats.cls }
     }
+
     var cost: Int {
         set { cardStats.cost = newValue }
         get { return cardStats.cost }
     }
+
     var mechanics: [CardMechanic] {
         set { cardStats.mechanics = newValue }
         get { return cardStats.mechanics }
     }
+}
+
+// MARK: Minion
+
+protocol MinionStats {
+    var attack: Int { get set }
+    var health: Int { get set }
 }
 
 protocol Minion: Card {
@@ -79,58 +102,63 @@ extension Minion {
         get { return self.minionStats.attack }
         set { self.minionStats.attack = newValue }
     }
-    var health: Int { get {
-            return self.minionStats.health
-        } set {
-            self.minionStats.health = newValue
-        }}
-}
-
-final class SenjinShieldmasta: Minion {
-    struct Stats: CardStats, MinionStats {
-        var dbfId: Int = 635
-        var name: String = "Sen'jin Shieldmasta"
-        var cls: CardClass = .neutral
-        var cost: Int = 4
-        var mechanics: [CardMechanic] = [.taunt]
-        var attack: Int = 3
-        var health: Int = 5
+    
+    var health: Int {
+        get { return self.minionStats.health }
+        set { self.minionStats.health = newValue }
     }
-    
-    static var defaultCardStats: CardStats { return Stats() }
-    static var defaultMinionStats: MinionStats { return Stats() }
-    var cardStats: CardStats = Stats()
-    var minionStats: MinionStats = Stats()
-
-    var enchantments: [Enchantment] = []
-    
 }
 
-protocol Enchantment: Card {
-    
+// MARK: Spell
+
+protocol SpellStats {
 }
 
-/*
 protocol Spell: Card {
-    
+    static var defaultSpellStats: SpellStats { get }
+    var spellStats: SpellStats { get set }
 }
 
 extension Spell {
-    var type: CardType { return .spell }
+}
+
+// MARK: Weapon
+
+protocol WeaponStats {
+    var attack: Int { get set }
+    var durability: Int { get set }
 }
 
 protocol Weapon: Card {
-    var attack: Int { get }
-    var durability: Int { get }
+    static var defaultWeaponStats: WeaponStats { get }
+    var weaponStats: WeaponStats { get set }
 }
 
 extension Weapon {
-    var type: CardType { return .weapon }
+    var attack: Int {
+        get { return self.weaponStats.attack }
+        set { self.weaponStats.attack = newValue }
+    }
+    
+    var durability: Int {
+        get { return self.weaponStats.durability }
+        set { self.weaponStats.durability = newValue }
+    }
 }
 
+// MARK: Enchantment
 
+protocol EnchantmentStats {
+}
+
+protocol Enchantment: Card {
+    static var defaultEnchantmentStats: EnchantmentStats { get }
+    var enchantmentStats: EnchantmentStats { get set }
+}
+
+extension CardStats where Self: EnchantmentStats {
+    var cost: Int { return 0 }
+}
 
 extension Enchantment {
-    var type: CardType { return .enchantment }
 }
-*/

@@ -74,7 +74,7 @@ struct User: Model, QueryParams {
         self.salt = ""
         self.hash = ""
     }
-    
+
     /// Get a copy of self, without hash and salt
     func withoutSensitiveInfo() -> User {
         var rv = self

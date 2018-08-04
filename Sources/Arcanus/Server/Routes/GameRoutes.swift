@@ -97,9 +97,7 @@ func initializeGameRoutes(app: Server) {
             respondWith(rv, nil)
         }
     }
-    
-    app.router.post("/games/:game/start") { (auth: BasicAuth, id: GameIDMiddleware, _: EmptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
-        
-    }
 
+    app.router.post("/games/:game/start") { (_: BasicAuth, _: GameIDMiddleware, _: EmptyPost, _: @escaping (Game?, RequestError?) -> ()) in
+    }
 }

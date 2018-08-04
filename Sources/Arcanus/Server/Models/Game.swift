@@ -19,11 +19,11 @@ final class Game: Model, CustomStringConvertible {
     var open: Bool {
         return self.user2 == Game.GameOpenUser2
     }
-    
+
     var entityID: Int = 0
     func nextEntityID() -> Int {
-        entityID += 1
-        return entityID
+        self.entityID += 1
+        return self.entityID
     }
 
     // var passwordToJoin: String?
@@ -118,8 +118,7 @@ final class Game: Model, CustomStringConvertible {
 
         return rv
     }
-    
+
     func start() {
-        
     }
 }
