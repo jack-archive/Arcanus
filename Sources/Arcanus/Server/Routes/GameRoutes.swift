@@ -50,16 +50,16 @@ func initializeGameRoutes(app: Server) {
         }
     }
 
-    app.router.post("/games/:game/players") { (auth: BasicAuth, id: GameIDMiddleware, _: EmptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
+    app.router.post("/games/:game/players") { (_: BasicAuth, id: GameIDMiddleware, _: EmptyPost, respondWith: @escaping (Game?, RequestError?) -> ()) in
         handleErrors(respondWith: respondWith) { _ in
             guard let game = try Game.get(id.id) else {
                 throw ArcanusError.gameNotFound
             }
-            
+
             guard game.open else {
                 throw ArcanusError.gameAlreadyFull
             }
-            
+
             try game.join(user: id.id)
 
             var error: Error?
@@ -70,7 +70,6 @@ func initializeGameRoutes(app: Server) {
             })
             if error != nil { throw error! }
         }
-        
     }
 
     app.router.get("/games") { (_: BasicAuth, params: GetGamesMiddleware, respondWith: @escaping ([Game]?, RequestError?) -> ()) in

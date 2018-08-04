@@ -9,14 +9,14 @@ import Foundation
 import LoggerAPI
 import SwiftKueryORM
 
-final class Game: StringIDModel, CustomStringConvertible {
+final class Game: StringIDModel, GetAllModel, CustomStringConvertible {
     var id: String
-    
+
     var player1: String { return Player.joinID(self.id, Player.P1ID) }
     var player2: String { return Player.joinID(self.id, Player.P2ID) }
 
     var description: String {
-        return "Game [\(self.id)] (\(player1) vs \(player2))"
+        return "Game [\(self.id)] (\(self.player1) vs \(self.player2))"
     }
 
     var open: Bool {
@@ -34,13 +34,13 @@ final class Game: StringIDModel, CustomStringConvertible {
     //    var user1: String = ""
     static let GameOpenUsername: String = "GAME_OPEN"
     //    var user2: String = GameOpenUser2
-    
+
     func join(user: String) throws {
         guard let p1 = try Player.get(player1),
-              let p2 = try Player.get(player2) else {
+            let p2 = try Player.get(player2) else {
             throw ArcanusError.databaseError(nil)
         }
-        
+
         if p1.user == Game.GameOpenUsername {
             p1.user = user
         } else if p2.user == Game.GameOpenUsername {
@@ -49,7 +49,7 @@ final class Game: StringIDModel, CustomStringConvertible {
             throw ArcanusError.gameAlreadyFull
         }
     }
-    
+
     init(user1: String) throws {
         self.id = try Game.generateRandomID()
 
@@ -70,34 +70,11 @@ final class Game: StringIDModel, CustomStringConvertible {
     }
 
     static func getGames(open: Bool = false) throws -> [Game] {
-        struct OpenParam: QueryParams {
-            let user2: String
-            init() {
-                self.user2 = Game.GameOpenUsername
-            }
-        }
-
-        var rv: [Game] = []
-        var error: RequestError?
-        let handler = { (results: [Game]?, err: RequestError?) in
-            if err != nil {
-                error = err
-                return
-            }
-            rv = results!
-        }
-
+        var arr = try Game.getAll()
         if open {
-            Game.findAll(matching: OpenParam(), handler)
-        } else {
-            Game.findAll(handler)
+            arr = arr.filter { $0.open }
         }
-
-        if error != nil {
-            throw ArcanusError.kituraError(error!)
-        }
-
-        return rv
+        return arr
     }
 
     func start() {

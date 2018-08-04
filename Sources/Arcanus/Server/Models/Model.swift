@@ -35,11 +35,39 @@ extension StringIDModel {
                 error = err
             }
         }
-        
+
         if error == nil {
             return rv
         } else {
             throw ArcanusError.kituraError(error!)
         }
+    }
+}
+
+protocol GetAllModel: Model {
+    static func getAll() throws -> [Self]
+}
+
+extension GetAllModel {
+    static func getAll() throws -> [Self] {
+        var rv: [Self] = []
+        var error: RequestError?
+
+        let handler = { (results: [Self]?, err: RequestError?) in
+            if err != nil {
+                error = err
+                return
+            }
+            rv = results!
+        }
+
+        // Self.findAll(matching: qp, handler)
+        Self.findAll(handler)
+
+        if error != nil {
+            throw ArcanusError.kituraError(error!)
+        }
+
+        return rv
     }
 }

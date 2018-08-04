@@ -5,22 +5,24 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import SwiftKueryORM
 import LoggerAPI
+import SwiftKueryORM
 
 final class Player: StringIDModel {
     var id: String
     var game: String {
-        return String(id.split(separator: ":")[0])
+        return String(self.id.split(separator: ":")[0])
     }
+
     var pid: Int {
-         return Int(id.split(separator: ":")[1])!
+        return Int(self.id.split(separator: ":")[1])!
     }
+
     var user: String
-    
+
     static let P1ID = 0
     static let P2ID = 1
-    
+
     static func joinID(_ game: String, _ pid: Int) -> String {
         return "\(game):\(pid)"
     }
@@ -36,11 +38,11 @@ final class Player: StringIDModel {
     var deck: [Card] {
         return []
     }
-    
+
     init(game: String, pid: Int) throws {
         self.id = "\(game):\(pid)"
         self.user = Game.GameOpenUsername
-        
+
         var error: Error?
         self.save { player, err in
             if player == nil || err != nil {

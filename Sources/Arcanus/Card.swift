@@ -23,8 +23,8 @@ extension Entity {
 enum CardClass: String {
     case neutral
     case druid, hunter, mage,
-         paladin, priest, rouge,
-         shaman, warlock, warrior
+        paladin, priest, rouge,
+        shaman, warlock, warrior
 }
 
 enum CardMechanic: String {
@@ -33,7 +33,7 @@ enum CardMechanic: String {
     case windfury
     case battlecry
     case deathrattle
-    
+
     case oneTurnEffect
 }
 
@@ -63,7 +63,7 @@ extension Card {
         set { cardStats.name = newValue }
         get { return cardStats.name }
     }
-    
+
     var text: String {
         set { cardStats.text = newValue }
         get { return cardStats.text }
@@ -102,7 +102,7 @@ extension Minion {
         get { return self.minionStats.attack }
         set { self.minionStats.attack = newValue }
     }
-    
+
     var health: Int {
         get { return self.minionStats.health }
         set { self.minionStats.health = newValue }
@@ -139,7 +139,7 @@ extension Weapon {
         get { return self.weaponStats.attack }
         set { self.weaponStats.attack = newValue }
     }
-    
+
     var durability: Int {
         get { return self.weaponStats.durability }
         set { self.weaponStats.durability = newValue }

@@ -17,12 +17,12 @@ final class SenjinShieldmasta: Minion {
         var attack: Int = 3
         var health: Int = 5
     }
-    
+
     static var defaultCardStats: CardStats { return Stats() }
     static var defaultMinionStats: MinionStats { return Stats() }
     var cardStats: CardStats = Stats()
     var minionStats: MinionStats = Stats()
-    
+
     var enchantments: [Enchantment] = []
 }
 
@@ -37,12 +37,12 @@ final class AbusiveSergeant: Minion {
         var attack: Int = 1
         var health: Int = 1
     }
-    
+
     static var defaultCardStats: CardStats { return Stats() }
     static var defaultMinionStats: MinionStats { return Stats() }
     var cardStats: CardStats = Stats()
     var minionStats: MinionStats = Stats()
-    
+
     var enchantments: [Enchantment] = []
 }
 
@@ -56,11 +56,11 @@ final class Inspired: Enchantment {
         var cost: Int = 0
         var mechanics: [CardMechanic] = [.oneTurnEffect]
     }
-    
+
     static var defaultCardStats: CardStats { return Stats() }
     static var defaultEnchantmentStats: EnchantmentStats { return Stats() }
     var cardStats: CardStats = Stats()
     var enchantmentStats: EnchantmentStats = Stats()
-    
+
     var enchantments: [Enchantment] = []
 }
