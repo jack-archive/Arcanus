@@ -14,10 +14,10 @@ import Vapor
 public func routes(_ router: Router) throws {
     let authRouteController = AuthenticationRouteController()
     try authRouteController.boot(router: router)
-    
+
     let userRouteController = UserRouteController()
     try userRouteController.boot(router: router)
-    
+
     let protectedRouteController = ProtectedRoutesController()
     try protectedRouteController.boot(router: router)
 }
