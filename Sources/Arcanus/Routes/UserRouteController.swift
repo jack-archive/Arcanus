@@ -41,7 +41,7 @@ private extension UserRouteController {
         }
     }
 
-    func registerUserHandler(_ request: Request, creds: Credentials) throws -> Future<AuthenticationContainer> {
+    func registerUserHandler(_ request: Request, creds: Credentials) throws -> Future<Response> {
         return User.query(on: request).filter(\.username == creds.username).first().flatMap { existingUser in
             guard existingUser == nil else {
                 throw Abort(.badRequest, reason: "user \(creds.username) already exists", identifier: nil)
@@ -51,8 +51,9 @@ private extension UserRouteController {
 
                 let logger = try request.make(Logger.self)
                 logger.warning("New user created: \(user.username)")
-
+                
                 return try self.authController.authenticationContainer(for: user, on: request)
+                    .encode(status: .created, for: request)
             }
         }
     }

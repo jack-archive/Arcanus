@@ -14,7 +14,7 @@ import Vapor
 public func configure(_ config: inout Config,
                       _ env: inout Environment,
                       _ services: inout Services,
-                      _ path: String) throws {
+                      _ path: String?) throws {
     // Register routes to the router
     let router = EngineRouter.default()
     try routes(router)
@@ -32,7 +32,7 @@ public func configure(_ config: inout Config,
 
     // Configure our database
     var databaseConfig = DatabasesConfig()
-    let db = try SQLiteDatabase(storage: .file(path: path))
+    let db = try SQLiteDatabase(storage: .file(path: path ?? "\(directoryConfig.workDir)/arcanus.db"))
     databaseConfig.add(database: db, as: .sqlite)
     databaseConfig.enableLogging(on: .sqlite)
     services.register(databaseConfig)

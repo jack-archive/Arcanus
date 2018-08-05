@@ -9,12 +9,12 @@ import FluentSQLite
 import Foundation
 import Vapor
 
-final class Game: SQLiteModel, Content, Migration {
+final class Game: SQLiteModel, Content, Migration, Parameter {
     typealias ID = Int
 
     var id: ID?
-    private(set) var player1: Player.ID?
-    private(set) var player2: Player.ID?
+    var player1: Player.ID?
+    var player2: Player.ID?
 
     init(p1: Player.ID) {
         self.player1 = p1

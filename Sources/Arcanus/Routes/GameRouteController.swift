@@ -12,35 +12,31 @@ import Vapor
 
 class GameRouteController: RouteCollection {
     func boot(router: Router) throws {
-        let group = router.grouped("games")
-        group.post("", use: createGameHandler)
+        let games = router.grouped("games")
+        games.post(use: createGameHandler)
+        
+        let players = games.grouped(Game.parameter, "players")
+        players.post(use: joinGameHandler)
     }
 }
 
 private extension GameRouteController {
     func createGameHandler(_ request: Request) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
+        
         let player = Player(user: user.id!)
         return player.save(on: request).flatMap { player in
             Game(p1: player.id!).save(on: request)
         }
     }
-
-    /*
-    func registerUserHandler(_ request: Request, creds: Credentials) throws -> Future<AuthenticationContainer> {
-        return User.query(on: request).filter(\.username == creds.username).first().flatMap { existingUser in
-            guard existingUser == nil else {
-                throw Abort(.badRequest, reason: "user \(creds.username) already exists" , identifier: nil)
-            }
-
-            return try User(username: creds.username, toHash: creds.password).save(on: request).flatMap { user in
-
-                let logger = try request.make(Logger.self)
-                logger.warning("New user created: \(user.username)")
-
-                return try self.authController.authenticationContainer(for: user, on: request)
-            }
+    
+    func joinGameHandler(_ request: Request) throws -> Future<Game> {
+        let user = try request.requireAuthenticated(User.self)
+        let player = Player(user: user.id!)
+        
+        return try request.parameters.next(Game.self).flatMap { game in
+            game.player2 = player.id
+            return game.update(on: request)
         }
     }
-    */
 }
