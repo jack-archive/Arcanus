@@ -22,3 +22,7 @@ struct AuthenticationContainer: Content {
 struct RefreshTokenContainer: Content {
     let refreshToken: RefreshToken.Token
 }
+
+struct UsernameContainer: Content {
+    let username: String
+}
