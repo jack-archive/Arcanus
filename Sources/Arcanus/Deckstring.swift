@@ -7,12 +7,15 @@
 import Foundation
 import VarInt
 
+enum DeckstringError: Error {
+    case base64DecodeFailed
+}
+
 // See https://www.reddit.com/r/hearthstone/comments/6f2xyk/how_to_encodedecode_deck_codes/
 // for info on how the encoding works
-
 public func decodeDeckstring(_ input: String) throws -> [UInt64] {
     guard var data = Data(base64Encoded: input) else {
-        throw ArcanusError.failedToConvertData
+        throw DeckstringError.base64DecodeFailed
     }
 
     // Setup bytes to hold data

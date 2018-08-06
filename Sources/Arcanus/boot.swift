@@ -4,7 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Arcanus
-import Foundation
-import LoggerAPI
-import Rainbow
+import Routing
+import Vapor
+
+/// Called after your application has initialized.
+///
+/// [Learn More →](https://docs.vapor.codes/3.0/getting-started/structure/#bootswift)
+public func boot(_ app: Application) throws {
+    // your code here
+    
+}

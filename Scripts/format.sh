@@ -18,7 +18,7 @@ swiftformat                         \
     --exponentcase lowercase        \
     --operatorfunc spaced           \
     --elseposition same-line        \
-    --empty tuple                   \
+    --empty void                    \
     --ranges nospace                \
     --hexliteralcase uppercase      \
     --linebreaks lf                 \
