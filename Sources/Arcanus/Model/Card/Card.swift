@@ -209,3 +209,11 @@ protocol HeroPower: Card {
 
 extension HeroPower {
 }
+
+// MARK: Card Index
+
+fileprivate var CardIndex: [DbfID: Card.Type] = [:]
+
+func getCard(dbfID: DbfID) -> Card.Type? {
+    return CardIndex[dbfID]
+}
