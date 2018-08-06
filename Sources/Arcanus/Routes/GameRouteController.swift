@@ -35,7 +35,12 @@ private extension GameRouteController {
         let player = Player(user: user.id!)
         
         return try request.parameters.next(Game.self).flatMap { game in
+            let logger = try request.make(Logger.self)
+            logger.info("\(user.username) joining game \(game.id!)")
+            
             game.player2 = player.id
+            try game.describe(on: request).do({ logger.info($0) }).catch({ logger.error("\($0)") })
+            
             return game.update(on: request)
         }
     }

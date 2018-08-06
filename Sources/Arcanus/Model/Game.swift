@@ -19,4 +19,20 @@ final class Game: SQLiteModel, Content, Migration, Parameter {
     init(p1: Player.ID) {
         self.player1 = p1
     }
+    
+    func describe(on db: DatabaseConnectable) throws -> Future<String> {
+        guard player1 != nil, player2 != nil else {
+            throw Abort(.badRequest)
+        }
+        
+        let user1 = Player.get(on: db, id: player1!).map({ try $0?.getUser(on: db).wait() })
+        let user2 = Player.get(on: db, id: player2!).map({ try $0?.getUser(on: db).wait() })
+        
+        return map(to: String.self, user1, user2) {
+            guard $0 != nil, $1 != nil else {
+                throw Abort(.badRequest)
+            }
+            return "Game \(self.id!) [\($0!.username), \($1!.username)]"
+        }
+    }
 }

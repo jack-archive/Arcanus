@@ -18,4 +18,12 @@ final class Player: SQLiteModel, Content, Migration {
     init(user: User.ID) {
         self.user = user
     }
+
+    func getUser(on db: DatabaseConnectable) -> Future<User?> {
+        return User.query(on: db).filter(\.id == self.user).first()
+    }
+    
+    static func get(on db: DatabaseConnectable, id: ID) -> Future<Player?> {
+        return Player.query(on: db).filter(\.id == id).first()
+    }
 }

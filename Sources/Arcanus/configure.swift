@@ -7,14 +7,16 @@
 import Authentication
 import FluentSQLite
 import Vapor
+import Environment
 
 /// Called before your application initializes.
 ///
 /// [Learn More →](https://docs.vapor.codes/3.0/getting-started/structure/#configureswift)
 public func configure(_ config: inout Config,
-                      _ env: inout Environment,
+                      _ env: inout Vapor.Environment,
                       _ services: inout Services,
                       _ path: String?) throws {
+    
     // Register routes to the router
     let router = EngineRouter.default()
     try routes(router)
@@ -23,7 +25,7 @@ public func configure(_ config: inout Config,
     // Configure the rest of your application here
     let directoryConfig = DirectoryConfig.detect()
     services.register(directoryConfig)
-
+    
     // Configure Fluents SQL provider
     try services.register(FluentSQLiteProvider())
 
