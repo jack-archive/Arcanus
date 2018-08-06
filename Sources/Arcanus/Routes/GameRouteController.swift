@@ -13,7 +13,7 @@ import Vapor
 class GameRouteController: RouteCollection {
     func boot(router: Router) throws {
         let games = router.grouped("games")
-        games.post(use: createGameHandler)
+        games.post(JoinGameContainer.self, at: "", use: createGameHandler)
         
         let players = games.grouped(Game.parameter, "players")
         players.post(JoinGameContainer.self, at: "", use: joinGameHandler)
@@ -29,20 +29,21 @@ private extension GameRouteController {
         let deckstring: String
     }
     
-    func createGameHandler(_ request: Request) throws -> Future<Game> {
+    func createGameHandler(_ request: Request, container: JoinGameContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
         
-        let player = Player(user: user.id!)
-        return player.save(on: request).flatMap { player in
+        let player = try Player(user: user.id!, deckstring: container.deckstring).save(on: request)
+        return player.flatMap { player in
             Game(p1: player.id!).save(on: request)
         }
     }
     
     func joinGameHandler(_ request: Request, container: JoinGameContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        let player = Player(user: user.id!).save(on: request)   // Future
-        let game = try request.parameters.next(Game.self)       // Future
+        let player = try Player(user: user.id!, deckstring: container.deckstring).save(on: request) // Future
+        let game = try request.parameters.next(Game.self)   // Future
         let logger = try request.make(Logger.self)
+        
         
         return map(to: EventLoopFuture<Game>.self, player, game) { player, game in
             logger.info("\(user.username) joining game \(game.id!)")
