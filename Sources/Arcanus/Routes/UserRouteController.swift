@@ -24,8 +24,6 @@ struct Credentials: Content {
     var password: String
 }
 
-//MARK: Helper
-
 private extension UserRouteController {
     func loginUserHandler(_ request: Request, creds: Credentials) throws -> Future<AuthenticationContainer> {
         return User.query(on: request).filter(\.username == creds.username).first().flatMap { existingUser in

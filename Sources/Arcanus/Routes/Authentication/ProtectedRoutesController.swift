@@ -12,30 +12,10 @@ import Vapor
 struct ProtectedRoutesController: RouteCollection {
     func boot(router: Router) throws {
         let group = router.grouped("api")
-
-        let basicAuthMiddleware = User.basicAuthMiddleware(using: BCrypt)
         let guardAuthMiddleware = User.guardAuthMiddleware()
-        let basicAuthGroup = group.grouped([basicAuthMiddleware, guardAuthMiddleware])
-        // basicAuthGroup.get("basic", use: basicAuthRouteHandler)
-
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenAuthGroup = group.grouped([tokenAuthMiddleware, guardAuthMiddleware])
-        // tokenAuthGroup.get("token", use: tokenAuthRouteHandler)
 
         try tokenAuthGroup.register(collection: GameRouteController())
     }
-}
-
-//MARK: Helper
-
-private extension ProtectedRoutesController {
-    /*
-    func basicAuthRouteHandler(_ request: Request) throws -> AuthenticationContainer {
-        return try request.requireAuthenticated(User.self)
-    }
-
-    func tokenAuthRouteHandler(_ request: Request) throws -> User {
-        return try request.requireAuthenticated(User.self)
-    }
- */
 }

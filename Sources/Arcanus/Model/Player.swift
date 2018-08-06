@@ -14,9 +14,20 @@ final class Player: SQLiteModel, Content, Migration {
 
     var id: ID?
     private(set) var user: User.ID
+    private(set) var deck: [DbfID] = []
 
     init(user: User.ID) {
         self.user = user
+    }
+    
+    convenience init(user: User.ID, deck: [DbfID]) {
+        self.init(user: user)
+        self.deck = deck
+    }
+    
+    convenience init(user: User.ID, deckstring: String) throws {
+        let arr = try decodeDeckstring(deckstring).map({ DbfID($0) })
+        self.init(user: user, deck: arr)
     }
 
     func getUser(on db: DatabaseConnectable) throws -> Future<User> {

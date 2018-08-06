@@ -6,6 +6,8 @@
 
 import Foundation
 
+typealias DbfID = Int
+
 /// Anything in the game is an entity, has a uid, unique from any other entity *in the game*.
 /// Entities recieve events.
 protocol Entity: AnyObject {
@@ -52,7 +54,7 @@ enum CardMechanic: String {
 }
 
 protocol CardStats {
-    var dbfId: Int { get set }
+    var dbfId: DbfID { get set }
     var name: String { get set }
     var text: String { get set }
     var cls: CardClass { get set }
@@ -68,7 +70,7 @@ protocol Card: Entity {
 }
 
 extension Card {
-    var dbfId: Int {
+    var dbfId: DbfID {
         set { cardStats.dbfId = newValue }
         get { return cardStats.dbfId }
     }

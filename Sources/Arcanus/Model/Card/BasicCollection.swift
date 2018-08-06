@@ -8,7 +8,7 @@ import Foundation
 
 final class SenjinShieldmasta: Minion {
     struct Stats: CardStats, MinionStats {
-        var dbfId: Int = 635
+        var dbfId: DbfID = 635
         var name: String = "Sen'jin Shieldmasta"
         var text: String = "<b>Taunt</b>"
         var cls: CardClass = .neutral
@@ -28,7 +28,7 @@ final class SenjinShieldmasta: Minion {
 
 final class AbusiveSergeant: Minion {
     struct Stats: CardStats, MinionStats {
-        var dbfId: Int = 242
+        var dbfId: DbfID = 242
         var name: String = "Abusive Sergeant"
         var text: String = "<b>Battlecry:</b> Give a minion +2 Attack this turn."
         var cls: CardClass = .neutral
@@ -49,7 +49,7 @@ final class AbusiveSergeant: Minion {
 /// Abusive Sergeant gives this enchantment
 final class Inspired: Enchantment {
     struct Stats: CardStats, EnchantmentStats {
-        var dbfId: Int = 809
+        var dbfId: DbfID = 809
         var name: String = "Inspired"
         var text: String = "This minion has +2 Attack this turn."
         var cls: CardClass = .neutral
@@ -67,7 +67,7 @@ final class Inspired: Enchantment {
 
 final class JainaProudmoore: Hero {
     struct Stats: CardStats, HeroStats {
-        var dbfId: Int = 637
+        var dbfId: DbfID = 637
         var name: String = "Jaina Proudmoore"
         var text: String = ""
         var cls: CardClass = .mage
@@ -86,7 +86,7 @@ final class JainaProudmoore: Hero {
 
 final class Fireblast: HeroPower {
     struct Stats: CardStats, HeroPowerStats {
-        var dbfId: Int = 807
+        var dbfId: DbfID = 807
         var name: String = "Fireblast"
         var text: String = "<b>Hero Power</b>\nDeal $1 damage."
         var cls: CardClass = .mage
