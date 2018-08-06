@@ -1,7 +1,4 @@
-# Hearthstone
+# Arcanus
+[![Travis CI](https://img.shields.io/travis/jmmaloney4/Arcanus.svg)](https://travis-ci.org/jmmaloney4/Arcanus)
 
-Hearthstone sim
-
-```
-curl https://raw.githubusercontent.com/jmmaloney4/Arcanus/master/vagrant-setup.sh | bash
-```
+Hearthstone Clone
