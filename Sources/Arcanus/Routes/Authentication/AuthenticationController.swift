@@ -22,16 +22,18 @@ struct AuthenticationController {
 
     func authenticationContainer(for user: User, on connection: DatabaseConnectable) throws -> Future<AuthenticationContainer> {
         return try removeAllTokens(for: user, on: connection).flatMap { _ in
-            try map(to: AuthenticationContainer.self, self.accessToken(for: user, on: connection), self.refreshToken(for: user, on: connection)) { access, refresh in
-                return AuthenticationContainer(accessToken: access, refreshToken: refresh)
+            try map(to: AuthenticationContainer.self,
+                    self.accessToken(for: user, on: connection),
+                    self.refreshToken(for: user, on: connection)) { access, refresh in
+                return AuthenticationContainer(user.username, accessToken: access, refreshToken: refresh)
             }
         }
     }
 
-    func revokeTokens(forUsername username: String, on connection: DatabaseConnectable) throws -> Future<Void> {
+    func revokeTokens(forUsername username: String, on connection: DatabaseConnectable) throws -> Future<UsernameContainer> {
         return User.query(on: connection).filter(\.username == username).first().flatMap { user in
             guard let user = user else {
-                return Future.map(on: connection) { Void() }
+                throw Abort(.badRequest, reason: "User does not exist")
             }
             return try self.removeAllTokens(for: user, on: connection)
         }
@@ -52,11 +54,11 @@ private extension AuthenticationController {
         return User.query(on: connection).filter(\.username == user.username).first()
     }
 
-    func removeAllTokens(for user: User, on connection: DatabaseConnectable) throws -> Future<Void> {
+    func removeAllTokens(for user: User, on connection: DatabaseConnectable) throws -> Future<UsernameContainer> {
         let accessTokens = AccessToken.query(on: connection).filter(\.userID == user.id!).delete()
         let refreshToken = RefreshToken.query(on: connection).filter(\.userID == user.id!).delete()
 
-        return map(to: Void.self, accessTokens, refreshToken) { _, _ in Void() }
+        return map(to: UsernameContainer.self, accessTokens, refreshToken) { _, _ in return UsernameContainer(user.username) }
     }
 
     func accessToken(for user: User, on connection: DatabaseConnectable) throws -> Future<AccessToken> {
