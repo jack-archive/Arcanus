@@ -10,14 +10,12 @@ let package =
                            .package(url: "https://github.com/vapor/fluent-sqlite.git", from: "3.0.0"),
                            .package(url: "https://github.com/vapor/auth.git", from: "2.0.0-rc"),
                            .package(url: "https://github.com/jmmaloney4/VarInt.git", .branch("master")),
-                           .package(url: "https://github.com/jmmaloney4/CommandLine.git", .branch("master")),
-                           .package(url: "https://github.com/jmmaloney4/Environment.git", .branch("master"))],
+                           .package(url: "https://github.com/jmmaloney4/CommandLine.git", .branch("master"))],
 
             targets: [.target(name: "Arcanus", dependencies: ["Vapor",
                                                               "FluentSQLite",
                                                               "Authentication",
                                                               "VarInt",
-                                                              "CommandLineKit",
-                                                              "Environment"]),
+                                                              "CommandLineKit"]),
             .target(name: "CLI", dependencies: ["Arcanus"]),
             .testTarget(name: "ArcanusTests", dependencies: ["Arcanus"])])

@@ -19,11 +19,14 @@ final class Player: SQLiteModel, Content, Migration {
         self.user = user
     }
 
-    func getUser(on db: DatabaseConnectable) -> Future<User?> {
+    func getUser(on db: DatabaseConnectable) throws -> Future<User> {
         return User.query(on: db).filter(\.id == self.user).first()
+            .unwrap(or: Abort(.internalServerError,
+                              reason: "Player \(self.id?.description ?? "NO ID (Unsaved)") bad user"))
     }
     
-    static func get(on db: DatabaseConnectable, id: ID) -> Future<Player?> {
+    static func get(on db: DatabaseConnectable, id: ID) -> Future<Player> {
         return Player.query(on: db).filter(\.id == id).first()
+            .unwrap(or: Abort(.badRequest, reason: "No player with id \(id)"))
     }
 }
