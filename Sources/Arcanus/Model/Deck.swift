@@ -94,18 +94,6 @@ struct Deck: SQLiteModel, Content, Migration  {
         return self.cards.map({ $0.defaultCardStats.dbfId })
     }
     
-    func countCards() -> [DbfID: Int] {
-        var dict: [DbfID: Int] = [:]
-        for card in self.toDbfIDArray() {
-            if dict[card] != nil {
-                dict[card]! += 1
-            } else {
-                dict[card] = 1
-            }
-        }
-        return dict
-    }
-    
     init(id: ID? = nil, format: Format, hero: Hero.Type, cards: [DbfID]) throws {
         self.id = id
         self.format = format
@@ -132,7 +120,6 @@ struct Deck: SQLiteModel, Content, Migration  {
     }
     
     func parseDeckstringArrayToCards(copy: Int?, _ array: inout [DbfID]) throws -> [Card.Type] {
-        //  var array = input
         let count = array.removeFirst()
         let deckstring = Array(array.prefix(count))
         array.removeFirst(count)
@@ -169,6 +156,18 @@ struct Deck: SQLiteModel, Content, Migration  {
         if !array.isEmpty {
             throw Abort(.unprocessableEntity, reason: "Extra bytes in array, Corrupt format")
         }
+    }
+    
+    func countCards() -> [DbfID: Int] {
+        var dict: [DbfID: Int] = [:]
+        for card in self.toDbfIDArray() {
+            if dict[card] != nil {
+                dict[card]! += 1
+            } else {
+                dict[card] = 1
+            }
+        }
+        return dict
     }
     
     func makeDeckstringCardArray(copy: Int?, counts: [DbfID: Int]) -> [DbfID] {
@@ -257,7 +256,7 @@ func decodeDeckstring(_ input: String) throws -> [UInt64] {
     return ints
 }
 
-fileprivate func encodeDeckstring(_ input: [UInt64]) -> String {
+func encodeDeckstring(_ input: [UInt64]) -> String {
     var bytes: [UInt8] = []
     for val in input {
         bytes.append(contentsOf: putUVarInt(val))
