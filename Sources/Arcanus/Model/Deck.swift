@@ -45,11 +45,6 @@ enum Format: DbfID {
     case standard = 2
 }
 
-fileprivate struct CountPairDbfID {
-    var card: DbfID
-    var count: Int
-}
-
 struct Deck: SQLiteModel, Content, Migration  {
     typealias ID = Int
     var id: ID?
