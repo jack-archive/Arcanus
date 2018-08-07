@@ -39,7 +39,7 @@ func toPairs<Element: Any>(_ self: Array<Element>) -> [(Element, Element)]? {
     var rv: [(Element, Element)] = []
     
     while !working.isEmpty {
-        let pair = working.dropLast(working.count - 2)
+        let pair = working.prefix(2)
         rv.append((pair[0], pair[1]))
         working.removeFirst(2)
     }

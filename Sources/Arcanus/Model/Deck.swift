@@ -45,7 +45,13 @@ enum Format: DbfID {
     case standard = 2
 }
 
-struct Deck: SQLiteModel, Content, Migration  {
+struct DeckJson: Content {
+    var format: Int
+    var hero: DbfID
+    var cards: [DbfID] // Frequency
+}
+
+struct Deck: SQLiteModel, Migration  {
     typealias ID = Int
     var id: ID?
     var format: Format
@@ -63,16 +69,9 @@ struct Deck: SQLiteModel, Content, Migration  {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let id = try values.decode(ID?.self, forKey: .id)
-        let heroDbfId = try values.decode(DbfID.self, forKey: .hero)
+        let format = try values.decode(Int.self, forKey: .format)
+        let hero = try values.decode(DbfID.self, forKey: .hero)
         let cards = try values.decode(Array<DbfID>.self, forKey: .cards)
-        
-        guard let format = Format(rawValue: try values.decode(Int.self, forKey: .format)) else {
-            throw Abort(.badRequest)
-        }
-        
-        guard let hero = getCard(dbfID: heroDbfId) as? Hero.Type else {
-            throw Abort(.unprocessableEntity)
-        }
         
         try self.init(id: id, format: format, hero: hero, cards: cards)
     }
@@ -96,6 +95,18 @@ struct Deck: SQLiteModel, Content, Migration  {
         self.cards = try cards.map({ try getCard(dbfID: $0).unwrap(or: Abort(.badRequest)) })
     }
     
+    init(id: ID? = nil, format raw: Int, hero dbfId: DbfID, cards: [DbfID]) throws {
+        guard let format = Format(rawValue: raw) else {
+            throw Abort(.badRequest)
+        }
+        
+        guard let hero = getCard(dbfID: dbfId) as? Hero.Type else {
+            throw Abort(.unprocessableEntity)
+        }
+        
+        try self.init(id: id, format: format, hero: hero, cards: cards)
+    }
+    
     func deckstringToFrequency(copy: Int? = nil /* 1, 2, or nil for n-copy array */,
         array: [DbfID]) throws -> [DbfID] {
         var rv: [DbfID] = []
@@ -112,6 +123,17 @@ struct Deck: SQLiteModel, Content, Migration  {
         }
         
         return rv
+    }
+    
+    
+    
+    init(fromJson json: DeckJson) throws {
+        
+    }
+    
+    init(fromDeckstring input: String) throws {
+        let arr = try decodeDeckstring(input).map({ DbfID($0) })
+        try self.init(fromDeckstring: arr)
     }
     
     func parseDeckstringArrayToCards(copy: Int?, _ array: inout [DbfID]) throws -> [Card.Type] {

@@ -13,37 +13,44 @@ import Vapor
 class GameRouteController: RouteCollection {
     func boot(router: Router) throws {
         let games = router.grouped("games")
-        games.post(JoinGameContainer.self, at: "", use: createGameHandler)
+        games.post(DeckContainer.self, at: "", use: createGameHandler)
         
         let players = games.grouped(Game.parameter, "players")
-        players.post(JoinGameContainer.self, at: "", use: joinGameHandler)
+        players.post(DeckContainer.self, at: "", use: joinGameHandler)
     }
-}
-
-protocol DeckstringContainer: Content {
-    var deckstring: String { get }
 }
 
 private extension GameRouteController {
-    struct JoinGameContainer: DeckstringContainer {
-        let deckstring: String
+    struct DeckContainer: Content {
+        let deckstring: String?
+        let deck: DeckJson?
+        
+        func asDeck() throws -> Deck {
+            if deckstring != nil {
+                return try Deck(fromDeckstring: deckstring!)
+            } else if deck != nil {
+                return try Deck(fromJson: deck!)
+            } else {
+                throw Abort(.badRequest, reason: "Must supply either Deck Json or Deckstring")
+            }
+        }
     }
     
-    func createGameHandler(_ request: Request, container: JoinGameContainer) throws -> Future<Game> {
+    func createGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        
-        let player = try Player(user: user.id!, deckstring: container.deckstring).save(on: request)
+        let deck = try container.asDeck()
+        let player = try Player(user: user.id!, deck: deck).save(on: request)
         return player.flatMap { player in
             Game(p1: player.id!).save(on: request)
         }
     }
     
-    func joinGameHandler(_ request: Request, container: JoinGameContainer) throws -> Future<Game> {
+    func joinGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        let player = try Player(user: user.id!, deckstring: container.deckstring).save(on: request) // Future
+        let deck = try container.asDeck()
+        let player = try Player(user: user.id!, deck: deck).save(on: request) // Future
         let game = try request.parameters.next(Game.self)   // Future
         let logger = try request.make(Logger.self)
-        
         
         return map(to: EventLoopFuture<Game>.self, player, game) { player, game in
             logger.info("\(user.username) joining game \(game.id!)")
