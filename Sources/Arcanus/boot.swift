@@ -12,5 +12,12 @@ import Vapor
 /// [Learn More →](https://docs.vapor.codes/3.0/getting-started/structure/#bootswift)
 public func boot(_ app: Application) throws {
     // your code here
+    /*
+    var test = Test(hero: JainaProudmoore.self)
+    let db = try app.newConnection(to: .sqlite).wait()
+    var saved = try test.save(on: db).wait()
+    var loaded = try Test.find(saved.id!, on: db).wait()
     
+    print(test, saved, loaded!)
+    */
 }

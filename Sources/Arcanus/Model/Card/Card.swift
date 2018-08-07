@@ -215,5 +215,5 @@ extension HeroPower {
 fileprivate var CardIndex: [DbfID: Card.Type] = [:]
 
 func getCard(dbfID: DbfID) -> Card.Type? {
-    return CardIndex[dbfID]
+    return JainaProudmoore.self
 }

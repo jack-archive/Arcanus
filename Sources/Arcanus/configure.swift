@@ -44,5 +44,6 @@ public func configure(_ config: inout Config,
     migrationConfig.add(model: RefreshToken.self, database: .sqlite)
     migrationConfig.add(model: Game.self, database: .sqlite)
     migrationConfig.add(model: Player.self, database: .sqlite)
+    migrationConfig.add(model: Deck.self, database: .sqlite)
     services.register(migrationConfig)
 }

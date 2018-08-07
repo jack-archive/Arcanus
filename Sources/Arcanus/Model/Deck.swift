@@ -10,12 +10,44 @@ import Foundation
 import Vapor
 import VarInt
 
-// https://hearthsim.info/docs/deckstrings/
+
 // https://www.reddit.com/r/hearthstone/comments/6f2xyk/how_to_encodedecode_deck_codes/
+// https://hearthsim.info/docs/deckstrings/
+/*
+ 
+ 2. Cards block
+ The cards block is split in four pairs of length + array in the following order:
+ 
+ - Heroes
+ - Single-copy cards
+ - 2-copy cards
+ - n-copy cards
+ 
+ Each pair has a leading varint specifying the number of items in the array. For the first three blocks, those are arrays of varints. For the last block, it is an array of pairs of varints. The goal of this structure is to make the deckstring as compact as possible. Each card is represented with a varint DBF ID as mentioned before.
+ 
+ Heroes: An array of initial heroes present in the deck. In other words, which hero the deck was made for. You should really always expect one. Additional note: The hero’s class determines which class the deck is for, but the deck is ostensibly made for a hero, not a class. If the specified hero is a hero skin, it will be used instead of the main hero iff available.
+ 
+ Note on heroes: Although it is an array, it is used for the initial hero, not playable heroes (such as the Frozen Throne heroes). If you can draw it, do not use this array.
+ 
+ Single-copy cards: Cards for which there is exactly one copy in the deck. 2-copy cards: Cards for which there is exactly two copies in the deck.
+ 
+ n-copy cards: All other cards in the deck. This array is a list of varint pairs, **representing first the dbf id, followed by the amount of times that card is present in the deck**. This SHOULD only contain cards with a minimum of 3 instances in the deck, which means that it will (at this time) always be empty for constructed decks; however it can theoretically contain single and double copy cards as well.
+ 
+ Although final ordering does not matter, cards are sorted by DBF ID in their respective array in order to consistently generate the same deckstrings for the same decks.
+ 
+ */
+
+// Frequency Representation: 30 cards, each specified number of times, i.e. 2 cards means repeat dbfID twice
+// Deckstring Representation: 3 sparate arrays, 3rd one is n-copy array
 
 enum Format: DbfID {
     case wild = 1
     case standard = 2
+}
+
+fileprivate struct CountPairDbfID {
+    var card: DbfID
+    var count: Int
 }
 
 struct Deck: SQLiteModel, Content, Migration  {
@@ -23,24 +55,92 @@ struct Deck: SQLiteModel, Content, Migration  {
     var id: ID?
     var format: Format
     var hero: Hero.Type
-    var cards: [(count: Int, Card.Type)] // Count: Card
+    // Stored in Freq representation
+    var cards: [Card.Type]
     
     enum CodingKeys: String, CodingKey {
-        case array
+        case id
+        case format
+        case hero
+        case cards
     }
     
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        let array = try values.decode(Array<DbfID>.self, forKey: .array)
-        try self.init(array: array)
+        let id = try values.decode(ID?.self, forKey: .id)
+        let heroDbfId = try values.decode(DbfID.self, forKey: .hero)
+        let cards = try values.decode(Array<DbfID>.self, forKey: .cards)
+        
+        guard let format = Format(rawValue: try values.decode(Int.self, forKey: .format)) else {
+            throw Abort(.badRequest)
+        }
+        
+        guard let hero = getCard(dbfID: heroDbfId) as? Hero.Type else {
+            throw Abort(.unprocessableEntity)
+        }
+        
+        try self.init(id: id, format: format, hero: hero, cards: cards)
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.toArray(), forKey: .array)
+        try container.encode(self.id, forKey: .id)
+        try container.encode(self.format.rawValue, forKey: .format)
+        try container.encode(self.hero.defaultCardStats.dbfId, forKey: .hero)
+        try container.encode(self.toDbfIDArray(), forKey: .cards)
     }
     
-    init(array input: [DbfID]) throws {
+    func toDbfIDArray() -> [DbfID] {
+        return self.cards.map({ $0.defaultCardStats.dbfId })
+    }
+    
+    func countCards() -> [DbfID: Int] {
+        var dict: [DbfID: Int] = [:]
+        for card in self.toDbfIDArray() {
+            if dict[card] != nil {
+                dict[card]! += 1
+            } else {
+                dict[card] = 1
+            }
+        }
+        return dict
+    }
+    
+    init(id: ID? = nil, format: Format, hero: Hero.Type, cards: [DbfID]) throws {
+        self.id = id
+        self.format = format
+        self.hero = hero
+        self.cards = try cards.map({ try getCard(dbfID: $0).unwrap(or: Abort(.badRequest)) })
+    }
+    
+    func deckstringToFrequency(copy: Int? = nil /* 1, 2, or nil for n-copy array */,
+        array: [DbfID]) throws -> [DbfID] {
+        var rv: [DbfID] = []
+        
+        if copy != nil { // 1 or 2 copy
+            array.forEach { dbfId in
+                rv.append(contentsOf: Array(repeating: dbfId, count: copy!))
+            }
+        } else { // n-Copy
+            let pairs = try array.toNCopyPairs()
+            pairs.forEach { pair in
+                rv.append(contentsOf: Array(repeating: pair.card, count: pair.count))
+            }
+        }
+        
+        return rv
+    }
+    
+    func parseDeckstringArrayToCards(copy: Int?, _ array: inout [DbfID]) throws -> [Card.Type] {
+        //  var array = input
+        let count = array.removeFirst()
+        let deckstring = Array(array.prefix(count))
+        array.removeFirst(count)
+        let freq = try deckstringToFrequency(copy: copy, array: deckstring)
+        return try freq.map({ try getCard(dbfID: $0).unwrap(or: Abort(.badRequest)) })
+    }
+    
+    init(fromDeckstring input: [DbfID]) throws {
         var array = input
         array.removeFirst() // First is always 0
         array.removeFirst() // Version still is always 1
@@ -61,34 +161,31 @@ struct Deck: SQLiteModel, Content, Migration  {
         
         // Cards
         self.cards = []
+        self.cards.append(contentsOf: try parseDeckstringArrayToCards(copy: 1, &array))
+        self.cards.append(contentsOf: try parseDeckstringArrayToCards(copy: 2, &array))
+        self.cards.append(contentsOf: try parseDeckstringArrayToCards(copy: nil, &array))
         
-        let oneCopyCardsCount = array.removeFirst()
-        try array.dropLast(array.count - oneCopyCardsCount) // Get one copy card sub array
-            .map({ card in try getCard(dbfID: card)         // Get card type for DbfID, check for nil
-                .unwrap(or: Abort(.unprocessableEntity, reason: "Could not find card \(card)")) })
-            .forEach({ self.cards.append((1, $0)) })        // Add to self.cards
-        array.removeFirst(oneCopyCardsCount)                // Move array ahead
-        
-        let twoCopyCardsCount = array.removeFirst()
-        try array.dropLast(array.count - twoCopyCardsCount)
-            .map({ card in try getCard(dbfID: card)
-                .unwrap(or: Abort(.unprocessableEntity, reason: "Could not find card \(card)")) })
-            .forEach({ self.cards.append((2, $0)) })
-        array.removeFirst(twoCopyCardsCount)
-        
-        let nCopyCardsCount = array.removeFirst()
-        try array.dropLast(array.count - nCopyCardsCount).toNCopyPairs()
-            .map({ pair in try getCard(dbfID: pair.card)
-                .unwrap(or: Abort(.unprocessableEntity, reason: "Could not find card \(pair.card)")) })
-            .forEach({ self.cards.append((1, $0)) })
-        array.removeFirst(nCopyCardsCount)
-        
+        // Check that array is not malformed
         if !array.isEmpty {
             throw Abort(.unprocessableEntity, reason: "Extra bytes in array, Corrupt format")
         }
     }
     
-    func toArray() -> [DbfID] {
+    func makeDeckstringCardArray(copy: Int?, counts: [DbfID: Int]) -> [DbfID] {
+        var rv: [DbfID] = []
+        rv.append(counts.count)
+        counts.forEach { card, count in
+            rv.append(card) // Add card regardless
+            if copy == nil {
+                rv.append(count)
+            }
+        }
+        
+        return rv
+    }
+    
+    /// Encoded as deckstring, with format, hero array, and 3 card arrays
+    func toDeckstringArray() -> [DbfID] {
         var rv: [DbfID] = []
         rv.append(0) // Always 0
         rv.append(1) // Version 1
@@ -97,55 +194,35 @@ struct Deck: SQLiteModel, Content, Migration  {
         rv.append(1) // One hero
         rv.append(hero.defaultCardStats.dbfId)
         
-        let oneCopyCards = self.cards.filter({ $0.count == 1 })
-        rv.append(oneCopyCards.count)
-        oneCopyCards.forEach { _, card in
-            rv.append(card.defaultCardStats.dbfId)
-        }
+        let counts = self.countCards()
+        let oneCopyCards = counts.filter { _, count in return count == 1 }
+        let twoCopyCards = counts.filter { _, count in return count == 2 }
+        let nCopyCards = counts.filter { _, count in return count > 2 }
         
-        let twoCopyCards = self.cards.filter({ $0.count == 2 })
-        rv.append(twoCopyCards.count)
-        twoCopyCards.forEach { _, card in
-            rv.append(card.defaultCardStats.dbfId)
-        }
-        
-        let nCopyCards = self.cards.filter({ $0.count > 2 })
-        rv.append(nCopyCards.count)
-        nCopyCards.forEach { count, card in
-            rv.append(card.defaultCardStats.dbfId)  // First is DbfID
-            rv.append(count)                        // Second is count
-        }
+        rv.append(contentsOf: makeDeckstringCardArray(copy: 1, counts: oneCopyCards))
+        rv.append(contentsOf: makeDeckstringCardArray(copy: 2, counts: twoCopyCards))
+        rv.append(contentsOf: makeDeckstringCardArray(copy: nil, counts: nCopyCards))
         
         return rv
     }
     
     func deckstring() -> String {
-        return encodeDeckstring(self.toArray().map({ UInt64($0) }))
+        return encodeDeckstring(self.toDeckstringArray().map({ UInt64($0) }))
     }
 }
 
 // MARK: n-Copy Pair Extensions
 
-fileprivate struct NCopyPair {
-    var card: DbfID
-    var count: Int
-}
+fileprivate typealias NCopyPairDbfID = (card: DbfID, count: Int)
 
-fileprivate func toNCopyPairs(_ self: Array<DbfID>) throws -> [NCopyPair] {
+fileprivate func toNCopyPairs(_ self: Array<DbfID>) throws -> [NCopyPairDbfID] {
     return try self.toPairs()
         .unwrap(or: Abort(.unprocessableEntity, reason: "n-Copy array not divisible by 2"))
-        .map { return NCopyPair(card: $0, count: $1) }
-}
-
-fileprivate extension ArraySlice where Element == DbfID {
-    func toNCopyPairs() throws -> [NCopyPair] {
-        let copy = Array(self)
-        return try Arcanus.toNCopyPairs(copy)
-    }
+        .map { return NCopyPairDbfID(card: $0, count: $1) }
 }
 
 fileprivate extension Array where Element == DbfID {
-    func toNCopyPairs() throws -> [NCopyPair] {
+    func toNCopyPairs() throws -> [NCopyPairDbfID] {
         return try Arcanus.toNCopyPairs(self)
     }
 }
