@@ -38,19 +38,21 @@ private extension GameRouteController {
     
     func createGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        let deck = try container.asDeck()
-        let player = try Player(user: user.id!, deck: deck).save(on: request)
+        let deck = try container.asDeck().save(on: request).wait()
+        let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request)
         return player.flatMap { player in
             Game(p1: player.id!).save(on: request)
         }
     }
+    
     // TODO: Test
     func joinGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        let deck = try container.asDeck()
-        let player = try Player(user: user.id!, deck: deck).save(on: request) // Future
-        let game = try request.parameters.next(Game.self)   // Future
+        let game = try request.parameters.next(Game.self)
         let logger = try request.make(Logger.self)
+        
+        let deck = try container.asDeck().save(on: request).wait()
+        let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request) // Future
         
         return map(to: EventLoopFuture<Game>.self, player, game) { player, game in
             logger.info("\(user.username) joining game \(game.id!)")

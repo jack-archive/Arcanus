@@ -14,9 +14,9 @@ final class Player: SQLiteModel, Content, Migration {
 
     var id: ID?
     private(set) var user: User.ID
-    private(set) var deck: Deck
+    private(set) var deck: Deck.ID
     
-    init(user: User.ID, deck: Deck) throws {
+    init(user: User.ID, deck: Deck.ID) throws {
         self.user = user
         self.deck = deck
     }

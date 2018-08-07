@@ -62,11 +62,26 @@ protocol CardStats {
     var mechanics: [CardMechanic] { get set }
 }
 
-protocol Card: Entity {
+protocol Card: Entity, CustomStringConvertible {
     var enchantments: [Enchantment] { get set }
 
     static var defaultCardStats: CardStats { get }
     var cardStats: CardStats { get set }
+}
+
+extension Card {
+    var description: String {
+        return "\(self.name) [\(self.dbfId), \(self.cost) Mana, \(self.text)]"
+    }
+}
+
+extension Card {
+    static var dbfId: DbfID { return defaultCardStats.dbfId }
+    static var name: String { return defaultCardStats.name }
+    static var text: String { return defaultCardStats.text }
+    static var cls: CardClass { return defaultCardStats.cls }
+    static var cost: Int { return defaultCardStats.cost }
+    static var mechanics: [CardMechanic] { return defaultCardStats.mechanics }
 }
 
 extension Card {
@@ -213,15 +228,38 @@ extension HeroPower {
 // MARK: Card Index
 
 struct CardIndex {
-    fileprivate var CardNameIndex: [String: Card.Type] = [:]
-    fileprivate var CardDbfIDIndex: [DbfID: Card.Type] = [:]
+    fileprivate static var CardNameIndex: [String: Card.Type] = [:]
+    fileprivate static var CardDbfIDIndex: [DbfID: Card.Type] = [:]
     
-    func get<T: Card>(_ type: T.Type? = nil, _ dbfID: DbfID) -> T.Type? {
+    static func add(_ card: Card.Type) {
+        CardNameIndex[card.defaultCardStats.name] = card
+        CardDbfIDIndex[card.defaultCardStats.dbfId] = card
+    }
+    
+    static func getCard(_ dbfID: DbfID) -> Card.Type? {
+        return CardDbfIDIndex[dbfID]
+    }
+    
+    static func getCard(_ name: String) -> Card.Type? {
+        return CardNameIndex[name]
+    }
+    
+    static func getHero(_ dbfID: DbfID) -> Hero.Type? {
+        return CardDbfIDIndex[dbfID] as? Hero.Type
+    }
+    
+    static func getHero(_ name: String) -> Hero.Type? {
+        return CardNameIndex[name] as? Hero.Type
+    }
+    
+    /*
+    static func get<T: Card>(_ dbfID: DbfID) -> T.Type? {
         return CardDbfIDIndex[dbfID] as? T.Type
     }
     
-    func get<T: Card>(_ name: String) -> T.Type? {
+    static func get<T: Card>(_ name: String) -> T.Type? {
         return CardNameIndex[name] as? T.Type
     }
+     */
 
 }

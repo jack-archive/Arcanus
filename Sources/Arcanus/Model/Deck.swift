@@ -97,7 +97,7 @@ struct Deck: SQLiteModel, Migration  {
         self.id = id
         self.format = format
         self.hero = hero
-        self.cards = try cards.map({ try CardIndex.get(Card.self, $0).unwrap(or: Abort(.badRequest)) })
+        self.cards = try cards.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest)) })
     }
     
     init(id: ID? = nil, format raw: Int, hero dbfId: DbfID, cards: [DbfID]) throws {
@@ -105,7 +105,7 @@ struct Deck: SQLiteModel, Migration  {
             throw Abort(.badRequest)
         }
         
-        guard let hero = getCard(dbfID: dbfId) as? Hero.Type else {
+        guard let hero = CardIndex.getHero(dbfId) else {
             throw Abort(.unprocessableEntity)
         }
         
@@ -144,7 +144,7 @@ struct Deck: SQLiteModel, Migration  {
         let deckstring = Array(array.prefix(count))
         array.removeFirst(count)
         let freq = try deckstringToFrequency(copy: copy, array: deckstring)
-        return try freq.map({ try getCard(dbfID: $0).unwrap(or: Abort(.badRequest)) })
+        return try freq.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest)) })
     }
     
     init(fromDeckstring input: [DbfID]) throws {
@@ -161,7 +161,7 @@ struct Deck: SQLiteModel, Migration  {
         // Hero
         guard array.removeFirst() == 1 else { throw Abort(.unprocessableEntity, reason: "Can only be one hero") }
         let heroID = array.removeFirst()
-        guard let hero = getCard(dbfID: heroID) as? Hero.Type else {
+        guard let hero = CardIndex.getHero(heroID) else {
             throw Abort(.unprocessableEntity, reason: "Can't find hero for \(heroID)")
         }
         self.hero = hero
