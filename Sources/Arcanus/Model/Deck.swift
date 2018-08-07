@@ -10,7 +10,6 @@ import Foundation
 import Vapor
 import VarInt
 
-
 // https://www.reddit.com/r/hearthstone/comments/6f2xyk/how_to_encodedecode_deck_codes/
 // https://hearthsim.info/docs/deckstrings/
 /*
@@ -45,10 +44,16 @@ enum Format: DbfID {
     case standard = 2
 }
 
-struct DeckJson: Content {
+struct DbfIDDeckJson: Content {
     var format: Int
     var hero: DbfID
     var cards: [DbfID] // Frequency
+}
+
+struct NameDeckJson: Content {
+    var format: Int
+    var hero: String
+    var cards: [String] // Frequency
 }
 
 struct Deck: SQLiteModel, Migration  {
@@ -92,7 +97,7 @@ struct Deck: SQLiteModel, Migration  {
         self.id = id
         self.format = format
         self.hero = hero
-        self.cards = try cards.map({ try getCard(dbfID: $0).unwrap(or: Abort(.badRequest)) })
+        self.cards = try cards.map({ try CardIndex.get(Card.self, $0).unwrap(or: Abort(.badRequest)) })
     }
     
     init(id: ID? = nil, format raw: Int, hero dbfId: DbfID, cards: [DbfID]) throws {
@@ -125,10 +130,8 @@ struct Deck: SQLiteModel, Migration  {
         return rv
     }
     
-    
-    
-    init(fromJson json: DeckJson) throws {
-        
+    init(fromJson json: DbfIDDeckJson) throws {
+        try self.init(format: json.format, hero: json.hero, cards: json.cards)
     }
     
     init(fromDeckstring input: String) throws {

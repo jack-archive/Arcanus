@@ -23,7 +23,7 @@ class GameRouteController: RouteCollection {
 private extension GameRouteController {
     struct DeckContainer: Content {
         let deckstring: String?
-        let deck: DeckJson?
+        let deck: DbfIDDeckJson?
         
         func asDeck() throws -> Deck {
             if deckstring != nil {
@@ -44,7 +44,7 @@ private extension GameRouteController {
             Game(p1: player.id!).save(on: request)
         }
     }
-    
+    // TODO: Test
     func joinGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
         let deck = try container.asDeck()

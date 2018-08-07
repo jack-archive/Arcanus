@@ -212,8 +212,16 @@ extension HeroPower {
 
 // MARK: Card Index
 
-fileprivate var CardIndex: [DbfID: Card.Type] = [:]
+struct CardIndex {
+    fileprivate var CardNameIndex: [String: Card.Type] = [:]
+    fileprivate var CardDbfIDIndex: [DbfID: Card.Type] = [:]
+    
+    func get<T: Card>(_ type: T.Type? = nil, _ dbfID: DbfID) -> T.Type? {
+        return CardDbfIDIndex[dbfID] as? T.Type
+    }
+    
+    func get<T: Card>(_ name: String) -> T.Type? {
+        return CardNameIndex[name] as? T.Type
+    }
 
-func getCard(dbfID: DbfID) -> Card.Type? {
-    return JainaProudmoore.self
 }
