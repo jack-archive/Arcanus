@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Vapor
 
 typealias DbfID = Int
 
@@ -23,6 +24,19 @@ extension Entity {
 
 // MARK: Card
 
+enum CardType: String, Codable {
+    case minion, spell, weapon, enchantment, hero, power
+    
+    enum CodingKeys: CodingKey {
+        case value
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.rawValue, forKey: .value)
+    }
+}
+
 enum CardRarity: String {
     case free, common, rare, epic, legendary
 }
@@ -36,14 +50,23 @@ enum CardRace: String {
     case neutral
 }
 
-enum CardClass: String {
+enum CardClass: String, Codable {
     case neutral
     case druid, hunter, mage,
         paladin, priest, rouge,
         shaman, warlock, warrior
+    
+    enum CodingKeys: CodingKey {
+        case value
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.rawValue, forKey: .value)
+    }
 }
 
-enum CardMechanic: String {
+enum CardMechanic: String, Codable {
     case charge
     case taunt
     case windfury
@@ -51,15 +74,15 @@ enum CardMechanic: String {
     case deathrattle
 
     case oneTurnEffect
-}
-
-protocol CardStats {
-    var dbfId: DbfID { get set }
-    var name: String { get set }
-    var text: String { get set }
-    var cls: CardClass { get set }
-    var cost: Int { get set }
-    var mechanics: [CardMechanic] { get set }
+    
+    enum CodingKeys: CodingKey {
+        case value
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.rawValue, forKey: .value)
+    }
 }
 
 protocol Card: Entity, CustomStringConvertible {
@@ -118,14 +141,14 @@ extension Card {
 
 // MARK: Minion
 
-protocol MinionStats {
-    var attack: Int { get set }
-    var health: Int { get set }
-}
-
 protocol Minion: Card {
     static var defaultMinionStats: MinionStats { get }
     var minionStats: MinionStats { get set }
+}
+
+extension Minion {
+    static var attack: Int { return defaultMinionStats.attack }
+    static var health: Int { return defaultMinionStats.health }
 }
 
 extension Minion {
@@ -142,9 +165,6 @@ extension Minion {
 
 // MARK: Spell
 
-protocol SpellStats {
-}
-
 protocol Spell: Card {
     static var defaultSpellStats: SpellStats { get }
     var spellStats: SpellStats { get set }
@@ -155,14 +175,14 @@ extension Spell {
 
 // MARK: Weapon
 
-protocol WeaponStats {
-    var attack: Int { get set }
-    var durability: Int { get set }
-}
-
 protocol Weapon: Card {
     static var defaultWeaponStats: WeaponStats { get }
     var weaponStats: WeaponStats { get set }
+}
+
+extension Weapon {
+    static var attack: Int { return defaultWeaponStats.attack }
+    static var durability: Int { return defaultWeaponStats.durability }
 }
 
 extension Weapon {
@@ -179,9 +199,6 @@ extension Weapon {
 
 // MARK: Enchantment
 
-protocol EnchantmentStats {
-}
-
 protocol Enchantment: Card {
     static var defaultEnchantmentStats: EnchantmentStats { get }
     var enchantmentStats: EnchantmentStats { get set }
@@ -196,13 +213,13 @@ extension Enchantment {
 
 // MARK: Hero
 
-protocol HeroStats {
-    var health: Int { get set }
-}
-
 protocol Hero: Card {
     static var defaultHeroStats: HeroStats { get }
     var heroStats: HeroStats { get set }
+}
+
+extension Hero {
+    static var health: Int { return defaultHeroStats.health }
 }
 
 extension Hero {
@@ -213,9 +230,6 @@ extension Hero {
 }
 
 // MARK: Hero Power
-
-protocol HeroPowerStats {
-}
 
 protocol HeroPower: Card {
     static var defaultHeroPowerStats: HeroPowerStats { get }

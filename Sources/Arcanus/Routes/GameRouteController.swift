@@ -45,7 +45,6 @@ private extension GameRouteController {
         }
     }
     
-    // TODO: Test
     func joinGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
         let game = try request.parameters.next(Game.self)

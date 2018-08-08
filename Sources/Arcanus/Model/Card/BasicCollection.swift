@@ -21,6 +21,7 @@ final class Placeholder: Card, Minion, Spell, Weapon, Enchantment, Hero, HeroPow
         var name: String = "Placeholder"
         var text: String = "PLACEHOLDER CARD"
         var cls: CardClass = .neutral
+        var type: CardType = .minion
         var cost: Int = 1
         var mechanics: [CardMechanic] = []
         var durability: Int = 1
