@@ -38,10 +38,10 @@ private extension GameRouteController {
     
     func createGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        let deck = try container.asDeck().save(on: request).wait()
-        let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request)
-        return player.flatMap { player in
-            Game(p1: player.id!).save(on: request)
+        return try container.asDeck().save(on: request).flatMap { deck in
+            return try Player(user: user.id!, deck: deck.requireID()).save(on: request).flatMap { player in
+                Game(p1: player.id!).save(on: request)
+            }
         }
     }
     
@@ -51,23 +51,24 @@ private extension GameRouteController {
         let game = try request.parameters.next(Game.self)
         let logger = try request.make(Logger.self)
         
-        let deck = try container.asDeck().save(on: request).wait()
-        let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request) // Future
-        
-        return map(to: EventLoopFuture<Game>.self, player, game) { player, game in
-            logger.info("\(user.username) joining game \(game.id!)")
+        return try container.asDeck().save(on: request).flatMap { deck in
+            let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request)
             
-            // addPlayer will return false if both player slots have values
-            guard game.addPlayer(player.id!) else {
-                throw Abort(.badRequest, reason: "Game is full")
+            return flatMap(to: Game.self, player, game) { player, game in
+                logger.info("\(user.username) joining game \(game.id!)")
+                
+                // addPlayer will return false if both player slots have values
+                guard game.addPlayer(player.id!) else {
+                    throw Abort(.badRequest, reason: "Game is full")
+                }
+                
+                // Log game
+                try game.describe(on: request)
+                    .do({ logger.info($0) })
+                    .catch({ logger.error($0.localizedDescription) })
+                
+                return game.update(on: request)
             }
-            
-            // Log game
-            try game.describe(on: request)
-                .do({ logger.info($0) })
-                .catch({ logger.error("\($0)") })
-            
-            return game.update(on: request)
-        }.flatMap({ $0 })
+        }
     }
 }
