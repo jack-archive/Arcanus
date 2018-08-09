@@ -11,6 +11,20 @@ protocol Stats: Codable {
     
 }
 
+fileprivate enum CodingKeys: CodingKey {
+    case dbfId
+    case name
+    case text
+    case cls
+    case type
+    case cost
+    case mechanics
+    
+    case attack
+    case health
+    case durability
+}
+
 protocol CardStats: Stats {
     var dbfId: DbfID { get set }
     var name: String { get set }
@@ -21,6 +35,23 @@ protocol CardStats: Stats {
     var mechanics: [CardMechanic] { get set }
 }
 
+extension CardStats {
+    fileprivate func encodeCardStats(to container: inout KeyedEncodingContainer<CodingKeys>) throws {
+        try container.encode(self.dbfId, forKey: .dbfId)
+        try container.encode(self.name, forKey: .name)
+        try container.encode(self.text, forKey: .text)
+        try container.encode(self.cls, forKey: .cls)
+        try container.encode(self.type, forKey: .type)
+        try container.encode(self.cost, forKey: .cost)
+        try container.encode(self.mechanics, forKey: .mechanics)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+    }
+}
+
 protocol MinionStats: Stats {
     var attack: Int { get set }
     var health: Int { get set }
@@ -28,6 +59,13 @@ protocol MinionStats: Stats {
 
 extension CardStats where Self: MinionStats {
     var type: CardType { return .minion }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+        try container.encode(self.attack, forKey: .attack)
+        try container.encode(self.health, forKey: .health)
+    }
 }
 
 protocol SpellStats: Stats {
@@ -35,6 +73,11 @@ protocol SpellStats: Stats {
 
 extension CardStats where Self: SpellStats {
     var type: CardType { return .spell }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+    }
 }
 
 protocol WeaponStats: Stats {
@@ -44,6 +87,13 @@ protocol WeaponStats: Stats {
 
 extension CardStats where Self: WeaponStats {
     var type: CardType { return .weapon }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+        try container.encode(self.attack, forKey: .attack)
+        try container.encode(self.durability, forKey: .durability)
+    }
 }
 
 protocol EnchantmentStats: Stats {
@@ -51,6 +101,11 @@ protocol EnchantmentStats: Stats {
 
 extension CardStats where Self: EnchantmentStats {
     var type: CardType { return .enchantment }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+    }
 }
 
 protocol HeroStats: Stats {
@@ -59,6 +114,12 @@ protocol HeroStats: Stats {
 
 extension CardStats where Self: HeroStats {
     var type: CardType { return .hero }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+        try container.encode(self.health, forKey: .health)
+    }
 }
 
 protocol HeroPowerStats: Stats {
@@ -66,42 +127,27 @@ protocol HeroPowerStats: Stats {
 
 extension CardStats where Self: HeroPowerStats {
     var type: CardType { return .power }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try self.encodeCardStats(to: &container)
+    }
 }
+
 
 struct StatsContainer: Content {
     var stats: CardStats
-    var minion: MinionStats?
-    var spell: SpellStats?
-    var weapon: WeaponStats?
-    var enchantment: EnchantmentStats?
-    var hero: HeroStats?
-    var hp: HeroPowerStats?
-    
-    enum CodingKeys: CodingKey {
-        case dbfId
-        case name
-        case text
-        case cls
-        case cost
-        case mechanics
-        
-        case attack
-        case health
-        case durability
-    }
     
     init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        
-        stats.dbfId = try values.decode(DbfID.self, forKey: .dbfId)
-        stats.name = try values.decode(String.self, forKey: .name)
-        stats.text = try values.decode(String.self, forKey: .text)
-        stats.cls = try values.decode(CardClass.self, forKey: .cls)
-        stats.cost = try values.decode(Int.self, forKey: .cost)
-        stats.mechanics = try values.decode([CardMechanic].self, forKey: .mechanics)
-
-        
-        
-
+        throw Abort(.badRequest, reason: "Not Decodable")
+    }
+    
+    init(stats: CardStats) {
+        self.stats = stats
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        try self.stats.encode(to: encoder)
     }
 }
+

@@ -17,15 +17,15 @@ struct CardParam: Parameter {
 
 class CardRouteController: RouteCollection {
     func boot(router: Router) throws {
-        let cards = router.grouped("games")
+        let cards = router.grouped("cards")
         cards.get(CardParam.parameter, use: getCardForIdHandler)
     }
 }
 
 private extension CardRouteController {
-    func getCardForIdHandler(_ request: Request) throws -> Future<UsernameContainer> {
+    func getCardForIdHandler(_ request: Request) throws -> Future<StatsContainer> {
         let dbfId = try request.parameters.next(CardParam.self)
         let card = try CardIndex.getCard(dbfId).unwrap(or: Abort(.badRequest, reason: "No card with id \(dbfId)"))
-        var response: CardResponse
+        return Future.map(on: request) { StatsContainer(stats: card.defaultCardStats) }
     }
 }
