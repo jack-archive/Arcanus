@@ -20,7 +20,7 @@ public func routes(_ router: Router) throws {
 
     let protectedRouteController = ProtectedRoutesController()
     try protectedRouteController.boot(router: router)
-    
+
     let cardRouteController = CardRouteController()
     try cardRouteController.boot(router: router)
 }

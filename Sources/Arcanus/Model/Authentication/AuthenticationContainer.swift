@@ -27,7 +27,7 @@ struct RefreshTokenContainer: Content {
 
 struct UsernameContainer: Content {
     let username: String
-    
+
     init(_ username: String) {
         self.username = username
     }

@@ -4,8 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Foundation
 import Core
+import Foundation
 
 /// Code will only run in Debug configuration
 public func DEBUG(_ code: () throws -> Void) throws {
@@ -34,16 +34,16 @@ func toPairs<Element: Any>(_ self: Array<Element>) -> [(Element, Element)]? {
     if self.count % 2 != 0 {
         return nil
     }
-    
+
     var working = self
     var rv: [(Element, Element)] = []
-    
+
     while !working.isEmpty {
         let pair = working.prefix(2)
         rv.append((pair[0], pair[1]))
         working.removeFirst(2)
     }
-    
+
     return rv
 }
 

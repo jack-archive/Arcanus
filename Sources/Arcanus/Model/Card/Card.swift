@@ -26,11 +26,11 @@ extension Entity {
 
 enum CardType: String, Codable {
     case minion, spell, weapon, enchantment, hero, power
-    
+
     enum CodingKeys: CodingKey {
         case value
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -39,7 +39,7 @@ enum CardType: String, Codable {
 
 enum CardRarity: String, Codable {
     case free, common, rare, epic, legendary
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -48,7 +48,7 @@ enum CardRarity: String, Codable {
 
 enum CardSet: String, Codable {
     case basic, classic
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -58,7 +58,7 @@ enum CardSet: String, Codable {
 // http://hearthstone.wikia.com/wiki/Race
 enum CardRace: String, Codable {
     case neutral
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -70,7 +70,7 @@ enum CardClass: String, Codable {
     case druid, hunter, mage,
         paladin, priest, rouge,
         shaman, warlock, warrior
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -85,7 +85,7 @@ enum CardMechanic: String, Codable {
     case deathrattle
 
     case oneTurnEffect
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.rawValue)
@@ -251,36 +251,35 @@ extension HeroPower {
 struct CardIndex {
     fileprivate static var CardNameIndex: [String: Card.Type] = [:]
     fileprivate static var CardDbfIDIndex: [DbfID: Card.Type] = [:]
-    
+
     static func add(_ card: Card.Type) {
-        CardNameIndex[card.defaultCardStats.name] = card
-        CardDbfIDIndex[card.defaultCardStats.dbfId] = card
+        self.CardNameIndex[card.defaultCardStats.name] = card
+        self.CardDbfIDIndex[card.defaultCardStats.dbfId] = card
     }
-    
+
     static func getCard(_ dbfID: DbfID) -> Card.Type? {
-        return CardDbfIDIndex[dbfID]
+        return self.CardDbfIDIndex[dbfID]
     }
-    
+
     static func getCard(_ name: String) -> Card.Type? {
-        return CardNameIndex[name]
+        return self.CardNameIndex[name]
     }
-    
+
     static func getHero(_ dbfID: DbfID) -> Hero.Type? {
-        return CardDbfIDIndex[dbfID] as? Hero.Type
+        return self.CardDbfIDIndex[dbfID] as? Hero.Type
     }
-    
+
     static func getHero(_ name: String) -> Hero.Type? {
-        return CardNameIndex[name] as? Hero.Type
+        return self.CardNameIndex[name] as? Hero.Type
     }
-    
+
     /*
     static func get<T: Card>(_ dbfID: DbfID) -> T.Type? {
         return CardDbfIDIndex[dbfID] as? T.Type
     }
-    
+
     static func get<T: Card>(_ name: String) -> T.Type? {
         return CardNameIndex[name] as? T.Type
     }
      */
-
 }

@@ -15,7 +15,7 @@ final class Player: SQLiteModel, Content, Migration {
     var id: ID?
     private(set) var user: User.ID
     private(set) var deck: Deck.ID
-    
+
     init(user: User.ID, deck: Deck.ID) throws {
         self.user = user
         self.deck = deck
@@ -26,7 +26,7 @@ final class Player: SQLiteModel, Content, Migration {
             .unwrap(or: Abort(.internalServerError,
                               reason: "Player \(self.id?.description ?? "NO ID (Unsaved)") bad user"))
     }
-    
+
     static func get(on db: DatabaseConnectable, id: ID) -> Future<Player> {
         return Player.query(on: db).filter(\.id == id).first()
             .unwrap(or: Abort(.badRequest, reason: "No player with id \(id)"))

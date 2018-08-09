@@ -58,7 +58,7 @@ private extension AuthenticationController {
         let accessTokens = AccessToken.query(on: connection).filter(\.userID == user.id!).delete()
         let refreshToken = RefreshToken.query(on: connection).filter(\.userID == user.id!).delete()
 
-        return map(to: UsernameContainer.self, accessTokens, refreshToken) { _, _ in return UsernameContainer(user.username) }
+        return map(to: UsernameContainer.self, accessTokens, refreshToken) { _, _ in UsernameContainer(user.username) }
     }
 
     func accessToken(for user: User, on connection: DatabaseConnectable) throws -> Future<AccessToken> {

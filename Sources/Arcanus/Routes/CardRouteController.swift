@@ -11,7 +11,7 @@ struct CardParam: Parameter {
     static func resolveParameter(_ parameter: String, on container: Container) throws -> DbfID {
         return try DbfID(parameter).unwrap(or: Abort(.unprocessableEntity, reason: "\(parameter) is not convertable to Int"))
     }
-    
+
     typealias ResolvedParameter = DbfID
 }
 

@@ -8,7 +8,6 @@ import Foundation
 import Vapor
 
 protocol Stats: Codable {
-    
 }
 
 fileprivate enum CodingKeys: CodingKey {
@@ -19,7 +18,7 @@ fileprivate enum CodingKeys: CodingKey {
     case type
     case cost
     case mechanics
-    
+
     case attack
     case health
     case durability
@@ -45,7 +44,7 @@ extension CardStats {
         try container.encode(self.cost, forKey: .cost)
         try container.encode(self.mechanics, forKey: .mechanics)
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
@@ -59,7 +58,7 @@ protocol MinionStats: Stats {
 
 extension CardStats where Self: MinionStats {
     var type: CardType { return .minion }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
@@ -73,7 +72,7 @@ protocol SpellStats: Stats {
 
 extension CardStats where Self: SpellStats {
     var type: CardType { return .spell }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
@@ -87,7 +86,7 @@ protocol WeaponStats: Stats {
 
 extension CardStats where Self: WeaponStats {
     var type: CardType { return .weapon }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
@@ -101,7 +100,7 @@ protocol EnchantmentStats: Stats {
 
 extension CardStats where Self: EnchantmentStats {
     var type: CardType { return .enchantment }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
@@ -114,7 +113,7 @@ protocol HeroStats: Stats {
 
 extension CardStats where Self: HeroStats {
     var type: CardType { return .hero }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
@@ -127,27 +126,25 @@ protocol HeroPowerStats: Stats {
 
 extension CardStats where Self: HeroPowerStats {
     var type: CardType { return .power }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
     }
 }
 
-
 struct StatsContainer: Content {
     var stats: CardStats
-    
+
     init(from decoder: Decoder) throws {
         throw Abort(.badRequest, reason: "Not Decodable")
     }
-    
+
     init(stats: CardStats) {
         self.stats = stats
     }
-    
+
     func encode(to encoder: Encoder) throws {
         try self.stats.encode(to: encoder)
     }
 }
-
