@@ -32,22 +32,37 @@ enum CardType: String, Codable {
     }
     
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.rawValue, forKey: .value)
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 }
 
-enum CardRarity: String {
+enum CardRarity: String, Codable {
     case free, common, rare, epic, legendary
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
-enum CardSet: String {
+enum CardSet: String, Codable {
     case basic, classic
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
 // http://hearthstone.wikia.com/wiki/Race
-enum CardRace: String {
+enum CardRace: String, Codable {
     case neutral
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
 enum CardClass: String, Codable {
@@ -56,13 +71,9 @@ enum CardClass: String, Codable {
         paladin, priest, rouge,
         shaman, warlock, warrior
     
-    enum CodingKeys: CodingKey {
-        case value
-    }
-    
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.rawValue, forKey: .value)
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 }
 
@@ -75,13 +86,9 @@ enum CardMechanic: String, Codable {
 
     case oneTurnEffect
     
-    enum CodingKeys: CodingKey {
-        case value
-    }
-    
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.rawValue, forKey: .value)
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 }
 

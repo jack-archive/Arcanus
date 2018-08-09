@@ -17,7 +17,7 @@ struct CardParam: Parameter {
 
 class CardRouteController: RouteCollection {
     func boot(router: Router) throws {
-        let cards = router.grouped("cards")
+        let cards = router.grouped("api", "cards")
         cards.get(CardParam.parameter, use: getCardForIdHandler)
     }
 }
@@ -25,6 +25,7 @@ class CardRouteController: RouteCollection {
 private extension CardRouteController {
     func getCardForIdHandler(_ request: Request) throws -> Future<StatsContainer> {
         let dbfId = try request.parameters.next(CardParam.self)
+        print(dbfId)
         let card = try CardIndex.getCard(dbfId).unwrap(or: Abort(.badRequest, reason: "No card with id \(dbfId)"))
         return Future.map(on: request) { StatsContainer(stats: card.defaultCardStats) }
     }
