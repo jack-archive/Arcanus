@@ -21,13 +21,14 @@ final class Placeholder: Card, Minion, Spell, Weapon, Enchantment, Hero, HeroPow
         var name: String = "Placeholder"
         var text: String = "PLACEHOLDER CARD"
         var cls: CardClass = .neutral
+        var type: CardType = .minion
         var cost: Int = 1
         var mechanics: [CardMechanic] = []
         var durability: Int = 1
         var attack: Int = 1
         var health: Int = 1
     }
-    
+
     static var defaultMinionStats: MinionStats = Stats()
     var minionStats: MinionStats = Stats()
     static var defaultSpellStats: SpellStats = Stats()
@@ -42,9 +43,8 @@ final class Placeholder: Card, Minion, Spell, Weapon, Enchantment, Hero, HeroPow
     var heroPowerStats: HeroPowerStats = Stats()
     static var defaultCardStats: CardStats = Stats()
     var cardStats: CardStats = Stats()
-    
-    var enchantments: [Enchantment] = []
 
+    var enchantments: [Enchantment] = []
 }
 
 final class SenjinShieldmasta: Minion {

@@ -49,7 +49,7 @@ private extension UserRouteController {
 
                 let logger = try request.make(Logger.self)
                 logger.warning("New user created: \(user.username)")
-                
+
                 return try self.authController.authenticationContainer(for: user, on: request)
                     .encode(status: .created, for: request)
             }

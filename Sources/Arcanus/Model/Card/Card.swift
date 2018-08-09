@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Vapor
 
 typealias DbfID = Int
 
@@ -23,27 +24,60 @@ extension Entity {
 
 // MARK: Card
 
-enum CardRarity: String {
-    case free, common, rare, epic, legendary
+enum CardType: String, Codable {
+    case minion, spell, weapon, enchantment, hero, power
+
+    enum CodingKeys: CodingKey {
+        case value
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
-enum CardSet: String {
+enum CardRarity: String, Codable {
+    case free, common, rare, epic, legendary
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
+}
+
+enum CardSet: String, Codable {
     case basic, classic
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
 // http://hearthstone.wikia.com/wiki/Race
-enum CardRace: String {
+enum CardRace: String, Codable {
     case neutral
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
-enum CardClass: String {
+enum CardClass: String, Codable {
     case neutral
     case druid, hunter, mage,
         paladin, priest, rouge,
         shaman, warlock, warrior
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
-enum CardMechanic: String {
+enum CardMechanic: String, Codable {
     case charge
     case taunt
     case windfury
@@ -51,15 +85,11 @@ enum CardMechanic: String {
     case deathrattle
 
     case oneTurnEffect
-}
 
-protocol CardStats {
-    var dbfId: DbfID { get set }
-    var name: String { get set }
-    var text: String { get set }
-    var cls: CardClass { get set }
-    var cost: Int { get set }
-    var mechanics: [CardMechanic] { get set }
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
 }
 
 protocol Card: Entity, CustomStringConvertible {
@@ -118,14 +148,14 @@ extension Card {
 
 // MARK: Minion
 
-protocol MinionStats {
-    var attack: Int { get set }
-    var health: Int { get set }
-}
-
 protocol Minion: Card {
     static var defaultMinionStats: MinionStats { get }
     var minionStats: MinionStats { get set }
+}
+
+extension Minion {
+    static var attack: Int { return defaultMinionStats.attack }
+    static var health: Int { return defaultMinionStats.health }
 }
 
 extension Minion {
@@ -142,9 +172,6 @@ extension Minion {
 
 // MARK: Spell
 
-protocol SpellStats {
-}
-
 protocol Spell: Card {
     static var defaultSpellStats: SpellStats { get }
     var spellStats: SpellStats { get set }
@@ -155,14 +182,14 @@ extension Spell {
 
 // MARK: Weapon
 
-protocol WeaponStats {
-    var attack: Int { get set }
-    var durability: Int { get set }
-}
-
 protocol Weapon: Card {
     static var defaultWeaponStats: WeaponStats { get }
     var weaponStats: WeaponStats { get set }
+}
+
+extension Weapon {
+    static var attack: Int { return defaultWeaponStats.attack }
+    static var durability: Int { return defaultWeaponStats.durability }
 }
 
 extension Weapon {
@@ -179,9 +206,6 @@ extension Weapon {
 
 // MARK: Enchantment
 
-protocol EnchantmentStats {
-}
-
 protocol Enchantment: Card {
     static var defaultEnchantmentStats: EnchantmentStats { get }
     var enchantmentStats: EnchantmentStats { get set }
@@ -196,13 +220,13 @@ extension Enchantment {
 
 // MARK: Hero
 
-protocol HeroStats {
-    var health: Int { get set }
-}
-
 protocol Hero: Card {
     static var defaultHeroStats: HeroStats { get }
     var heroStats: HeroStats { get set }
+}
+
+extension Hero {
+    static var health: Int { return defaultHeroStats.health }
 }
 
 extension Hero {
@@ -213,9 +237,6 @@ extension Hero {
 }
 
 // MARK: Hero Power
-
-protocol HeroPowerStats {
-}
 
 protocol HeroPower: Card {
     static var defaultHeroPowerStats: HeroPowerStats { get }
@@ -230,36 +251,35 @@ extension HeroPower {
 struct CardIndex {
     fileprivate static var CardNameIndex: [String: Card.Type] = [:]
     fileprivate static var CardDbfIDIndex: [DbfID: Card.Type] = [:]
-    
+
     static func add(_ card: Card.Type) {
-        CardNameIndex[card.defaultCardStats.name] = card
-        CardDbfIDIndex[card.defaultCardStats.dbfId] = card
+        self.CardNameIndex[card.defaultCardStats.name] = card
+        self.CardDbfIDIndex[card.defaultCardStats.dbfId] = card
     }
-    
+
     static func getCard(_ dbfID: DbfID) -> Card.Type? {
-        return CardDbfIDIndex[dbfID]
+        return self.CardDbfIDIndex[dbfID]
     }
-    
+
     static func getCard(_ name: String) -> Card.Type? {
-        return CardNameIndex[name]
+        return self.CardNameIndex[name]
     }
-    
+
     static func getHero(_ dbfID: DbfID) -> Hero.Type? {
-        return CardDbfIDIndex[dbfID] as? Hero.Type
+        return self.CardDbfIDIndex[dbfID] as? Hero.Type
     }
-    
+
     static func getHero(_ name: String) -> Hero.Type? {
-        return CardNameIndex[name] as? Hero.Type
+        return self.CardNameIndex[name] as? Hero.Type
     }
-    
+
     /*
     static func get<T: Card>(_ dbfID: DbfID) -> T.Type? {
         return CardDbfIDIndex[dbfID] as? T.Type
     }
-    
+
     static func get<T: Card>(_ name: String) -> T.Type? {
         return CardNameIndex[name] as? T.Type
     }
      */
-
 }
