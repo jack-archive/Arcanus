@@ -13,4 +13,6 @@ import Vapor
 public func boot(_ app: Application) throws {
     // your code here
     
+    // let db = try app.newConnection(to: .sqlite).wait()
+    
 }

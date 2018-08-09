@@ -15,6 +15,9 @@ public func configure(_ config: inout Config,
                       _ env: inout Environment,
                       _ services: inout Services) throws {
     
+    // Setup Cards
+    addBasicCollection()
+    
     // Register routes to the router
     let router = EngineRouter.default()
     try routes(router)
@@ -44,5 +47,6 @@ public func configure(_ config: inout Config,
     migrationConfig.add(model: RefreshToken.self, database: .sqlite)
     migrationConfig.add(model: Game.self, database: .sqlite)
     migrationConfig.add(model: Player.self, database: .sqlite)
+    migrationConfig.add(model: Deck.self, database: .sqlite)
     services.register(migrationConfig)
 }

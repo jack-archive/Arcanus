@@ -6,6 +6,47 @@
 
 import Foundation
 
+func addBasicCollection() {
+    CardIndex.add(Placeholder.self)
+    CardIndex.add(SenjinShieldmasta.self)
+    CardIndex.add(AbusiveSergeant.self)
+    CardIndex.add(Inspired.self)
+    CardIndex.add(JainaProudmoore.self)
+    CardIndex.add(Fireblast.self)
+}
+
+final class Placeholder: Card, Minion, Spell, Weapon, Enchantment, Hero, HeroPower {
+    struct Stats: CardStats, MinionStats, SpellStats, WeaponStats, EnchantmentStats, HeroStats, HeroPowerStats {
+        var dbfId: DbfID = 1
+        var name: String = "Placeholder"
+        var text: String = "PLACEHOLDER CARD"
+        var cls: CardClass = .neutral
+        var cost: Int = 1
+        var mechanics: [CardMechanic] = []
+        var durability: Int = 1
+        var attack: Int = 1
+        var health: Int = 1
+    }
+    
+    static var defaultMinionStats: MinionStats = Stats()
+    var minionStats: MinionStats = Stats()
+    static var defaultSpellStats: SpellStats = Stats()
+    var spellStats: SpellStats = Stats()
+    static var defaultWeaponStats: WeaponStats = Stats()
+    var weaponStats: WeaponStats = Stats()
+    static var defaultEnchantmentStats: EnchantmentStats = Stats()
+    var enchantmentStats: EnchantmentStats = Stats()
+    static var defaultHeroStats: HeroStats = Stats()
+    var heroStats: HeroStats = Stats()
+    static var defaultHeroPowerStats: HeroPowerStats = Stats()
+    var heroPowerStats: HeroPowerStats = Stats()
+    static var defaultCardStats: CardStats = Stats()
+    var cardStats: CardStats = Stats()
+    
+    var enchantments: [Enchantment] = []
+
+}
+
 final class SenjinShieldmasta: Minion {
     struct Stats: CardStats, MinionStats {
         var dbfId: DbfID = 635
