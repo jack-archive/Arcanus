@@ -6,11 +6,14 @@
 
 import Foundation
 
+// Murloc Tidehunter
+// Kobold Geomancer
+// Frostwolf Warlord
+// Stormwind Champion
+
 func addBasicCollection() {
     CardIndex.add(Placeholder.self)
     CardIndex.add(SenjinShieldmasta.self)
-    CardIndex.add(AbusiveSergeant.self)
-    CardIndex.add(Inspired.self)
     CardIndex.add(JainaProudmoore.self)
     CardIndex.add(Fireblast.self)
 }
@@ -20,28 +23,36 @@ final class Placeholder: Card, Minion, Spell, Weapon, Enchantment, Hero, HeroPow
         var dbfId: DbfID = 1
         var name: String = "Placeholder"
         var text: String = "PLACEHOLDER CARD"
+        var flavor: String = ""
         var cls: CardClass = .neutral
+        var collectible: Bool = true
         var type: CardType = .minion
+        var rarity: CardRarity = .free
+        var set: CardSet = .core
+        var gang: GadgetzanGang? = nil
         var cost: Int = 1
         var mechanics: [CardMechanic] = []
-        var durability: Int = 1
+        var playRequirements: PlayRequirements = [:]
+        
         var attack: Int = 1
         var health: Int = 1
+        var durability: Int = 1
+        var race: MinionRace = .neutral
     }
 
-    static var defaultMinionStats: MinionStats = Stats()
+    static private(set) var defaultMinionStats: MinionStats = Stats()
     var minionStats: MinionStats = Stats()
-    static var defaultSpellStats: SpellStats = Stats()
+    static private(set) var defaultSpellStats: SpellStats = Stats()
     var spellStats: SpellStats = Stats()
-    static var defaultWeaponStats: WeaponStats = Stats()
+    static private(set) var defaultWeaponStats: WeaponStats = Stats()
     var weaponStats: WeaponStats = Stats()
-    static var defaultEnchantmentStats: EnchantmentStats = Stats()
+    static private(set) var defaultEnchantmentStats: EnchantmentStats = Stats()
     var enchantmentStats: EnchantmentStats = Stats()
-    static var defaultHeroStats: HeroStats = Stats()
+    static private(set) var defaultHeroStats: HeroStats = Stats()
     var heroStats: HeroStats = Stats()
-    static var defaultHeroPowerStats: HeroPowerStats = Stats()
+    static private(set) var defaultHeroPowerStats: HeroPowerStats = Stats()
     var heroPowerStats: HeroPowerStats = Stats()
-    static var defaultCardStats: CardStats = Stats()
+    static private(set) var defaultCardStats: CardStats = Stats()
     var cardStats: CardStats = Stats()
 
     var enchantments: [Enchantment] = []
@@ -52,93 +63,53 @@ final class SenjinShieldmasta: Minion {
         var dbfId: DbfID = 635
         var name: String = "Sen'jin Shieldmasta"
         var text: String = "<b>Taunt</b>"
+        var flavor: String = "Sen'jin Village is nice, if you like trolls and dust."
         var cls: CardClass = .neutral
+        var collectible: Bool = true
+        var type: CardType = .minion
+        var rarity: CardRarity = .free
+        var set: CardSet = .core
+        var gang: GadgetzanGang? = nil
         var cost: Int = 4
         var mechanics: [CardMechanic] = [.taunt]
+        var playRequirements: PlayRequirements = [:]
         var attack: Int = 3
         var health: Int = 5
+        var race: MinionRace = .neutral
     }
 
-    static var defaultCardStats: CardStats { return Stats() }
-    static var defaultMinionStats: MinionStats { return Stats() }
+    static private(set) var defaultCardStats: CardStats = Stats()
+    static private(set) var defaultMinionStats: MinionStats = Stats()
     var cardStats: CardStats = Stats()
     var minionStats: MinionStats = Stats()
 
     var enchantments: [Enchantment] = []
 }
 
-final class AbusiveSergeant: Minion {
+final class BloodfenRaptor: Minion {
     struct Stats: CardStats, MinionStats {
-        var dbfId: DbfID = 242
-        var name: String = "Abusive Sergeant"
-        var text: String = "<b>Battlecry:</b> Give a minion +2 Attack this turn."
+        var dbfId: DbfID = 216
+        var name: String = "Bloodfen Raptor"
+        var text: String = ""
+        var flavor: String = "\"Kill 30 raptors.\" - Hemet Nesingwary"
         var cls: CardClass = .neutral
-        var cost: Int = 1
-        var mechanics: [CardMechanic] = [.battlecry]
-        var attack: Int = 1
-        var health: Int = 1
+        var collectible: Bool = true
+        var type: CardType = .minion
+        var rarity: CardRarity = .free
+        var set: CardSet = .core
+        var gang: GadgetzanGang? = nil
+        var cost: Int = 2
+        var mechanics: [CardMechanic] = [.taunt]
+        var playRequirements: PlayRequirements = [:]
+        var attack: Int = 3
+        var health: Int = 2
+        var race: MinionRace = .beast
     }
-
-    static var defaultCardStats: CardStats { return Stats() }
-    static var defaultMinionStats: MinionStats { return Stats() }
+    
+    static private(set) var defaultCardStats: CardStats = Stats()
+    static private(set) var defaultMinionStats: MinionStats = Stats()
     var cardStats: CardStats = Stats()
     var minionStats: MinionStats = Stats()
-
-    var enchantments: [Enchantment] = []
-}
-
-/// Abusive Sergeant gives this enchantment
-final class Inspired: Enchantment {
-    struct Stats: CardStats, EnchantmentStats {
-        var dbfId: DbfID = 809
-        var name: String = "Inspired"
-        var text: String = "This minion has +2 Attack this turn."
-        var cls: CardClass = .neutral
-        var cost: Int = 0
-        var mechanics: [CardMechanic] = [.oneTurnEffect]
-    }
-
-    static var defaultCardStats: CardStats { return Stats() }
-    static var defaultEnchantmentStats: EnchantmentStats { return Stats() }
-    var cardStats: CardStats = Stats()
-    var enchantmentStats: EnchantmentStats = Stats()
-
-    var enchantments: [Enchantment] = []
-}
-
-final class JainaProudmoore: Hero {
-    struct Stats: CardStats, HeroStats {
-        var dbfId: DbfID = 637
-        var name: String = "Jaina Proudmoore"
-        var text: String = ""
-        var cls: CardClass = .mage
-        var cost: Int = 0
-        var mechanics: [CardMechanic] = []
-        var health: Int = 30
-    }
-
-    static var defaultCardStats: CardStats { return Stats() }
-    static var defaultHeroStats: HeroStats { return Stats() }
-    var cardStats: CardStats = Stats()
-    var heroStats: HeroStats = Stats()
-
-    var enchantments: [Enchantment] = []
-}
-
-final class Fireblast: HeroPower {
-    struct Stats: CardStats, HeroPowerStats {
-        var dbfId: DbfID = 807
-        var name: String = "Fireblast"
-        var text: String = "<b>Hero Power</b>\nDeal $1 damage."
-        var cls: CardClass = .mage
-        var cost: Int = 0
-        var mechanics: [CardMechanic] = []
-    }
-
-    static var defaultCardStats: CardStats { return Stats() }
-    static var defaultHeroPowerStats: HeroPowerStats { return Stats() }
-    var cardStats: CardStats = Stats()
-    var heroPowerStats: HeroPowerStats = Stats()
-
+    
     var enchantments: [Enchantment] = []
 }

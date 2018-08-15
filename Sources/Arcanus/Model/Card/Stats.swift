@@ -25,16 +25,23 @@ fileprivate enum CodingKeys: CodingKey {
 }
 
 protocol CardStats: Stats {
-    var dbfId: DbfID { get set }
+    var dbfId: DbfID { get }
     var name: String { get set }
     var text: String { get set }
+    var flavor: String { get }
     var cls: CardClass { get set }
+    var collectible: Bool { get }
     var type: CardType { get }
+    var rarity: CardRarity { get }
+    var set: CardSet { get }
+    var gang: GadgetzanGang? { get }
     var cost: Int { get set }
     var mechanics: [CardMechanic] { get set }
+    var playRequirements: PlayRequirements { get set }
 }
 
 extension CardStats {
+    
     fileprivate func encodeCardStats(to container: inout KeyedEncodingContainer<CodingKeys>) throws {
         try container.encode(self.dbfId, forKey: .dbfId)
         try container.encode(self.name, forKey: .name)
@@ -45,15 +52,18 @@ extension CardStats {
         try container.encode(self.mechanics, forKey: .mechanics)
     }
 
+    /*
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try self.encodeCardStats(to: &container)
     }
+ */
 }
 
 protocol MinionStats: Stats {
     var attack: Int { get set }
     var health: Int { get set }
+    var race: MinionRace { get }
 }
 
 extension CardStats where Self: MinionStats {

@@ -41,40 +41,34 @@ extension Card {
     static var dbfId: DbfID { return defaultCardStats.dbfId }
     static var name: String { return defaultCardStats.name }
     static var text: String { return defaultCardStats.text }
+    static var flavor: String { return defaultCardStats.flavor }
     static var cls: CardClass { return defaultCardStats.cls }
+    static var collectible: Bool { return defaultCardStats.collectible }
+    static var type: CardType { return defaultCardStats.type }
+    static var rarity: CardRarity { return defaultCardStats.rarity }
+    static var set: CardSet { return defaultCardStats.set }
+    static var gang: GadgetzanGang? { return defaultCardStats.gang }
     static var cost: Int { return defaultCardStats.cost }
     static var mechanics: [CardMechanic] { return defaultCardStats.mechanics }
-}
+    static var playRequirements: PlayRequirements { return defaultCardStats.playRequirements }
 
-extension Card {
-    var dbfId: DbfID {
-        set { cardStats.dbfId = newValue }
-        get { return cardStats.dbfId }
-    }
-
-    var name: String {
-        set { cardStats.name = newValue }
-        get { return cardStats.name }
-    }
-
-    var text: String {
-        set { cardStats.text = newValue }
-        get { return cardStats.text }
-    }
-
-    var cls: CardClass {
-        set { cardStats.cls = newValue }
-        get { return cardStats.cls }
-    }
-
-    var cost: Int {
-        set { cardStats.cost = newValue }
-        get { return cardStats.cost }
-    }
-
+    var dbfId: DbfID { return cardStats.dbfId }
+    var name: String { get { return cardStats.name } set { cardStats.name = newValue } }
+    var text: String { get { return cardStats.text } set { cardStats.text = newValue } }
+    var flavor: String { return cardStats.flavor }
+    var cls: CardClass { get { return cardStats.cls } set { cardStats.cls = newValue } }
+    var collectible: Bool { return cardStats.collectible }
+    var rarity: CardRarity { return cardStats.rarity }
+    var set: CardSet { return cardStats.set }
+    var gang: GadgetzanGang? { return cardStats.gang }
+    var cost: Int { get { return cardStats.cost } set { cardStats.cost = newValue } }
     var mechanics: [CardMechanic] {
-        set { cardStats.mechanics = newValue }
         get { return cardStats.mechanics }
+        set { cardStats.mechanics = newValue }
+    }
+    var playRequirements: PlayRequirements {
+        get { return cardStats.playRequirements }
+        set { cardStats.playRequirements = newValue }
     }
 }
 
@@ -88,9 +82,8 @@ protocol Minion: Card {
 extension Minion {
     static var attack: Int { return defaultMinionStats.attack }
     static var health: Int { return defaultMinionStats.health }
-}
+    static var race: MinionRace { return defaultMinionStats.race }
 
-extension Minion {
     var attack: Int {
         get { return self.minionStats.attack }
         set { self.minionStats.attack = newValue }
@@ -100,6 +93,8 @@ extension Minion {
         get { return self.minionStats.health }
         set { self.minionStats.health = newValue }
     }
+    
+    var race: MinionRace { return minionStats.race }
 }
 
 // MARK: Spell
@@ -122,9 +117,7 @@ protocol Weapon: Card {
 extension Weapon {
     static var attack: Int { return defaultWeaponStats.attack }
     static var durability: Int { return defaultWeaponStats.durability }
-}
 
-extension Weapon {
     var attack: Int {
         get { return self.weaponStats.attack }
         set { self.weaponStats.attack = newValue }
@@ -159,9 +152,7 @@ protocol Hero: Card {
 
 extension Hero {
     static var health: Int { return defaultHeroStats.health }
-}
 
-extension Hero {
     var health: Int {
         get { return self.heroStats.health }
         set { self.heroStats.health = newValue }

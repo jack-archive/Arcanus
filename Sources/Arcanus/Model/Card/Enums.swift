@@ -22,12 +22,29 @@ enum CardRarity: String, Codable {
 }
 
 enum CardSet: String, Codable {
-    case basic, classic
+    case core, classic, hof
+    case naxx, gvg, brm, tgt, loe, gods, karazhan, gadgetzan
+    case ungoro, knights, kobolds, witchwood, boomsday
 }
 
+enum GadgetzanGang: String, Codable {
+    case kabal, goons, lotus
+}
+
+enum PlayRequirement: String, Codable {
+    case minionTarget
+    case targetIfAvaliable
+    case targetToPlay
+    case entireEntourageNotInPlay
+    case numMinionSlots
+}
+typealias PlayRequirements = [PlayRequirement: Int]
+
 // http://hearthstone.wikia.com/wiki/Race
-enum CardRace: String, Codable {
+enum MinionRace: String, Codable {
     case neutral
+    case murloc, demon, mech, elemental,
+    beast, totem, pirate, dragon, all
 }
 
 enum CardClass: String, Codable {
@@ -38,6 +55,6 @@ enum CardClass: String, Codable {
 }
 
 enum CardMechanic: String, Codable {
-    case charge, taunt, windfury, battlecry, deathrattle
+    case charge, taunt, stealth, windfury, battlecry, deathrattle
     case oneTurnEffect
 }
