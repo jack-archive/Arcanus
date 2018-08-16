@@ -93,7 +93,7 @@ extension Minion {
         get { return self.minionStats.health }
         set { self.minionStats.health = newValue }
     }
-    
+
     var race: MinionRace { return minionStats.race }
 }
 
@@ -181,7 +181,7 @@ struct CardIndex {
             self.CardDbfIDIndex[card.defaultCardStats.dbfId] = card
         }
     }
-    
+
     static func getCard(_ dbfID: DbfID) -> Card.Type? {
         return self.CardDbfIDIndex[dbfID]
     }

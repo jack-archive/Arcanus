@@ -15,13 +15,13 @@ struct HeroStatsConcrete: CardStats, HeroStats {
     var collectible: Bool = false
     var rarity: CardRarity = .free
     var set: CardSet = .core
-    var gang: GadgetzanGang? = nil
+    var gang: GadgetzanGang?
     var cost: Int = 0
     var mechanics: [CardMechanic] = []
     var playRequirements: PlayRequirements = [:]
-    
+
     var health: Int = 30
-    
+
     init(_ name: String, _ dbf: DbfID, _ cls: CardClass) {
         self.name = name
         self.dbfId = dbf
@@ -38,11 +38,11 @@ struct HeroPowerStatsConcrete: CardStats, HeroPowerStats {
     var collectible: Bool = false
     var rarity: CardRarity = .free
     var set: CardSet = .core
-    var gang: GadgetzanGang? = nil
+    var gang: GadgetzanGang?
     var cost: Int = 2
     var mechanics: [CardMechanic] = []
     var playRequirements: PlayRequirements = [:]
-    
+
     init(_ name: String, _ text: String, _ dbf: DbfID, _ cls: CardClass) {
         self.name = name
         self.text = text
@@ -55,12 +55,12 @@ final class JainaProudmoore: Hero {
     static func stats() -> HeroStatsConcrete {
         return HeroStatsConcrete("Jaina Proudmoore", 637, .mage)
     }
-    
-    static private(set) var defaultCardStats: CardStats = stats()
-    static private(set) var defaultHeroStats: HeroStats = stats()
+
+    private(set) static var defaultCardStats: CardStats = stats()
+    private(set) static var defaultHeroStats: HeroStats = stats()
     var cardStats: CardStats = stats()
     var heroStats: HeroStats = stats()
-    
+
     var enchantments: [Enchantment] = []
 }
 
@@ -70,12 +70,12 @@ final class Fireblast: HeroPower {
         rv.playRequirements[.targetToPlay] = 1
         return rv
     }
-    
-    static private(set) var defaultCardStats: CardStats = stats()
-    static private(set) var defaultHeroPowerStats: HeroPowerStats = stats()
+
+    private(set) static var defaultCardStats: CardStats = stats()
+    private(set) static var defaultHeroPowerStats: HeroPowerStats = stats()
     var cardStats: CardStats = stats()
     var heroPowerStats: HeroPowerStats = stats()
-    
+
     var enchantments: [Enchantment] = []
 }
 
@@ -83,12 +83,12 @@ final class Thrall: Hero {
     static func stats() -> HeroStatsConcrete {
         return HeroStatsConcrete("Thrall", 1066, .shaman)
     }
-    
-    static private(set) var defaultCardStats: CardStats = stats()
-    static private(set) var defaultHeroStats: HeroStats = stats()
+
+    private(set) static var defaultCardStats: CardStats = stats()
+    private(set) static var defaultHeroStats: HeroStats = stats()
     var cardStats: CardStats = stats()
     var heroStats: HeroStats = stats()
-    
+
     var enchantments: [Enchantment] = []
 }
 
@@ -99,11 +99,11 @@ final class TotemicCall: HeroPower {
         rv.playRequirements[.numMinionSlots] = 1
         return rv
     }
-    
-    static private(set) var defaultCardStats: CardStats = stats()
-    static private(set) var defaultHeroPowerStats: HeroPowerStats = stats()
+
+    private(set) static var defaultCardStats: CardStats = stats()
+    private(set) static var defaultHeroPowerStats: HeroPowerStats = stats()
     var cardStats: CardStats = stats()
     var heroPowerStats: HeroPowerStats = stats()
-    
+
     var enchantments: [Enchantment] = []
 }

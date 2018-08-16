@@ -38,20 +38,21 @@ enum PlayRequirement: String, Codable {
     case entireEntourageNotInPlay
     case numMinionSlots
 }
+
 typealias PlayRequirements = [PlayRequirement: Int]
 
 // http://hearthstone.wikia.com/wiki/Race
 enum MinionRace: String, Codable {
     case neutral
     case murloc, demon, mech, elemental,
-    beast, totem, pirate, dragon, all
+        beast, totem, pirate, dragon, all
 }
 
 enum CardClass: String, Codable {
     case neutral
     case druid, hunter, mage,
-    paladin, priest, rouge,
-    shaman, warlock, warrior
+        paladin, priest, rouge,
+        shaman, warlock, warrior
 }
 
 enum CardMechanic: String, Codable {

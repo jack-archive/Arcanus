@@ -66,28 +66,28 @@ struct Deck: SQLiteModel, Migration {
     var cards: [Card.Type]
 
     // MARK: Initializers
-    
+
     init(fromDeckstring input: String) throws {
         let arr = try decodeDeckstring(input).map({ DbfID($0) })
         try self.init(fromDeckstring: arr)
     }
-    
+
     init(fromJson json: DbfIDDeckJson) throws {
         try self.init(format: json.format, hero: json.hero, cards: json.cards)
     }
-    
+
     init(name: String? = nil, id: ID? = nil, format raw: Int, hero dbfId: DbfID, cards: [DbfID]) throws {
         guard let format = Format(rawValue: raw) else {
             throw Abort(.badRequest)
         }
-        
+
         guard let hero = CardIndex.getHero(dbfId) else {
             throw Abort(.unprocessableEntity)
         }
-        
+
         try self.init(name: name, id: id, format: format, hero: hero, cards: cards)
     }
-    
+
     init(name: String? = nil, id: ID? = nil, format: Format, hero: Hero.Type, cards: [DbfID]) throws {
         self.id = id
         self.name = name
@@ -95,18 +95,18 @@ struct Deck: SQLiteModel, Migration {
         self.hero = hero
         self.cards = try cards.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest)) })
     }
-    
+
     init(fromDeckstring input: [DbfID]) throws {
         var array = input
         array.removeFirst() // First is always 0
         array.removeFirst() // Version still is always 1
-        
+
         // Format
         guard let format = Format(rawValue: array.removeFirst()) else {
             throw Abort(.unprocessableEntity, reason: "Bad Format in array")
         }
         self.format = format
-        
+
         // Hero
         guard array.removeFirst() == 1 else { throw Abort(.unprocessableEntity, reason: "Can only be one hero") }
         let heroID = array.removeFirst()
@@ -114,21 +114,21 @@ struct Deck: SQLiteModel, Migration {
             throw Abort(.unprocessableEntity, reason: "Can't find hero for \(heroID)")
         }
         self.hero = hero
-        
+
         // Cards
         self.cards = []
         self.cards.append(contentsOf: try self.parseDeckstringArrayToCards(copy: 1, &array))
         self.cards.append(contentsOf: try self.parseDeckstringArrayToCards(copy: 2, &array))
         self.cards.append(contentsOf: try self.parseDeckstringArrayToCards(copy: nil, &array))
-        
+
         // Check that array is not malformed
         if !array.isEmpty {
             throw Abort(.unprocessableEntity, reason: "Extra bytes in array, Corrupt format")
         }
     }
-    
+
     // MARK: Codable
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -156,13 +156,13 @@ struct Deck: SQLiteModel, Migration {
         try container.encode(self.hero.defaultCardStats.dbfId, forKey: .hero)
         try container.encode(self.toDbfIDArray(), forKey: .cards)
     }
-    
+
     // MARK: Utility
 
     private func deckstringToFrequency(copy: Int? = nil /* 1, 2, or nil for n-copy array */,
-        array: [DbfID]) throws -> [DbfID] {
+                                       array: [DbfID]) throws -> [DbfID] {
         var rv: [DbfID] = []
-        
+
         if copy != nil { // 1 or 2 copy
             array.forEach { dbfId in
                 rv.append(contentsOf: Array(repeating: dbfId, count: copy!))
@@ -173,10 +173,10 @@ struct Deck: SQLiteModel, Migration {
                 rv.append(contentsOf: Array(repeating: pair.card, count: pair.count))
             }
         }
-        
+
         return rv
     }
-    
+
     private func parseDeckstringArrayToCards(copy: Int?, _ array: inout [DbfID]) throws -> [Card.Type] {
         let count = array.removeFirst()
         let deckstring = Array(array.prefix(count))
@@ -211,7 +211,7 @@ struct Deck: SQLiteModel, Migration {
     }
 
     // MARK: Exporting
-    
+
     /// Encoded as deckstring, with format, hero array, and 3 card arrays
     func toDeckstringArray() -> [DbfID] {
         var rv: [DbfID] = []
@@ -233,7 +233,7 @@ struct Deck: SQLiteModel, Migration {
 
         return rv
     }
-    
+
     func toDbfIDArray() -> [DbfID] {
         return self.cards.map({ $0.defaultCardStats.dbfId })
     }

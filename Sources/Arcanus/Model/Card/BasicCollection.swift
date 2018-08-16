@@ -29,30 +29,30 @@ final class Placeholder: Card, Minion, Spell, Weapon, Enchantment, Hero, HeroPow
         var type: CardType = .minion
         var rarity: CardRarity = .free
         var set: CardSet = .core
-        var gang: GadgetzanGang? = nil
+        var gang: GadgetzanGang?
         var cost: Int = 1
         var mechanics: [CardMechanic] = []
         var playRequirements: PlayRequirements = [:]
-        
+
         var attack: Int = 1
         var health: Int = 1
         var durability: Int = 1
         var race: MinionRace = .neutral
     }
 
-    static private(set) var defaultMinionStats: MinionStats = Stats()
+    private(set) static var defaultMinionStats: MinionStats = Stats()
     var minionStats: MinionStats = Stats()
-    static private(set) var defaultSpellStats: SpellStats = Stats()
+    private(set) static var defaultSpellStats: SpellStats = Stats()
     var spellStats: SpellStats = Stats()
-    static private(set) var defaultWeaponStats: WeaponStats = Stats()
+    private(set) static var defaultWeaponStats: WeaponStats = Stats()
     var weaponStats: WeaponStats = Stats()
-    static private(set) var defaultEnchantmentStats: EnchantmentStats = Stats()
+    private(set) static var defaultEnchantmentStats: EnchantmentStats = Stats()
     var enchantmentStats: EnchantmentStats = Stats()
-    static private(set) var defaultHeroStats: HeroStats = Stats()
+    private(set) static var defaultHeroStats: HeroStats = Stats()
     var heroStats: HeroStats = Stats()
-    static private(set) var defaultHeroPowerStats: HeroPowerStats = Stats()
+    private(set) static var defaultHeroPowerStats: HeroPowerStats = Stats()
     var heroPowerStats: HeroPowerStats = Stats()
-    static private(set) var defaultCardStats: CardStats = Stats()
+    private(set) static var defaultCardStats: CardStats = Stats()
     var cardStats: CardStats = Stats()
 
     var enchantments: [Enchantment] = []
@@ -69,7 +69,7 @@ final class SenjinShieldmasta: Minion {
         var type: CardType = .minion
         var rarity: CardRarity = .free
         var set: CardSet = .core
-        var gang: GadgetzanGang? = nil
+        var gang: GadgetzanGang?
         var cost: Int = 4
         var mechanics: [CardMechanic] = [.taunt]
         var playRequirements: PlayRequirements = [:]
@@ -78,8 +78,8 @@ final class SenjinShieldmasta: Minion {
         var race: MinionRace = .neutral
     }
 
-    static private(set) var defaultCardStats: CardStats = Stats()
-    static private(set) var defaultMinionStats: MinionStats = Stats()
+    private(set) static var defaultCardStats: CardStats = Stats()
+    private(set) static var defaultMinionStats: MinionStats = Stats()
     var cardStats: CardStats = Stats()
     var minionStats: MinionStats = Stats()
 
@@ -97,7 +97,7 @@ final class BloodfenRaptor: Minion {
         var type: CardType = .minion
         var rarity: CardRarity = .free
         var set: CardSet = .core
-        var gang: GadgetzanGang? = nil
+        var gang: GadgetzanGang?
         var cost: Int = 2
         var mechanics: [CardMechanic] = [.taunt]
         var playRequirements: PlayRequirements = [:]
@@ -105,11 +105,11 @@ final class BloodfenRaptor: Minion {
         var health: Int = 2
         var race: MinionRace = .beast
     }
-    
-    static private(set) var defaultCardStats: CardStats = Stats()
-    static private(set) var defaultMinionStats: MinionStats = Stats()
+
+    private(set) static var defaultCardStats: CardStats = Stats()
+    private(set) static var defaultMinionStats: MinionStats = Stats()
     var cardStats: CardStats = Stats()
     var minionStats: MinionStats = Stats()
-    
+
     var enchantments: [Enchantment] = []
 }

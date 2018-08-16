@@ -24,7 +24,7 @@ fileprivate enum CodingKeys: CodingKey {
     case cost
     case mechanics
     case playRequirements
-    
+
     case attack
     case health
     case durability
