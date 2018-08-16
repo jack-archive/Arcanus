@@ -175,11 +175,13 @@ struct CardIndex {
     fileprivate static var CardNameIndex: [String: Card.Type] = [:]
     fileprivate static var CardDbfIDIndex: [DbfID: Card.Type] = [:]
 
-    static func add(_ card: Card.Type) {
-        self.CardNameIndex[card.defaultCardStats.name] = card
-        self.CardDbfIDIndex[card.defaultCardStats.dbfId] = card
+    static func add(_ cards: Card.Type...) {
+        for card in cards {
+            self.CardNameIndex[card.defaultCardStats.name] = card
+            self.CardDbfIDIndex[card.defaultCardStats.dbfId] = card
+        }
     }
-
+    
     static func getCard(_ dbfID: DbfID) -> Card.Type? {
         return self.CardDbfIDIndex[dbfID]
     }
@@ -195,14 +197,4 @@ struct CardIndex {
     static func getHero(_ name: String) -> Hero.Type? {
         return self.CardNameIndex[name] as? Hero.Type
     }
-
-    /*
-    static func get<T: Card>(_ dbfID: DbfID) -> T.Type? {
-        return CardDbfIDIndex[dbfID] as? T.Type
-    }
-
-    static func get<T: Card>(_ name: String) -> T.Type? {
-        return CardNameIndex[name] as? T.Type
-    }
-     */
 }
