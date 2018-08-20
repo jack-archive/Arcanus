@@ -13,5 +13,9 @@ import Vapor
 public func boot(_ app: Application) throws {
     // your code here
 
+    let deck = try Deck(format: .standard, hero: JainaProudmoore.self, cards: [SenjinShieldmasta.self, SenjinShieldmasta.self, BloodfenRaptor.self, BloodfenRaptor.self])
+    print(deck.deckstring())
+    print(deck.toNameJson())
+    
     // let db = try app.newConnection(to: .sqlite).wait()
 }

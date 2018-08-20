@@ -8,7 +8,6 @@ import Authentication
 import FluentSQLite
 import Foundation
 import Vapor
-import VarInt
 
 // https://www.reddit.com/r/hearthstone/comments/6f2xyk/how_to_encodedecode_deck_codes/
 // https://hearthsim.info/docs/deckstrings/
@@ -44,22 +43,12 @@ enum Format: DbfID {
     case standard = 2
 }
 
-struct DbfIDDeckJson: Content {
-    var format: Int
-    var hero: DbfID
-    var cards: [DbfID] // Frequency
-}
-
-struct NameDeckJson: Content {
-    var format: Int
-    var hero: String
-    var cards: [String] // Frequency
-}
-
 struct Deck: SQLiteModel, Migration {
     typealias ID = Int
     var id: ID?
     var name: String?
+    var user: User.ID? = nil
+    
     var format: Format
     var hero: Hero.Type
     // Stored in Freq representation
@@ -67,16 +56,38 @@ struct Deck: SQLiteModel, Migration {
 
     // MARK: Initializers
 
-    init(fromDeckstring input: String) throws {
-        let arr = try decodeDeckstring(input).map({ DbfID($0) })
-        try self.init(fromDeckstring: arr)
+    init(fromJson json: DbfIDJson) throws {
+        try self.init(name: json.name, format: json.format, hero: json.hero, cards: json.cards)
+    }
+    
+    init(fromJson json: NameJson) throws {
+        try self.init(name: json.name, format: json.format, hero: json.hero, cards: json.cards)
+    }
+    
+    init(fromJson json: DeckstringJson) throws {
+        try self.init(withName: json.name, fromDeckstring: json.deckstring)
+    }
+    
+    private init(withName name: String? = nil, fromDeckstring input: String) throws {
+        let arr = try decodeBase64VarIntString(input).map({ DbfID($0) })
+        try self.init(withName: name, fromDeckstring: arr)
     }
 
-    init(fromJson json: DbfIDDeckJson) throws {
-        try self.init(format: json.format, hero: json.hero, cards: json.cards)
+    private init(name: String? = nil, format raw: Int, hero heroName: String, cards names: [String]) throws {
+        guard let format = Format(rawValue: raw) else {
+            throw Abort(.badRequest)
+        }
+
+        guard let hero = CardIndex.getHero(heroName) else {
+            throw Abort(.unprocessableEntity)
+        }
+
+        let cards = try names.map({ try CardIndex.getCard($0).unwrap(or: Abort(.unprocessableEntity)) })
+
+        try self.init(name: name, format: format, hero: hero, cards: cards)
     }
 
-    init(name: String? = nil, id: ID? = nil, format raw: Int, hero dbfId: DbfID, cards: [DbfID]) throws {
+    private init(name: String? = nil, format raw: Int, hero dbfId: DbfID, cards dbfids: [DbfID]) throws {
         guard let format = Format(rawValue: raw) else {
             throw Abort(.badRequest)
         }
@@ -85,18 +96,21 @@ struct Deck: SQLiteModel, Migration {
             throw Abort(.unprocessableEntity)
         }
 
-        try self.init(name: name, id: id, format: format, hero: hero, cards: cards)
+        let cards = try dbfids.map({ try CardIndex.getCard($0).unwrap(or: Abort(.unprocessableEntity)) })
+
+        try self.init(name: name, format: format, hero: hero, cards: cards)
     }
 
-    init(name: String? = nil, id: ID? = nil, format: Format, hero: Hero.Type, cards: [DbfID]) throws {
-        self.id = id
+    init(name: String? = nil, format: Format, hero: Hero.Type, cards: [Card.Type]) throws {
         self.name = name
         self.format = format
         self.hero = hero
-        self.cards = try cards.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest)) })
+        self.cards = cards
     }
 
-    init(fromDeckstring input: [DbfID]) throws {
+    private init(withName name: String? = nil, fromDeckstring input: [DbfID]) throws {
+        self.name = name
+        
         var array = input
         array.removeFirst() // First is always 0
         array.removeFirst() // Version still is always 1
@@ -108,7 +122,9 @@ struct Deck: SQLiteModel, Migration {
         self.format = format
 
         // Hero
-        guard array.removeFirst() == 1 else { throw Abort(.unprocessableEntity, reason: "Can only be one hero") }
+        guard array.removeFirst() == 1 else {
+            throw Abort(.unprocessableEntity, reason: "Can only be one hero")
+        }
         let heroID = array.removeFirst()
         guard let hero = CardIndex.getHero(heroID) else {
             throw Abort(.unprocessableEntity, reason: "Can't find hero for \(heroID)")
@@ -145,7 +161,8 @@ struct Deck: SQLiteModel, Migration {
         let hero = try values.decode(DbfID.self, forKey: .hero)
         let cards = try values.decode(Array<DbfID>.self, forKey: .cards)
 
-        try self.init(name: name, id: id, format: format, hero: hero, cards: cards)
+        try self.init(name: name, format: format, hero: hero, cards: cards)
+        self.id = id
     }
 
     func encode(to encoder: Encoder) throws {
@@ -182,7 +199,7 @@ struct Deck: SQLiteModel, Migration {
         let deckstring = Array(array.prefix(count))
         array.removeFirst(count)
         let freq = try deckstringToFrequency(copy: copy, array: deckstring)
-        return try freq.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest)) })
+        return try freq.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest, reason: "Card not found for id \($0)")) })
     }
 
     func countCards() -> [DbfID: Int] {
@@ -239,7 +256,7 @@ struct Deck: SQLiteModel, Migration {
     }
 
     func deckstring() -> String {
-        return encodeDeckstring(self.toDeckstringArray().map({ UInt64($0) }))
+        return encodeBase64VarIntString(self.toDeckstringArray().map({ UInt64($0) }))
     }
 }
 
@@ -257,43 +274,4 @@ fileprivate extension Array where Element == DbfID {
     func toNCopyPairs() throws -> [NCopyPairDbfID] {
         return try Arcanus.toNCopyPairs(self)
     }
-}
-
-// MARK: VarInt Deckstring Encoding and Decoding
-
-enum DeckstringError: Error {
-    case base64DecodeFailed
-}
-
-// See https://www.reddit.com/r/hearthstone/comments/6f2xyk/how_to_encodedecode_deck_codes/
-// for info on how the encoding works
-func decodeDeckstring(_ input: String) throws -> [UInt64] {
-    guard var data = Data(base64Encoded: input) else {
-        throw DeckstringError.base64DecodeFailed
-    }
-
-    // Setup bytes to hold data
-    var bytes: [UInt8] = Array(repeating: 0, count: data.count)
-    data.copyBytes(to: UnsafeMutablePointer(&bytes), count: data.count)
-    var ints: [UInt64] = []
-
-    while true {
-        let (int, count) = uVarInt(bytes)
-        if count <= 0 {
-            break
-        }
-        ints.append(int)
-        bytes.removeFirst(count)
-    }
-
-    return ints
-}
-
-func encodeDeckstring(_ input: [UInt64]) -> String {
-    var bytes: [UInt8] = []
-    for val in input {
-        bytes.append(contentsOf: putUVarInt(val))
-    }
-
-    return Data(bytes: bytes).base64EncodedString()
 }

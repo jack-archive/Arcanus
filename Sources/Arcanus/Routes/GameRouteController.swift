@@ -9,7 +9,7 @@ import Fluent
 import Foundation
 import Logging
 import Vapor
-
+/*
 class GameRouteController: RouteCollection {
     func boot(router: Router) throws {
         let games = router.grouped("games")
@@ -23,7 +23,7 @@ class GameRouteController: RouteCollection {
 private extension GameRouteController {
     struct DeckContainer: Content {
         let deckstring: String?
-        let deck: DbfIDDeckJson?
+        let deck: Deck.DbfIDJson?
 
         func asDeck() throws -> Deck {
             if self.deckstring != nil {
@@ -71,3 +71,4 @@ private extension GameRouteController {
         }
     }
 }
+*/

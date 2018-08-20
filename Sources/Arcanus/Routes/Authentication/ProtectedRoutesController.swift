@@ -16,6 +16,7 @@ struct ProtectedRoutesController: RouteCollection {
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let tokenAuthGroup = group.grouped([tokenAuthMiddleware, guardAuthMiddleware])
 
-        try tokenAuthGroup.register(collection: GameRouteController())
+        // try tokenAuthGroup.register(collection: GameRouteController())
+        try tokenAuthGroup.register(collection: DeckRouteController())
     }
 }

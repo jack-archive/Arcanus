@@ -14,6 +14,7 @@ import Foundation
 func addBasicCollection() {
     CardIndex.add(Placeholder.self)
     CardIndex.add(SenjinShieldmasta.self)
+    CardIndex.add(BloodfenRaptor.self)
     CardIndex.add(JainaProudmoore.self)
     CardIndex.add(Fireblast.self)
 }
