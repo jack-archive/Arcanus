@@ -13,6 +13,24 @@ protocol DeckConvertible {
 }
 
 extension Deck {
+    static func fromRequest(_ request: Request) throws -> Deck {
+        let dbfIdJson = try? request.content.syncDecode(Deck.DbfIDJson.self)
+        let nameJson = try? request.content.syncDecode(Deck.NameJson.self)
+        let deckstringJson = try? request.content.syncDecode(Deck.DeckstringJson.self)
+        
+        if let dbfIdJson = dbfIdJson {
+            return try dbfIdJson.asDeck()
+        } else if let nameJson = nameJson {
+            return try nameJson.asDeck()
+        } else if let deckstringJson = deckstringJson {
+            return try deckstringJson.asDeck()
+        } else {
+            throw Abort(.badRequest, reason: "JSON does not match required format")
+        }
+    }
+}
+
+extension Deck {
     struct DbfIDJson: Content, DeckConvertible {
         var id: Deck.ID?
         var name: String?
