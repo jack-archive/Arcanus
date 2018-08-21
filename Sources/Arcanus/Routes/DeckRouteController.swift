@@ -79,18 +79,18 @@ private extension DeckRouteController {
             return deck.delete(on: request).transform(to: HTTPStatus.noContent)
         }
     }
-    
+
     func setCardsInDeckHandler(_ request: Request, cards: [DbfID]) throws -> Future<HTTPStatus> {
         let user = try request.requireAuthenticated(User.self)
         let id = try request.parameters.next(DeckIDParam.self)
-        
+
         return Deck.find(id, on: request).flatMap { deck in
             guard var deck = deck, try deck.user == user.requireID() else {
                 throw Abort(.notFound, reason: "No deck found with id \(id)")
             }
-            
+
             try deck.setCards(cards)
-            
+
             return deck.save(on: request).transform(to: HTTPStatus.noContent)
         }
     }

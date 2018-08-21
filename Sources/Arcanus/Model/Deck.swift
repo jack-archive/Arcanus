@@ -241,7 +241,7 @@ struct Deck: SQLiteModel, Migration {
     mutating func setCards(_ cards: [DbfID]) throws {
         self.cards = try cards.map({ try CardIndex.getCard($0).unwrap(or: Abort(.badRequest, reason: "No card found for \($0)")) })
     }
-    
+
     // MARK: Exporting
 
     /// Encoded as deckstring, with format, hero array, and 3 card arrays
