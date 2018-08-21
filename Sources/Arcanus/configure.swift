@@ -36,7 +36,8 @@ public func configure(_ config: inout Config,
     var databaseConfig = DatabasesConfig()
     let db = try SQLiteDatabase(storage: .file(path: "\(directoryConfig.workDir)/arcanus.db"))
     databaseConfig.add(database: db, as: .sqlite)
-    databaseConfig.enableLogging(on: .sqlite)
+    // Un-Comment to enable logging of SQL statements
+    // databaseConfig.enableLogging(on: .sqlite)
     services.register(databaseConfig)
 
     // Configure our model migrations
