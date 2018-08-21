@@ -9,66 +9,58 @@ import Fluent
 import Foundation
 import Logging
 import Vapor
-/*
+
 class GameRouteController: RouteCollection {
     func boot(router: Router) throws {
         let games = router.grouped("games")
-        games.post(DeckContainer.self, at: "", use: createGameHandler)
-
+        games.post(JoinGameJson.self, at: "", use: createGameHandler)
+        
         let players = games.grouped(Game.parameter, "players")
-        players.post(DeckContainer.self, at: "", use: joinGameHandler)
+        players.post(JoinGameJson.self, at: "", use: joinGameHandler)
     }
 }
 
 private extension GameRouteController {
-    struct DeckContainer: Content {
-        let deckstring: String?
-        let deck: Deck.DbfIDJson?
-
-        func asDeck() throws -> Deck {
-            if self.deckstring != nil {
-                return try Deck(fromDeckstring: self.deckstring!)
-            } else if self.deck != nil {
-                return try Deck(fromJson: self.deck!)
-            } else {
-                throw Abort(.badRequest, reason: "Must supply either Deck Json or Deckstring")
-            }
-        }
+    struct JoinGameJson: Content {
+        var deck: Deck.ID
     }
-
-    func createGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
+    
+    func createGameHandler(_ request: Request, container: JoinGameJson) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
-        return try container.asDeck().save(on: request).flatMap { deck in
-            try Player(user: user.id!, deck: deck.requireID()).save(on: request).flatMap { player in
-                Game(p1: player.id!).save(on: request)
-            }
+        return Deck.find(container.deck, on: request)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { deck in
+                try Player(user: user.id!, deck: deck.requireID()).save(on: request).flatMap { player in
+                    Game(p1: player.id!).save(on: request)
+                }
         }
     }
-
-    func joinGameHandler(_ request: Request, container: DeckContainer) throws -> Future<Game> {
+    
+    func joinGameHandler(_ request: Request, container: JoinGameJson) throws -> Future<Game> {
         let user = try request.requireAuthenticated(User.self)
         let game = try request.parameters.next(Game.self)
         let logger = try request.make(Logger.self)
-
-        return try container.asDeck().save(on: request).flatMap { deck in
-            let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request)
-
-            return flatMap(to: Game.self, player, game) { player, game in
-                logger.info("\(user.username) joining game \(game.id!)")
-
-                // addPlayer will return false if both player slots have values
-                guard game.addPlayer(player.id!) else {
-                    throw Abort(.badRequest, reason: "Game is full")
+        
+        return Deck.find(container.deck, on: request)
+            .unwrap(or: Abort(.notFound))
+            .flatMap { deck in
+                let player = try Player(user: user.id!, deck: deck.requireID()).save(on: request)
+                
+                return flatMap(to: Game.self, player, game) { player, game in
+                    logger.info("\(user.username) joining game \(game.id!)")
+                    
+                    // addPlayer will return false if both player slots have values
+                    guard game.addPlayer(player.id!) else {
+                        throw Abort(.badRequest, reason: "Game is full")
+                    }
+                    
+                    // Log game
+                    try game.describe(on: request)
+                        .do({ logger.info($0) })
+                        .catch({ logger.error($0.localizedDescription) })
+                    
+                    return game.update(on: request)
                 }
-
-                // Log game
-                try game.describe(on: request)
-                    .do({ logger.info($0) })
-                    .catch({ logger.error($0.localizedDescription) })
-
-                return game.update(on: request)
-            }
         }
     }
 }
-*/
