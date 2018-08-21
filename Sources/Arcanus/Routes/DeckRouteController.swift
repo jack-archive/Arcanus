@@ -22,6 +22,7 @@ class DeckRouteController: RouteCollection {
         router.get("user", "collection", use: getAllDecksHandler)
         router.get("user", "collection", DeckIDParam.parameter, use: getDeckHandler)
         router.delete("user", "collection", DeckIDParam.parameter, use: deleteDeckHandler)
+        router.put([DbfID].self, at: "user", "collection", DeckIDParam.parameter, use: setCardsInDeckHandler)
     }
 }
 
@@ -38,31 +39,31 @@ private extension DeckRouteController {
             deck.user = try user.requireID()
 
             return deck.save(on: request)
-                .map { deck in deck.toNameJson() }
+                .map { deck in deck.toDbfIDJson() }
                 .encode(status: .created, for: request)
         }
     }
 
-    func getAllDecksHandler(_ request: Request) throws -> Future<[Deck.NameJson]> {
+    func getAllDecksHandler(_ request: Request) throws -> Future<[Deck.DbfIDJson]> {
         let user = try request.requireAuthenticated(User.self)
         return Deck.query(on: request)
             .filter(\.user == user.id)
             .all()
             .map { decks in
-                decks.map { deck in return deck.toNameJson() }
+                decks.map { deck in return deck.toDbfIDJson() }
             }
     }
 
-    func getDeckHandler(_ request: Request) throws -> Future<Deck.NameJson> {
+    func getDeckHandler(_ request: Request) throws -> Future<Deck.DbfIDJson> {
         let user = try request.requireAuthenticated(User.self)
         let id = try request.parameters.next(DeckIDParam.self)
 
         return Deck.find(id, on: request).map { deck in
-            guard deck != nil, try deck!.user == user.requireID() else {
+            guard let deck = deck, try deck.user == user.requireID() else {
                 throw Abort(.notFound, reason: "No deck found with id \(id)")
             }
 
-            return deck!.toNameJson()
+            return deck.toDbfIDJson()
         }
     }
 
@@ -71,11 +72,26 @@ private extension DeckRouteController {
         let id = try request.parameters.next(DeckIDParam.self)
 
         return Deck.find(id, on: request).flatMap { deck in
-            guard deck != nil, try deck!.user == user.requireID() else {
+            guard let deck = deck, try deck.user == user.requireID() else {
                 throw Abort(.notFound, reason: "No deck found with id \(id)")
             }
 
-            return deck!.delete(on: request).transform(to: HTTPStatus.noContent)
+            return deck.delete(on: request).transform(to: HTTPStatus.noContent)
+        }
+    }
+    
+    func setCardsInDeckHandler(_ request: Request, cards: [DbfID]) throws -> Future<HTTPStatus> {
+        let user = try request.requireAuthenticated(User.self)
+        let id = try request.parameters.next(DeckIDParam.self)
+        
+        return Deck.find(id, on: request).flatMap { deck in
+            guard var deck = deck, try deck.user == user.requireID() else {
+                throw Abort(.notFound, reason: "No deck found with id \(id)")
+            }
+            
+            try deck.setCards(cards)
+            
+            return deck.save(on: request).transform(to: HTTPStatus.noContent)
         }
     }
 }
