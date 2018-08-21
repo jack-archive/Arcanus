@@ -47,27 +47,69 @@ struct Deck: SQLiteModel, Migration {
     typealias ID = Int
     var id: ID?
     var name: String?
-    var user: User.ID? = nil
-    
+    var user: User.ID?
+
     var format: Format
     var hero: Hero.Type
     // Stored in Freq representation
     var cards: [Card.Type]
+
+    // MARK: Codable
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case user
+        case format
+        case hero
+        case cards
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try values.decode(ID?.self, forKey: .id)
+        let name = try values.decode(String?.self, forKey: .name)
+        let user = try values.decode(User.ID?.self, forKey: .user)
+        let format = try values.decode(Int.self, forKey: .format)
+        let hero = try values.decode(DbfID.self, forKey: .hero)
+        let cards = try values.decode(Array<DbfID>.self, forKey: .cards)
+
+        guard id != 0 else {
+            // Dummy Object
+            try self.init(name: "Placeholder", format: .wild, hero: Placeholder.self, cards: [Placeholder.self])
+            self.id = 0
+            return
+        }
+
+        try self.init(name: name, format: format, hero: hero, cards: cards)
+        self.id = id
+        self.user = user
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.id, forKey: .id)
+        try container.encode(self.name, forKey: .name)
+        try container.encode(self.user, forKey: .user)
+        try container.encode(self.format.rawValue, forKey: .format)
+        try container.encode(self.hero.defaultCardStats.dbfId, forKey: .hero)
+        try container.encode(self.toDbfIDArray(), forKey: .cards)
+    }
 
     // MARK: Initializers
 
     init(fromJson json: DbfIDJson) throws {
         try self.init(name: json.name, format: json.format, hero: json.hero, cards: json.cards)
     }
-    
+
     init(fromJson json: NameJson) throws {
         try self.init(name: json.name, format: json.format, hero: json.hero, cards: json.cards)
     }
-    
+
     init(fromJson json: DeckstringJson) throws {
         try self.init(withName: json.name, fromDeckstring: json.deckstring)
     }
-    
+
     private init(withName name: String? = nil, fromDeckstring input: String) throws {
         let arr = try decodeBase64VarIntString(input).map({ DbfID($0) })
         try self.init(withName: name, fromDeckstring: arr)
@@ -110,7 +152,7 @@ struct Deck: SQLiteModel, Migration {
 
     private init(withName name: String? = nil, fromDeckstring input: [DbfID]) throws {
         self.name = name
-        
+
         var array = input
         array.removeFirst() // First is always 0
         array.removeFirst() // Version still is always 1
@@ -141,37 +183,6 @@ struct Deck: SQLiteModel, Migration {
         if !array.isEmpty {
             throw Abort(.unprocessableEntity, reason: "Extra bytes in array, Corrupt format")
         }
-    }
-
-    // MARK: Codable
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case format
-        case hero
-        case cards
-    }
-
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        let id = try values.decode(ID?.self, forKey: .id)
-        let name = try values.decode(String?.self, forKey: .name)
-        let format = try values.decode(Int.self, forKey: .format)
-        let hero = try values.decode(DbfID.self, forKey: .hero)
-        let cards = try values.decode(Array<DbfID>.self, forKey: .cards)
-
-        try self.init(name: name, format: format, hero: hero, cards: cards)
-        self.id = id
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.id, forKey: .id)
-        try container.encode(self.name, forKey: .name)
-        try container.encode(self.format.rawValue, forKey: .format)
-        try container.encode(self.hero.defaultCardStats.dbfId, forKey: .hero)
-        try container.encode(self.toDbfIDArray(), forKey: .cards)
     }
 
     // MARK: Utility

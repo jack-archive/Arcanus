@@ -17,7 +17,7 @@ extension Deck {
         let dbfIdJson = try? request.content.syncDecode(Deck.DbfIDJson.self)
         let nameJson = try? request.content.syncDecode(Deck.NameJson.self)
         let deckstringJson = try? request.content.syncDecode(Deck.DeckstringJson.self)
-        
+
         if let dbfIdJson = dbfIdJson {
             return try dbfIdJson.asDeck()
         } else if let nameJson = nameJson {
