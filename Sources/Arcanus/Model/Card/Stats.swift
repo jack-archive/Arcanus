@@ -10,27 +10,6 @@ import Vapor
 protocol Stats: Codable {
 }
 
-fileprivate enum CodingKeys: CodingKey {
-    case dbfId
-    case name
-    case text
-    case flavor
-    case cls
-    case collectible
-    case type
-    case rarity
-    case set
-    case gang
-    case cost
-    case mechanics
-    case playRequirements
-
-    case attack
-    case health
-    case durability
-    case race
-}
-
 protocol CardStats: Stats {
     var dbfId: DbfID { get }
     var name: String { get set }
