@@ -24,7 +24,7 @@ struct Game: SQLiteModel, Content, Migration, Parameter {
         case players
         case board
     }
-    
+
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try values.decode(ID?.self, forKey: .id)
@@ -47,13 +47,13 @@ struct Game: SQLiteModel, Content, Migration, Parameter {
         self.players.append(Player(user: user, deck: deck))
         return true
     }
-    
+
     var isFull: Bool {
         // Sanity Check
         assert(self.players.count <= 2 && self.players.count >= 0)
         return self.players.count == 2
     }
-    
+
     func describe(on db: DatabaseConnectable) throws -> Future<String> {
         let user1 = User.find(players[.first].user, on: db).unwrap(or: Abort(.badRequest)).map({ $0.username })
         let user2 = User.find(players[.second].user, on: db).unwrap(or: Abort(.badRequest)).map({ $0.username })
