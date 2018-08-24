@@ -6,12 +6,13 @@
 
 import Foundation
 import Vapor
+import FluentSQLite
 
 typealias DbfID = Int
 
 /// Anything in the game is an entity, has a uid, unique from any other entity *in the game*.
 /// Entities recieve events.
-protocol Entity: AnyObject {
+protocol Entity {
     var uid: Int { get }
 }
 
@@ -25,7 +26,7 @@ extension Entity {
 // MARK: Card
 
 protocol Card: Entity, CustomStringConvertible {
-    var enchantments: [Enchantment] { get set }
+    var enchantments: [Any & Enchantment] { get set }
 
     static var defaultCardStats: CardStats { get }
     var cardStats: CardStats { get set }

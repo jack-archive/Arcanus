@@ -24,14 +24,14 @@ struct Game: SQLiteModel, Content, Migration, Parameter {
         case players
         case board
     }
-
+    
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try values.decode(ID?.self, forKey: .id)
         self.players = try values.decode([Player].self, forKey: .players)
         // self.board = try values.decode([[Card]].self, forKey: .board)
     }
-
+    
     func encode(to encoder: Encoder) throws {
         
     }
