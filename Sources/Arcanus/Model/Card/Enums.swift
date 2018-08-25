@@ -59,3 +59,36 @@ enum CardMechanic: String, Codable {
     case charge, taunt, stealth, windfury, battlecry, deathrattle
     case oneTurnEffect
 }
+
+struct AllowedCards {
+    var sets: [CardSet]
+    var allowed: [DbfID]
+    var unallowed: [DbfID]
+
+    enum CodingKeys: CodingKey {
+        case sets
+        case allowed
+        case unallowed
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.sets = try values.decode([String].self, forKey: .sets)
+            .map({ CardSet(rawValue: $0) })
+            .compactMap({ $0 }) // Unwrap
+        self.allowed = try values.decode([DbfID].self, forKey: .allowed)
+        self.unallowed = try values.decode([DbfID].self, forKey: .unallowed)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.sets.map({ $0.rawValue }), forKey: .sets)
+        try container.encode(self.allowed, forKey: .allowed)
+        try container.encode(self.unallowed, forKey: .unallowed)
+    }
+
+    func isAllowed(_ card: Card.Type) -> Bool {
+        // return card.defaultCardStats
+        return false
+    }
+}

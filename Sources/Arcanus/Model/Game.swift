@@ -9,73 +9,98 @@ import FluentSQLite
 import Foundation
 import Vapor
 
-struct AllowedCards: Content {
-    var sets: [CardSet]
-    var allowed: [DbfID]
-    var unallowed: [DbfID]
+struct Game: SQLiteModel, Content, Migration, Parameter {
+    typealias ID = Int
+
+    var id: ID?
+    // On game start, players are ordered in here by who goes first
+    var players: [Player] = []
+    var board: [[Card]] = [[], []]
+    // var events: [Event] = []
+    // var allowedCards: AllowedCards?
 
     enum CodingKeys: CodingKey {
-        case sets
-        case allowed
-        case unallowed
+        case id
+        case players
+        case board
     }
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.sets = try values.decode([String].self, forKey: .sets)
-            .map({ CardSet(rawValue: $0) })
-            .compactMap({ $0 }) // Unwrap
-        self.allowed = try values.decode([DbfID].self, forKey: .allowed)
-        self.unallowed = try values.decode([DbfID].self, forKey: .unallowed)
+        self.id = try values.decode(ID?.self, forKey: .id)
+        self.players = try values.decode([Player].self, forKey: .players)
+        // self.board = try values.decode([[Card]].self, forKey: .board)
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.sets.map({ $0.rawValue }), forKey: .sets)
-        try container.encode(self.allowed, forKey: .allowed)
-        try container.encode(self.unallowed, forKey: .unallowed)
+        
     }
 
-    func isAllowed(_ card: Card.Type) -> Bool {
-        // return card.defaultCardStats
-        return false
+    init() throws {}
+
+    @discardableResult
+    mutating func addPlayer(_ user: User.ID, _ deck: Deck.ID) -> Bool {
+        guard self.isFull else {
+            return false
+        }
+
+        self.players.append(Player(user: user, deck: deck))
+        return true
+    }
+    
+    var isFull: Bool {
+        // Sanity Check
+        assert(self.players.count <= 2 && self.players.count >= 0)
+        return self.players.count == 2
+    }
+    
+    func describe(on db: DatabaseConnectable) throws -> Future<String> {
+        let user1 = User.find(players[.first].user, on: db).unwrap(or: Abort(.badRequest)).map({ $0.username })
+        let user2 = User.find(players[.second].user, on: db).unwrap(or: Abort(.badRequest)).map({ $0.username })
+
+        return map(to: String.self, user1, user2) {
+            "<Game (\(self.id?.description ?? "unsaved")) [\($0), \($1)]>"
+        }
+    }
+
+    mutating func start() throws {
+        if !self.isFull {
+            throw Abort(.badRequest, reason: "Game needs another player")
+        }
+
+        // Randomly assign first / second
+        if try CryptoRandom().generate() {
+            // Swap order
+            self.players.append(self.players[.first])
+            self.players.remove(at: Side.first.rawValue)
+        } else { /* Leave order the same */ }
+
+        // state.changes.append(.start(players: self.players))
     }
 }
 
-final class Game: SQLiteModel, Content, Migration, Parameter {
-    typealias ID = Int
+struct Player: Codable {
+    var user: User.ID
+    var deck: Deck.ID
+}
 
-    var id: ID?
-    var player1: Player.ID?
-    var player2: Player.ID?
-    var allowedCards: AllowedCards?
+enum Side: Int {
+    case first = 0, second = 1
+}
 
-    init(p1: Player.ID) {
-        self.player1 = p1
+typealias Board = [[Card]]
+
+extension Array where Element == [Card] {
+    subscript(side: Side) -> Element {
+        return self[side.rawValue]
     }
+}
 
-    func addPlayer(_ id: Player.ID) -> Bool {
-        if self.player1 == nil {
-            self.player1 = id
-            return true
-        } else if self.player2 == nil {
-            self.player2 = id
-            return true
-        } else {
-            return false
-        }
+extension Array where Element == Player {
+    subscript(side: Side) -> Element {
+        return self[side.rawValue]
     }
+}
 
-    func describe(on db: DatabaseConnectable) throws -> Future<String> {
-        guard self.player1 != nil, self.player2 != nil else {
-            throw Abort(.badRequest, reason: "Game incomplete")
-        }
-
-        let user1 = Player.get(on: db, id: player1!).flatMap({ try $0.getUser(on: db) })
-        let user2 = Player.get(on: db, id: player2!).flatMap({ try $0.getUser(on: db) })
-
-        return map(to: String.self, user1, user2) {
-            "Game \(self.id!) [\($0.username), \($1.username)]"
-        }
-    }
+class GameHistory {
 }
