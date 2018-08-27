@@ -1,0 +1,14 @@
+/*
+There are {{ types.all.count }} metatypes
+ - {{ types.classes.count }} classes
+ - {{ types.protocols.count }} protocols
+ - {{ types.structs.count }} structs
+ - {{ types.enums.count }} enums
+ - {{ types.implementing.Minion.count }} minions
+*/
+
+{% for type in types.implementing.Card %}
+extension {{ type.name }} {
+    
+}
+{% endfor %}

@@ -8,6 +8,8 @@ Build/
 Index/
 DerivedData/
 
+Sources/Generated/
+
 *.log
 *.db
 cards.json
