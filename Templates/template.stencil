@@ -12,3 +12,35 @@ extension {{ type.name }} {
     
 }
 {% endfor %}
+
+{% for type in types.implementing.Stats|class %}
+extension {{ type.name }} {
+    /*
+    enum {{ type.name }}CodingKeys: CodingKey {
+        {% for variable in type.storedVariables %}
+        case {{ variable.name }}
+        {% endfor %}
+    }
+    */
+
+    init(
+        {% for variable in type.storedVariables %}
+        {{ variable.name }}: {{ variable.typeName }},
+        
+        {% endfor %}
+    ) {
+        {% for variable in type.storedVariables %}
+        self.{{ variable.name }} = {{ variable.name }}
+        {% endfor %}
+    }
+}
+{% endfor %}
+
+{% for type in types.implementing.Card|class %}
+
+// sourcery:inline:SenjinShieldmasta.TemplateName
+Hola -asdf
+// sourcery:end
+
+{% endfor %}
+ 

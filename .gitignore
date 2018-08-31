@@ -8,7 +8,7 @@ Build/
 Index/
 DerivedData/
 
-Sources/Generated/
+Sources/Arcanus/Generated/
 
 *.log
 *.db
