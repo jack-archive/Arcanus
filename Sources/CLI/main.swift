@@ -1,24 +1,22 @@
-import Arcanus
-import CommandLineKit
 import Foundation
-import Service
-import Vapor
+
+print("Hello, World!")
+
+let json = """
+[
+{"artist":"Dan Brereton","attack":3,"cardClass":"NEUTRAL","collectible":true,"cost":2,"dbfId":216,"faction":"HORDE","health":2,"howToEarnGolden":"Unlocked at Hunter Level 57.","id":"CS2_172","name":"Bloodfen Raptor","race":"BEAST","rarity":"FREE","set":"CORE","type":"MINION"},
+{"artist":"Brian Despain","attack":3,"cardClass":"NEUTRAL","collectible":true,"cost":4,"dbfId":635,"faction":"HORDE","flavor":"Sen'jin Village is nice, if you like trolls and dust.","health":5,"howToEarnGolden":"Unlocked at Rogue Level 59.","id":"CS2_179","mechanics":["TAUNT"],"name":"Sen'jin Shieldmasta","rarity":"FREE","set":"CORE","text":"<b>Taunt</b>","type":"MINION"},
+{"artist":"Raymond Swanland","cardClass":"PRIEST","collectible":true,"cost":2,"dbfId":1367,"howToEarn":"Unlocked at Level 1.","howToEarnGolden":"Unlocked at Level 36.","id":"CS2_234","name":"Shadow Word: Pain","playRequirements":{"REQ_MINION_TARGET":0,"REQ_TARGET_MAX_ATTACK":3,"REQ_TARGET_TO_PLAY":0},"rarity":"FREE","set":"CORE","text":"Destroy a minion with 3 or less Attack.","type":"SPELL"}
+]
+"""
+
+var data = json.data(using: .utf8)
 
 do {
-    var config = Config.default()
-    var env = try Environment.detect()
-    var services = Services.default()
-
-    try Arcanus.configure(&config, &env, &services)
-
-    let app = try Application(config: config,
-                              environment: env,
-                              services: services)
-
-    try Arcanus.boot(app)
-
-    try app.run()
+    let stats = try JSONDecoder().decode(CardsJson.self, from: data!)
+    print(stats)
 } catch {
     print(error)
-    exit(1)
 }
+
+
