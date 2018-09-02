@@ -9,6 +9,23 @@ import FluentSQLite
 import Foundation
 import Vapor
 
+struct BothPlayers<T> {
+    enum Index: Int {
+        case first = 0, second = 1
+    }
+    
+    var storage: [T]
+
+    subscript(index: Index) -> T {
+        get { return storage[index.rawValue] }
+        set { self.storage[index.rawValue] = newValue }
+    }
+    
+    init(_ first: T, _ second: T) {
+        self.storage = [first, second]
+    }
+}
+
 struct Game: SQLiteModel, Content, Migration, Parameter {
     typealias ID = Int
 
