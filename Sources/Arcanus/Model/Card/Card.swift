@@ -25,7 +25,7 @@ extension Entity {
 
 // MARK: Card
 
-protocol Card: Entity, CustomStringConvertible {
+protocol Card: Entity, CustomStringConvertible, CustomDebugStringConvertible {
     var enchantments: [Any & Enchantment] { get set }
 
     static var defaultCardStats: CardStats { get }
@@ -34,8 +34,28 @@ protocol Card: Entity, CustomStringConvertible {
 
 extension Card {
     var description: String {
-        return "\(self.name) [\(self.dbfId), \(self.cost) Mana, \(self.text)]"
+        return "\(self.name) (\(self.type)) [\(self.dbfId), \(self.cost) Mana, \(self.text)]"
     }
+    
+    var debugDescription: String {
+        return String(reflecting: self.cardStats)
+    }
+}
+
+protocol CardStats: Codable {
+    var dbfId: DbfID { get }
+    var name: String { get set }
+    var text: String { get set }
+    var flavor: String { get }
+    var cls: CardClass { get set }
+    var collectible: Bool { get }
+    var type: CardType { get }
+    var rarity: CardRarity { get }
+    var set: CardSet { get }
+    var gang: GadgetzanGang? { get }
+    var cost: Int { get set }
+    var mechanics: [CardMechanic] { get set }
+    var playRequirements: PlayRequirements { get set }
 }
 
 extension Card {
@@ -59,6 +79,7 @@ extension Card {
     var flavor: String { return cardStats.flavor }
     var cls: CardClass { get { return cardStats.cls } set { cardStats.cls = newValue } }
     var collectible: Bool { return cardStats.collectible }
+    var type: CardType { return cardStats.type }
     var rarity: CardRarity { return cardStats.rarity }
     var set: CardSet { return cardStats.set }
     var gang: GadgetzanGang? { return cardStats.gang }
@@ -72,105 +93,6 @@ extension Card {
         set { cardStats.playRequirements = newValue }
     }
 }
-
-// MARK: Minion
-
-protocol Minion: Card {
-    static var defaultMinionStats: MinionStats { get }
-    var minionStats: MinionStats { get set }
-}
-
-extension Minion {
-    static var attack: Int { return defaultMinionStats.attack }
-    static var health: Int { return defaultMinionStats.health }
-    static var race: MinionRace { return defaultMinionStats.race }
-
-    var attack: Int {
-        get { return self.minionStats.attack }
-        set { self.minionStats.attack = newValue }
-    }
-
-    var health: Int {
-        get { return self.minionStats.health }
-        set { self.minionStats.health = newValue }
-    }
-
-    var race: MinionRace { return minionStats.race }
-}
-
-// MARK: Spell
-
-protocol Spell: Card {
-    static var defaultSpellStats: SpellStats { get }
-    var spellStats: SpellStats { get set }
-}
-
-extension Spell {
-}
-
-// MARK: Weapon
-
-protocol Weapon: Card {
-    static var defaultWeaponStats: WeaponStats { get }
-    var weaponStats: WeaponStats { get set }
-}
-
-extension Weapon {
-    static var attack: Int { return defaultWeaponStats.attack }
-    static var durability: Int { return defaultWeaponStats.durability }
-
-    var attack: Int {
-        get { return self.weaponStats.attack }
-        set { self.weaponStats.attack = newValue }
-    }
-
-    var durability: Int {
-        get { return self.weaponStats.durability }
-        set { self.weaponStats.durability = newValue }
-    }
-}
-
-// MARK: Enchantment
-
-protocol Enchantment: Card {
-    static var defaultEnchantmentStats: EnchantmentStats { get }
-    var enchantmentStats: EnchantmentStats { get set }
-}
-
-extension CardStats where Self: EnchantmentStats {
-    var cost: Int { return 0 }
-}
-
-extension Enchantment {
-}
-
-// MARK: Hero
-
-protocol Hero: Card {
-    static var defaultHeroStats: HeroStats { get }
-    var heroStats: HeroStats { get set }
-}
-
-extension Hero {
-    static var health: Int { return defaultHeroStats.health }
-
-    var health: Int {
-        get { return self.heroStats.health }
-        set { self.heroStats.health = newValue }
-    }
-}
-
-// MARK: Hero Power
-
-protocol HeroPower: Card {
-    static var defaultHeroPowerStats: HeroPowerStats { get }
-    var heroPowerStats: HeroPowerStats { get set }
-}
-
-extension HeroPower {
-}
-
-// MARK: Card Index
 
 struct CardIndex {
     fileprivate static var CardNameIndex: [String: Card.Type] = [:]

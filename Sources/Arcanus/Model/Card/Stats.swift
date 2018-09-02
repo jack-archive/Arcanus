@@ -7,72 +7,7 @@
 import Foundation
 import Vapor
 
-protocol Stats: Codable {
-}
 
-protocol CardStats: Stats {
-    var dbfId: DbfID { get }
-    var name: String { get set }
-    var text: String { get set }
-    var flavor: String { get }
-    var cls: CardClass { get set }
-    var collectible: Bool { get }
-    var type: CardType { get }
-    var rarity: CardRarity { get }
-    var set: CardSet { get }
-    var gang: GadgetzanGang? { get }
-    var cost: Int { get set }
-    var mechanics: [CardMechanic] { get set }
-    var playRequirements: PlayRequirements { get set }
-}
-
-protocol MinionStats: Stats {
-    var attack: Int { get set }
-    var health: Int { get set }
-    var race: MinionRace { get }
-}
-
-extension CardStats where Self: MinionStats {
-    var type: CardType { return .minion }
-}
-
-protocol SpellStats: Stats {
-}
-
-extension CardStats where Self: SpellStats {
-    var type: CardType { return .spell }
-}
-
-protocol WeaponStats: Stats {
-    var attack: Int { get set }
-    var durability: Int { get set }
-}
-
-extension CardStats where Self: WeaponStats {
-    var type: CardType { return .weapon }
-}
-
-protocol EnchantmentStats: Stats {
-}
-
-extension CardStats where Self: EnchantmentStats {
-    var type: CardType { return .enchantment }
-}
-
-protocol HeroStats: Stats {
-    var health: Int { get set }
-}
-
-extension CardStats where Self: HeroStats {
-    var type: CardType { return .hero }
-}
-
-protocol HeroPowerStats: Stats {
-}
-
-extension CardStats where Self: HeroPowerStats {
-    var type: CardType { return .power }
-}
 
 struct StatsContainer: Content {
     var stats: CardStats
