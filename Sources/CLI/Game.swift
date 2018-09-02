@@ -19,6 +19,13 @@ enum Side: Int {
     }
 }
 
+extension Array where Element == Player {
+    subscript(index: Side) -> Player {
+        get { return self[index.rawValue] }
+        set { self[index.rawValue] = newValue }
+    }
+}
+
 struct BothPlayers<T> {
     private(set) var storage: [T]
     
@@ -36,67 +43,72 @@ enum PlayerAction {
     case playCard(fromHand: Int, toBoard: Int), combat(from: Int, to: Int), heroPower, endTurn
 }
 
-class Player {
+struct Player {
     var deck: [Card] = []
     var hand: [Card] = []
-    var board: [Card] = []
+    var board: [Minion] = []
+    var controller: PlayerController
+    
+    mutating func drawCard() {
+        self.hand.append(self.deck.remove(at: 0))
+    }
 }
 
 class Game {
     // var factory: CardFactory = CardJsonFactory()
-    private(set) var decks: BothPlayers<[Card]> = BothPlayers([], [])
-    private(set) var hands: BothPlayers<[Card]> = BothPlayers([], [])
-    private(set) var board: BothPlayers<[Minion]> = BothPlayers([], [])
-    private(set) var controllers: BothPlayers<PlayerController>
+    private(set) var players: [Player] = []
+    
+    // private(set) var decks: BothPlayers<[Card]> = BothPlayers([], [])
+    // private(set) var hands: BothPlayers<[Card]> = BothPlayers([], [])
+    // private(set) var board: BothPlayers<[Minion]> = BothPlayers([], [])
+    // private(set) var controllers: BothPlayers<PlayerController>
     
     init(_ p1: PlayerController, _ p2: PlayerController) {
-        self.controllers = BothPlayers(p1, p2)
-        self.decks[.first] = self.controllers[.first].getDeck()
-        self.decks[.second] = self.controllers[.second].getDeck()
+        self.players = [Player(deck: p1.getDeck(), hand: [], board: [], controller: p1),
+                        Player(deck: p2.getDeck(), hand: [], board: [], controller: p2)]
         
         for _ in 0...3 {
-            self.hands[.first].append(self.decks[.first].remove(at: 0))
+            self.players[.first].drawCard()
         }
         
         for _ in 0...4 {
-            self.hands[.second].append(self.decks[.second].remove(at: 0))
+            self.players[.second].drawCard()
         }
-        self.hands[.second].append(TheCoin())
+        self.players[.second].hand.append(TheCoin())
     }
     
     func turn(_ player: Side) {
         // Start of turn triggers
         
         // player draws card
-        self.hands[player].append(self.decks[player].remove(at: 0))
+        self.players[player].drawCard()
         // Run drawn card triggers
         
         // ask player for move
         while true {
-            let move: PlayerAction = self.controllers[player].chooseAction()
+            let move: PlayerAction = self.players[player].controller.chooseAction()
             print(move)
-            
             
             switch move {
             case .playCard(let handI, let boardI):
-                guard self.hands[player][handI] is Minion else {
+                guard self.players[player].hand[handI] is Minion else {
                     continue;
                 }
-                self.board[player].insert(self.hands[player].remove(at: handI) as! Minion, at: boardI)
+                self.players[player].board.insert(self.players[player].hand.remove(at: handI) as! Minion, at: boardI)
             
             case .combat(let myI, let enemyI):
-                var mine = self.board[player][myI]
-                var theirs = self.board[!player][enemyI]
+                var mine = self.players[player].board[myI]
+                var theirs = self.players[!player].board[enemyI]
                 
                 theirs.health -= mine.attack
                 mine.health -= theirs.attack
                 
                 if mine.isDead {
-                    self.board[player].remove(at: myI)
+                    self.players[player].board.remove(at: myI)
                 }
                 
                 if theirs.isDead {
-                    self.board[!player].remove(at: enemyI)
+                    self.players[!player].board.remove(at: enemyI)
                 }
             default: return
             }
