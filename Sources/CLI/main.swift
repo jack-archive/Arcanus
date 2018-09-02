@@ -9,7 +9,7 @@ let json = """
 {"artist":"Raymond Swanland","cardClass":"PRIEST","collectible":true,"cost":2,"dbfId":1367,"howToEarn":"Unlocked at Level 1.","howToEarnGolden":"Unlocked at Level 36.","id":"CS2_234","name":"Shadow Word: Pain","playRequirements":{"REQ_MINION_TARGET":0,"REQ_TARGET_MAX_ATTACK":3,"REQ_TARGET_TO_PLAY":0},"rarity":"FREE","set":"CORE","text":"Destroy a minion with 3 or less Attack.","type":"SPELL"}
 ]
 """
-
+/*
 var data = json.data(using: .utf8)
 
 do {
@@ -19,4 +19,14 @@ do {
     print(error)
 }
 
+*/
+/*
+var s1: Stats = .minion(MinionStats(dbfId: 1, name: "Hello", attack: 1, health: 21))
 
+s1.cardStats.name = "Sup"
+
+print(s1)
+*/
+
+var g = Game(CLIController(), CLIController())
+g.start()

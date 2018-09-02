@@ -5,54 +5,129 @@ enum CardType: String, Codable {
     case spell = "SPELL"
 }
 
-enum StatsStorage {
-    case minion(MinionStats)
-    case spell(SpellStats)
-}
-
-protocol CardStats: Codable {
+protocol CardStats {
     var dbfId: DbfID { get }
     var name: String { get set }
-    var type: CardType { get }
+    // var type: CardType
 }
 
-protocol MinionStats: CardStats {
+protocol IMinionStats {
     var attack: Int { get set }
     var health: Int { get set }
 }
 
-extension CardStats where Self: MinionStats {
-    var type: CardType { return .minion }
-}
-
-struct MinionStatsStruct: MinionStats {
+class MinionStats: CardStats, IMinionStats {
     var dbfId: DbfID
     var name: String
     
     var attack: Int
     var health: Int
-}
-
-protocol SpellStats: CardStats {
     
+    convenience init(_ stats: CardStats, attack: Int, health: Int) {
+        self.init(dbfId: stats.dbfId, name: stats.name, attack: attack, health: health)
+    }
+    
+    init(dbfId: DbfID, name: String, attack: Int, health: Int) {
+        self.dbfId = dbfId
+        self.name = name
+        
+        self.attack = attack
+        self.health = health
+    }
 }
 
-extension CardStats where Self: SpellStats {
-    var type: CardType { return .spell }
-}
-
-struct SpellStatsStruct: SpellStats {
+class SpellStats: CardStats {
     var dbfId: DbfID
     var name: String
-}
-
-protocol Card {
-    static var cardStats: StatsStorage! { get }
-    var cardStats: StatsStorage { get set }
-}
-
-protocol Minion: Card {
     
+    convenience init(_ stats: CardStats) {
+        self.init(dbfId: stats.dbfId, name: stats.name)
+    }
+    
+    
+    init(dbfId: DbfID, name: String) {
+        self.dbfId = dbfId
+        self.name = name
+    }
+}
+
+enum Stats: CardStats {
+    case minion(MinionStats)
+    case spell(SpellStats)
+    
+    var cardStats: CardStats {
+        get {
+            switch self {
+            case .minion(let stats):
+                return stats
+            case .spell(let stats):
+                return stats
+            }
+        }
+        
+        set {
+            switch self {
+            case .minion(let stats):
+                self = .minion(MinionStats(stats, attack: stats.attack, health: stats.health))
+            case .spell(let stats):
+                self = .spell(SpellStats(stats))
+            }
+        }
+    }
+    
+    var dbfId: DbfID { return self.cardStats.dbfId }
+    var name: String { get { return self.cardStats.name } set { self.cardStats.name = newValue }}
+}
+
+protocol Card: AnyObject {
+    static var stats: Stats { get }
+    var stats: Stats { get set }
+    
+    init()
+}
+
+extension Card {
+    
+}
+
+protocol Minion: Card, IMinionStats {
+    
+}
+
+extension Minion {
+    var attack: Int {
+        get {
+            switch self.stats {
+            case .minion(let stats): return stats.attack
+            default: fatalError()
+            }
+        }
+        set {
+            switch self.stats {
+            case .minion(let stats): self.stats = .minion(MinionStats(stats, attack: newValue, health: stats.health))
+            default: fatalError()
+            }
+        }
+    }
+    
+    var health: Int {
+        get {
+            switch self.stats {
+            case .minion(let stats): return stats.health
+            default: fatalError()
+            }
+        }
+        set {
+            switch self.stats {
+            case .minion(let stats): self.stats = .minion(MinionStats(stats, attack: stats.attack, health: newValue))
+            default: fatalError()
+            }
+        }
+    }
+    
+    var isDead: Bool {
+        return self.health < 0
+    }
 }
 
 protocol Spell: Card {
@@ -60,34 +135,64 @@ protocol Spell: Card {
 }
 
 class BloodfenRaptor: Minion {
-    static var cardStats: StatsStorage!
-    var cardStats: StatsStorage
+    static var stats: Stats = .minion(MinionStats(dbfId: 576, name: "Bloodfen Raptor", attack: 3, health: 2))
+    var stats: Stats
     
-    init() {
-        self.cardStats = BloodfenRaptor.cardStats
+    required init() {
+        self.stats = BloodfenRaptor.stats
     }
 }
 
-struct CardsJson: Decodable {
-    var cards: [CardStats] = []
+class TheCoin: Spell {
+    static var stats: Stats = .spell(SpellStats(dbfId: 141, name: "The Coin"))
+    var stats: Stats
     
-    enum TypeKey: CodingKey {
-        case type
-    }
-    
-    init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        
-        var copy = container
-        while !container.isAtEnd {
-            let card = try container.nestedContainer(keyedBy: TypeKey.self)
-            let type = try card.decode(CardType.self, forKey: .type)
-            switch type {
-            case .minion:
-                cards.append(try copy.decode(MinionStatsStruct.self))
-            case .spell:
-                cards.append(try copy.decode(SpellStatsStruct.self))
-            }
-        }
+    required init() {
+        self.stats = TheCoin.stats
     }
 }
+
+/*
+protocol CardFactory {
+    func make(_ dbfId: DbfID) -> Card?
+    func make(_ name: String) -> Card?
+    // func make(_ type: Card.Type) -> Card
+    
+    // func discover()
+    // ...
+}
+
+class CardJsonFactory: CardFactory {
+    var stencils: [Card.Type] = []
+    
+    var dbfIDs: [DbfID: Int] = [:]
+    var names: [String: Int] = [:]
+    // var types: [Card.Type: Int]
+    
+    func make(_ dbfId: DbfID) -> Card? {
+        guard let index = dbfIDs[dbfId] else {
+            return nil
+        }
+        return stencils[index].init()
+    }
+    
+    func make(_ name: String) -> Card? {
+        guard let index = names[name] else {
+            return nil
+        }
+        return stencils[index].init()
+    }
+    
+    func add(_ cards: Card.Type...) {
+        for card in cards {
+            self.names[card.stats.name] = self.stencils.count
+            self.dbfIDs[card.stats.dbfId] = self.stencils.count
+            self.stencils.append(card)
+        }
+    }
+    
+    init() {
+        self.add(BloodfenRaptor.self, TheCoin.self)
+    }
+}
+*/
