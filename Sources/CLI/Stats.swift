@@ -5,6 +5,11 @@ enum CardType: String, Codable {
     case spell = "SPELL"
 }
 
+enum StatsStorage {
+    case minion(MinionStats)
+    case spell(SpellStats)
+}
+
 protocol CardStats: Codable {
     var dbfId: DbfID { get }
     var name: String { get set }
@@ -42,24 +47,24 @@ struct SpellStatsStruct: SpellStats {
 }
 
 protocol Card {
-    static var cardStats: CardStats! { get }
-    var cardStats: CardStats { get set }
+    static var cardStats: StatsStorage! { get }
+    var cardStats: StatsStorage { get set }
 }
 
 protocol Minion: Card {
-    static var minionStats: MinionStats! { get }
-    var minionStats: MinionStats { get set }
+    
+}
+
+protocol Spell: Card {
+    
 }
 
 class BloodfenRaptor: Minion {
-    static var minionStats: MinionStats!
-    var minionStats: MinionStats
-    static var cardStats: CardStats!
-    var cardStats: CardStats
+    static var cardStats: StatsStorage!
+    var cardStats: StatsStorage
     
     init() {
         self.cardStats = BloodfenRaptor.cardStats
-        self.minionStats = BloodfenRaptor.minionStats
     }
 }
 
