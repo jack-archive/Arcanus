@@ -9,4 +9,3 @@ There are 1 metatypes
  - 0 enums
  - 1 minions
 */
-

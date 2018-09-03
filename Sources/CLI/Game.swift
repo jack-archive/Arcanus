@@ -1,16 +1,15 @@
+// Copyright © 2017 Jack Maloney. All Rights Reserved.
 //
-//  Game.swift
-//  ArcanusPackageDescription
-//
-//  Created by Jack Maloney on 8/31/18.
-//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
 
 enum Side: Int {
     case first = 0
     case second = 1
-    
+
     static prefix func ! (side: Side) -> Side {
         switch side {
         case .first: return .second
@@ -26,87 +25,71 @@ extension Array where Element == Player {
     }
 }
 
-struct BothPlayers<T> {
-    private(set) var storage: [T]
-    
-    subscript(index: Side) -> T {
-        get { return storage[index.rawValue] }
-        set { self.storage[index.rawValue] = newValue }
-    }
-    
-    init(_ first: T, _ second: T) {
-        self.storage = [first, second]
-    }
-}
-
 enum PlayerAction {
-    case playCard(fromHand: Int, toBoard: Int), combat(from: Int, to: Int), heroPower, endTurn
-}
-
-struct Player {
-    var deck: [Card] = []
-    var hand: [Card] = []
-    var board: [Minion] = []
-    var controller: PlayerController
-    
-    mutating func drawCard() {
-        self.hand.append(self.deck.remove(at: 0))
-    }
+    case playCard(fromHand: Int, toBoard: Int)
+    case combat(from: Int, to: Int)
+    case heroPower
+    case endTurn
 }
 
 class Game {
-    // var factory: CardFactory = CardJsonFactory()
-    private(set) var players: [Player] = []
-    
-    // private(set) var decks: BothPlayers<[Card]> = BothPlayers([], [])
-    // private(set) var hands: BothPlayers<[Card]> = BothPlayers([], [])
-    // private(set) var board: BothPlayers<[Minion]> = BothPlayers([], [])
-    // private(set) var controllers: BothPlayers<PlayerController>
-    
+    var players: [Player] = []
+    var currentSide: Side = .first
+    var currentPlayer: Player {
+        get {
+            return self.players[currentSide]
+        }
+        set {
+            self.players[currentSide] = newValue
+        }
+    }
+
     init(_ p1: PlayerController, _ p2: PlayerController) {
-        self.players = [Player(deck: p1.getDeck(), hand: [], board: [], controller: p1),
-                        Player(deck: p2.getDeck(), hand: [], board: [], controller: p2)]
-        
+        self.players = [Player(p1), Player(p2)]
+
+        // TODO: Randomize
+        p1.game = self
+        p1.side = .first
+        p2.game = self
+        p2.side = .second
+
         for _ in 0...3 {
             self.players[.first].drawCard()
         }
-        
+
         for _ in 0...4 {
             self.players[.second].drawCard()
         }
         self.players[.second].hand.append(TheCoin())
     }
-    
+
     func turn(_ player: Side) {
-        // Start of turn triggers
-        
-        // player draws card
         self.players[player].drawCard()
-        // Run drawn card triggers
-        
-        // ask player for move
+
         while true {
             let move: PlayerAction = self.players[player].controller.chooseAction()
             print(move)
-            
+
             switch move {
-            case .playCard(let handI, let boardI):
-                guard self.players[player].hand[handI] is Minion else {
-                    continue;
+            case let .playCard(handI, boardI):
+                let card = self.players[player].hand.remove(at: handI)
+                if let minion = card as? Minion {
+                    self.players[player].board.insert(minion, at: boardI)
+                } else if let spell = card as? Spell {
+                    do { try spell.execute(game: self) }
+                    catch {}
                 }
-                self.players[player].board.insert(self.players[player].hand.remove(at: handI) as! Minion, at: boardI)
-            
-            case .combat(let myI, let enemyI):
+            case let .combat(myI, enemyI):
                 var mine = self.players[player].board[myI]
                 var theirs = self.players[!player].board[enemyI]
-                
+
                 theirs.health -= mine.attack
                 mine.health -= theirs.attack
-                
+
                 if mine.isDead {
                     self.players[player].board.remove(at: myI)
                 }
-                
+
                 if theirs.isDead {
                     self.players[!player].board.remove(at: enemyI)
                 }
@@ -114,44 +97,34 @@ class Game {
             }
         }
     }
-    
+
     func start() {
         while true {
-            turn(.first)
-            turn(.second)
+            self.currentSide = .first
+            self.turn(.first)
+            self.currentSide = .second
+            self.turn(.second)
         }
     }
 }
 
-protocol PlayerController {
+protocol PlayerController: AnyObject {
     var game: Game! { get set }
     var side: Side! { get set }
-    
+    var player: Player! { get set }
+
     func getDeck() -> [Card]
     func chooseAction() -> PlayerAction
 }
 
-class CLIController: PlayerController {
-    var game: Game!
-    var side: Side!
-    
-    func getDeck() -> [Card] {
-        return [BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor(), BloodfenRaptor()]
-    }
-    
-    func chooseAction() -> PlayerAction {
-        print("? ")
-        if let typed = readLine() {
-            if let num = Int(typed) {
-                print(num)
-                switch num {
-                case 0: return .playCard(fromHand: 0, toBoard: 0)
-                case 1: return .endTurn
-                case 2: return .combat(from: 0, to: 0)
-                default: fatalError()
-                }
-            }
+extension PlayerController {
+    var player: Player! {
+        get {
+            guard self.game != nil else { return nil }
+            return game.players[self.side]
         }
-        fatalError()
+        set {
+            self.game.players[self.side] = newValue
+        }
     }
 }
