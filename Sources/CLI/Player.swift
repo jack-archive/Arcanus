@@ -7,8 +7,6 @@
 import Foundation
 
 struct Player {
-    weak var game: Game!
-
     var deck: [Card] = []
     var hand: [Card] = []
     var board: [Minion] = []

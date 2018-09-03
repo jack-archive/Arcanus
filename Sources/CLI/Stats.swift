@@ -14,7 +14,21 @@ enum CardType: String, Codable {
 protocol ICardStats {
     var dbfId: DbfID { get }
     var name: String { get set }
+    var cost: Int { get set }
     // var type: CardType
+}
+
+class CardStats: ICardStats {
+    var dbfId: DbfID
+    var name: String
+    var cost: Int
+
+    init(dbfId: DbfID, name: String, cost: Int) {
+        self.dbfId = dbfId
+        self.name = name
+        self.cost = cost
+    }
+
 }
 
 protocol IMinionStats {
@@ -22,41 +36,11 @@ protocol IMinionStats {
     var health: Int { get set }
 }
 
-class MinionStats: ICardStats, IMinionStats {
-    var dbfId: DbfID
-    var name: String
-
-    var attack: Int
-    var health: Int
-
-    convenience init(_ stats: ICardStats, attack: Int, health: Int) {
-        self.init(dbfId: stats.dbfId, name: stats.name, attack: attack, health: health)
-    }
-
-    init(dbfId: DbfID, name: String, attack: Int, health: Int) {
-        self.dbfId = dbfId
-        self.name = name
-
-        self.attack = attack
-        self.health = health
-    }
+protocol IHeroStats {
+    var health: Int { get set }
 }
 
-class SpellStats: ICardStats {
-    var dbfId: DbfID
-    var name: String
-
-    convenience init(_ stats: ICardStats) {
-        self.init(dbfId: stats.dbfId, name: stats.name)
-    }
-
-    init(dbfId: DbfID, name: String) {
-        self.dbfId = dbfId
-        self.name = name
-    }
-}
-
-enum Stats: ICardStats {
+enum Stats {
     case minion(MinionStats)
     case spell(SpellStats)
 
@@ -79,72 +63,10 @@ enum Stats: ICardStats {
             }
         }
     }
-
-    var dbfId: DbfID { return self.cardStats.dbfId }
-    var name: String { get { return self.cardStats.name } set { self.cardStats.name = newValue } }
-}
-
-protocol Card: AnyObject, ICardStats, CustomStringConvertible {
-    static var stats: Stats { get }
-    var stats: Stats { get set }
-
-    init()
-}
-
-extension Card {
-    var description: String {
-        return "<\(self.name)>"
-    }
-
-    var dbfId: DbfID { return self.stats.dbfId }
-    var name: String { get { return self.stats.name } set { self.stats.name = newValue } }
-}
-
-protocol Minion: Card, IMinionStats {
-}
-
-extension Minion {
-    var attack: Int {
-        get {
-            switch self.stats {
-            case let .minion(stats): return stats.attack
-            default: fatalError()
-            }
-        }
-        set {
-            switch self.stats {
-            case let .minion(stats): self.stats = .minion(MinionStats(stats, attack: newValue, health: stats.health))
-            default: fatalError()
-            }
-        }
-    }
-
-    var health: Int {
-        get {
-            switch self.stats {
-            case let .minion(stats): return stats.health
-            default: fatalError()
-            }
-        }
-        set {
-            switch self.stats {
-            case let .minion(stats): self.stats = .minion(MinionStats(stats, attack: stats.attack, health: newValue))
-            default: fatalError()
-            }
-        }
-    }
-
-    var isDead: Bool {
-        return self.health < 0
-    }
-}
-
-protocol Spell: Card {
-    func execute(game: Game) throws -> Bool
 }
 
 class BloodfenRaptor: Minion {
-    static var stats: Stats = .minion(MinionStats(dbfId: 576, name: "Bloodfen Raptor", attack: 3, health: 2))
+    static var stats: Stats = .minion(MinionStats(dbfId: 576, name: "Bloodfen Raptor", cost: 2, attack: 3, health: 2))
     var stats: Stats
 
     required init() {
@@ -153,7 +75,7 @@ class BloodfenRaptor: Minion {
 }
 
 class TheCoin: Spell {
-    static var stats: Stats = .spell(SpellStats(dbfId: 141, name: "The Coin"))
+    static var stats: Stats = .spell(SpellStats(dbfId: 141, name: "The Coin", cost: 0))
     var stats: Stats
 
     required init() {

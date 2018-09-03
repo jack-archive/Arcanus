@@ -2,10 +2,22 @@
 // DO NOT EDIT
 
 /*
-There are 1 metatypes
- - 1 classes
- - 2 protocols
- - 0 structs
- - 0 enums
- - 1 minions
+There are 14 metatypes
+ - 7 classes
+ - 7 protocols
+ - 1 structs
+ - 5 enums
+ -  minions
 */
+
+extension BloodfenRaptor {
+}
+extension Minion {
+}
+extension Spell {
+}
+extension TheCoin {
+}
+
+extension Card {
+}

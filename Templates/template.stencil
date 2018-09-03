@@ -4,7 +4,7 @@ There are {{ types.all.count }} metatypes
  - {{ types.protocols.count }} protocols
  - {{ types.structs.count }} structs
  - {{ types.enums.count }} enums
- - {{ types.implementing.Minion.count }} minions
+ - {{ DummyCard.instanceVariables.count }} minions
 */
 
 {% for type in types.implementing.Card %}
@@ -12,3 +12,11 @@ extension {{ type.name }} {
     
 }
 {% endfor %}
+
+extension Card {
+{% for type in ICardStats.allVariables %}
+
+{{ type }}
+
+{% endfor %}
+}
