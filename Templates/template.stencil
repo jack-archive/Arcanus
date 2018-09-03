@@ -7,16 +7,4 @@ There are {{ types.all.count }} metatypes
  - {{ DummyCard.instanceVariables.count }} minions
 */
 
-{% for type in types.implementing.Card %}
-extension {{ type.name }} {
-    
-}
-{% endfor %}
 
-extension Card {
-{% for type in ICardStats.allVariables %}
-
-{{ type }}
-
-{% endfor %}
-}

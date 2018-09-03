@@ -6,6 +6,8 @@
 
 typealias DbfID = Int
 
+protocol AutoInit {}
+
 enum CardType: String, Codable {
     case minion = "MINION"
     case spell = "SPELL"
@@ -18,7 +20,16 @@ protocol ICardStats {
     // var type: CardType
 }
 
-class CardStats: ICardStats {
+protocol IMinionStats {
+    var attack: Int { get set }
+    var health: Int { get set }
+}
+
+protocol IHeroStats {
+    var health: Int { get set }
+}
+
+class CardStats: ICardStats, AutoInit {
     var dbfId: DbfID
     var name: String
     var cost: Int
@@ -28,16 +39,6 @@ class CardStats: ICardStats {
         self.name = name
         self.cost = cost
     }
-
-}
-
-protocol IMinionStats {
-    var attack: Int { get set }
-    var health: Int { get set }
-}
-
-protocol IHeroStats {
-    var health: Int { get set }
 }
 
 enum Stats {

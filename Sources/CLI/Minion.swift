@@ -16,12 +16,10 @@ class MinionStats: CardStats, IMinionStats {
     }
 
     init(dbfId: DbfID, name: String, cost: Int, attack: Int, health: Int) {
-        self.dbfId = dbfId
-        self.name = name
-        self.cost = cost
-
         self.attack = attack
         self.health = health
+
+        super.init(dbfId: dbfId, name: name, cost: cost)
     }
 }
 

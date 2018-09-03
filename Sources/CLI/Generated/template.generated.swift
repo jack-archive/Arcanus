@@ -4,20 +4,8 @@
 /*
 There are 14 metatypes
  - 7 classes
- - 7 protocols
+ - 8 protocols
  - 1 structs
  - 5 enums
  -  minions
 */
-
-extension BloodfenRaptor {
-}
-extension Minion {
-}
-extension Spell {
-}
-extension TheCoin {
-}
-
-extension Card {
-}
