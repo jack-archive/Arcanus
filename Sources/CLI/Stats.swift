@@ -9,29 +9,47 @@ typealias DbfID = Int
 enum CardType: String, Codable {
     case minion = "MINION"
     case spell = "SPELL"
+    case weapon = "WEAPON"
+    case hero = "HERO"
 }
 
-// sourcery: concrete
-protocol CardStats: AnyObject {
-    var dbfId: DbfID { get }
-    var name: String { get set }
-    var text: String { get set }
-    var cost: Int { get set }
+enum CardRarity: String, Codable {
+    case free = "FREE"
+    case common = "COMMON"
+    case rare = "RARE"
+    case epic = "EPIC"
+    case legendary = "LEGENDARY"
 }
 
-// sourcery: concrete, super="CardStats"
-protocol MinionStats {
+enum CardSet: String, Codable {
+    case core = "CORE"
+    case classic = "EXPERT1"
+    case hof = "HOF" // Hall of Fame
+}
+
+enum PlayRequirement: String, Codable {
+    case minionTarget = "REQ_MINION_TARGET"
+    case targetIfAvaliable = "REQ_TARGET_IF_AVAILABLE"
+    case targetToPlay = "REQ_TARGET_TO_PLAY"
+    case entireEntourageNotInPlay = "REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY"
+    case numMinionSlots = "REQ_NUM_MINION_SLOTS"
+}
+
+enum CardMechanic: String, Codable {
+    case charge = "STEALTH"
+    case taunt = "TAUNT"
+}
+
+protocol IMinionStats {
     var attack: Int { get set }
     var health: Int { get set }
 }
 
-// sourcery: concrete, super="CardStats"
-protocol HeroStats {
+protocol IHeroStats {
     var health: Int { get set }
 }
 
-/*
-class CardStats: ICardStats, AutoInit {
+class CardStats: ICardStats {
     var dbfId: DbfID
     var name: String
     var text: String
@@ -44,13 +62,12 @@ class CardStats: ICardStats, AutoInit {
         self.cost = cost
     }
 }
-*/
  
 enum Stats {
     case minion(MinionStats)
     case spell(SpellStats)
     
-    /*
+    
     var cardStats: ICardStats {
         get {
             switch self {
@@ -70,7 +87,6 @@ enum Stats {
             }
         }
     }
- */
 }
 
 class BloodfenRaptor: Minion {
