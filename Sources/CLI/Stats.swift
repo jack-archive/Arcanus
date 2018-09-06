@@ -6,45 +6,51 @@
 
 typealias DbfID = Int
 
-protocol AutoInit {}
-
 enum CardType: String, Codable {
     case minion = "MINION"
     case spell = "SPELL"
 }
 
-protocol ICardStats {
+// sourcery: concrete
+protocol CardStats: AnyObject {
     var dbfId: DbfID { get }
     var name: String { get set }
+    var text: String { get set }
     var cost: Int { get set }
-    // var type: CardType
 }
 
-protocol IMinionStats {
+// sourcery: concrete, super="CardStats"
+protocol MinionStats {
     var attack: Int { get set }
     var health: Int { get set }
 }
 
-protocol IHeroStats {
+// sourcery: concrete, super="CardStats"
+protocol HeroStats {
     var health: Int { get set }
 }
 
+/*
 class CardStats: ICardStats, AutoInit {
     var dbfId: DbfID
     var name: String
+    var text: String
     var cost: Int
 
-    init(dbfId: DbfID, name: String, cost: Int) {
+    init(dbfId: DbfID, name: String, text: String, cost: Int) {
         self.dbfId = dbfId
         self.name = name
+        self.text = text
         self.cost = cost
     }
 }
-
+*/
+ 
 enum Stats {
     case minion(MinionStats)
     case spell(SpellStats)
-
+    
+    /*
     var cardStats: ICardStats {
         get {
             switch self {
@@ -54,7 +60,7 @@ enum Stats {
                 return stats
             }
         }
-
+        
         set {
             switch self {
             case let .minion(stats):
@@ -64,10 +70,11 @@ enum Stats {
             }
         }
     }
+ */
 }
 
 class BloodfenRaptor: Minion {
-    static var stats: Stats = .minion(MinionStats(dbfId: 576, name: "Bloodfen Raptor", cost: 2, attack: 3, health: 2))
+    static var stats: Stats = .minion(MinionStats(dbfId: 576, name: "Bloodfen Raptor", text: "", cost: 2, attack: 3, health: 2))
     var stats: Stats
 
     required init() {
@@ -76,7 +83,7 @@ class BloodfenRaptor: Minion {
 }
 
 class TheCoin: Spell {
-    static var stats: Stats = .spell(SpellStats(dbfId: 141, name: "The Coin", cost: 0))
+    static var stats: Stats = .spell(SpellStats(dbfId: 141, name: "The Coin", text: "Gain one mana cryxtal", cost: 0))
     var stats: Stats
 
     required init() {

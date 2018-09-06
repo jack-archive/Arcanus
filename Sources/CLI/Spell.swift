@@ -7,17 +7,19 @@
 
 import Foundation
 
-class SpellStats: ICardStats {
+class SpellStats: CardStats {
     var dbfId: DbfID
     var name: String
+    var text: String
     var cost: Int
 
-    convenience init(_ stats: ICardStats) {
-        self.init(dbfId: stats.dbfId, name: stats.name, cost: stats.cost)
+    convenience init(_ stats: CardStats) {
+        self.init(dbfId: stats.dbfId, name: stats.name, text: stats.text, cost: stats.cost)
     }
 
-    init(dbfId: DbfID, name: String, cost: Int) {
+    init(dbfId: DbfID, name: String, text: String, cost: Int) {
         self.dbfId = dbfId
+        self.text = text
         self.name = name
         self.cost = cost
     }

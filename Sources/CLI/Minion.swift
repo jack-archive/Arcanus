@@ -7,27 +7,31 @@
 
 import Foundation
 
-class MinionStats: CardStats, IMinionStats {
+class MinionStats: CardStats, MinionStats {
     var attack: Int
     var health: Int
 
-    convenience init(_ stats: ICardStats, attack: Int, health: Int) {
-        self.init(dbfId: stats.dbfId, name: stats.name, cost: stats.cost, attack: attack, health: health)
+    convenience init(_ stats: CardStats, attack: Int, health: Int) {
+        self.init(dbfId: stats.dbfId, name: stats.name, text: stats.text, cost: stats.cost, attack: attack, health: health)
     }
 
-    init(dbfId: DbfID, name: String, cost: Int, attack: Int, health: Int) {
+    init(dbfId: DbfID, name: String, text: String, cost: Int, attack: Int, health: Int) {
         self.attack = attack
         self.health = health
 
-        super.init(dbfId: dbfId, name: name, cost: cost)
+        super.init(dbfId: dbfId, name: name, text: text, cost: cost)
     }
 }
 
-protocol Minion: Card, IMinionStats {}
+protocol Minion: Card, MinionStats {}
 
 extension Minion {
     var isDead: Bool {
         return self.health < 0
+    }
+    
+    var description: String {
+        return "<>"
     }
 }
 

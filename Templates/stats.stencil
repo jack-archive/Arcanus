@@ -1,0 +1,13 @@
+{% for var in type.ICardStats.variables %}
+var {{ var.name }}: {{ var.typeName }}
+{% endfor %}
+
+init(
+{% for var in type.ICardStats.variables %}
+{{ var.name }}: {{ var.typeName }}{% if not forloop.last %},{% endif %}
+{% endfor %}
+) {
+{% for var in type.ICardStats.variables %}
+self.{{ var.name }} = {{ var.name }}
+{% endfor %}
+}

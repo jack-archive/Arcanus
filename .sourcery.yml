@@ -1,0 +1,7 @@
+sources:
+  - Sources/
+templates:
+  - Templates/
+output: ./Sources/CLI/Generated/
+args:
+  "statsClasses": ["ICardStats", "IMinionStats"]

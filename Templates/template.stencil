@@ -7,4 +7,73 @@ There are {{ types.all.count }} metatypes
  - {{ DummyCard.instanceVariables.count }} minions
 */
 
+{% for protocol in types.protocols|annotated:"concrete" %}
 
+class {{ protocol.name }}Concrete 
+{% if protocol|annotated:"super" %} : {{ protocol.annotations.super }}Concrete {% endif %}
+{
+
+{% for var in protocol.variables %}
+var {{ var.name }}: {{ var.typeName }}
+{% endfor %}
+
+init(
+{% for var in type.{{ protocol.annotations.super }}.allVariables %}
+{{ var.name }}: {{ var.typeName }}{% if not forloop.last %},{% endif %}
+{% endfor %}
+
+{% if type.{{protocol}}.variables > 0 %},{% endif %} 
+
+{% for var in type.{{protocol}}.variables %}
+{{ var.name }}: {{ var.typeName }}{% if not forloop.last %},{% endif %}
+{% endfor %}
+) {
+{% for var in type.I{{protocol}}.variables %}
+self.{{ var.name }} = {{ var.name }}
+{% endfor %}
+}
+
+}
+
+{% endfor %}
+
+/*
+
+{% for protocol in argument.statsClasses %}
+class {{ protocol }} {
+{% for var in type.{{protocol}}.variables %}
+var {{ var.name }}: {{ var.typeName }}
+{% endfor %}
+
+init(
+{% for var in type.{{protocol}}.variables %}
+{{ var.name }}: {{ var.typeName }}{% if not forloop.last %},{% endif %}
+{% endfor %}
+) {
+{% for var in type.I{{protocol}}.variables %}
+self.{{ var.name }} = {{ var.name }}
+{% endfor %}
+}
+}
+{% endfor %}
+
+class CardStats: ICardStats, AutoInit {
+
+{% for var in type.ICardStats.variables %}
+var {{ var.name }}: {{ var.typeName }}
+{% endfor %}
+
+init(
+{% for var in type.ICardStats.variables %}
+{{ var.name }}: {{ var.typeName }}{% if not forloop.last %},{% endif %}
+{% endfor %}
+) {
+{% for var in type.ICardStats.variables %}
+self.{{ var.name }} = {{ var.name }}
+{% endfor %}
+}
+
+}
+
+
+*/
