@@ -36,7 +36,7 @@ enum Stats: Codable {
         set {
             switch self {
             case let .minion(stats):
-                self = .minion(MinionStats(stats, attack: stats.attack, health: stats.health))
+                self = .minion(MinionStats(stats, attack: stats.attack, health: stats.health, race: stats.race))
             case let .spell(stats):
                 self = .spell(SpellStats(stats))
             }
@@ -44,26 +44,46 @@ enum Stats: Codable {
     }
 }
 
-class BloodfenRaptor: Minion {
-    static var stats: Stats = .minion(MinionStats(dbfId: 576,
+class BloodfenRaptor: Minion {    
+    static var stats: Stats = .minion(MinionStats(dbfId: 216,
                                                   name: "Bloodfen Raptor",
                                                   text: "",
+                                                  flavor: "\"Kill 30 raptors.\" - Hemet Nesingwary",
                                                   cost: 2,
+                                                  cls: .neutral,
+                                                  collectible: true,
+                                                  rarity: .free,
+                                                  set: .core,
+                                                  mechanics: [],
+                                                  playRequirements: [:],
                                                   attack: 3,
-                                                  health: 2))
+                                                  health: 2,
+                                                  race: .beast))
     var stats: Stats
 
     required init() {
+        
         self.stats = BloodfenRaptor.stats
     }
 }
 
 class TheCoin: Spell {
-    static var stats: Stats = .spell(SpellStats(dbfId: 141, name: "The Coin", text: "Gain one mana cryxtal", cost: 0))
+    static var stats: Stats = .spell(SpellStats(dbfId: 1746,
+                                                name: "The Coin",
+                                                text: "Gain 1 Mana Crystal this turn only.",
+                                                flavor: "",
+                                                cost: 0,
+                                                cls: .neutral,
+                                                collectible: false,
+                                                rarity: .free,
+                                                set: .core,
+                                                mechanics: [],
+                                                playRequirements: [:]))
     var stats: Stats
 
     required init() {
         self.stats = TheCoin.stats
+
     }
 
     func execute(game: Game) throws -> Bool {
