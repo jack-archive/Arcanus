@@ -6,9 +6,15 @@
 
 import Foundation
 
-class SpellStats: CardStats {
+protocol ISpellStats {
+    
+}
+
+class SpellStats: CardStats, ISpellStats {
     convenience init(_ stats: CardStats) {
-        self.init(dbfId: stats.dbfId, name: stats.name, text: stats.text, cost: stats.cost)
+        self.init(dbfId: stats.dbfId, name: stats.name, text: stats.text, flavor: stats.flavor, cost: stats.cost, cls: stats.cls,
+                  collectible: stats.collectible, rarity: stats.rarity, set: stats.set, mechanics: stats.mechanics,
+                  playRequirements: stats.playRequirements)
     }
 }
 

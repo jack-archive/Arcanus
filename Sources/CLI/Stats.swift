@@ -6,64 +6,19 @@
 
 typealias DbfID = Int
 
-enum CardType: String, Codable {
-    case minion = "MINION"
-    case spell = "SPELL"
-    case weapon = "WEAPON"
-    case hero = "HERO"
-}
-
-enum CardRarity: String, Codable {
-    case free = "FREE"
-    case common = "COMMON"
-    case rare = "RARE"
-    case epic = "EPIC"
-    case legendary = "LEGENDARY"
-}
-
-enum CardSet: String, Codable {
-    case core = "CORE"
-    case classic = "EXPERT1"
-    case hof = "HOF" // Hall of Fame
-}
-
-enum PlayRequirement: String, Codable {
-    case minionTarget = "REQ_MINION_TARGET"
-    case targetIfAvaliable = "REQ_TARGET_IF_AVAILABLE"
-    case targetToPlay = "REQ_TARGET_TO_PLAY"
-    case entireEntourageNotInPlay = "REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY"
-    case numMinionSlots = "REQ_NUM_MINION_SLOTS"
-}
-
-enum CardMechanic: String, Codable {
-    case charge = "STEALTH"
-    case taunt = "TAUNT"
-}
-
-protocol IMinionStats {
-    var attack: Int { get set }
-    var health: Int { get set }
-}
-
 protocol IHeroStats {
     var health: Int { get set }
 }
-
-class CardStats: ICardStats {
-    var dbfId: DbfID
-    var name: String
-    var text: String
-    var cost: Int
-
-    init(dbfId: DbfID, name: String, text: String, cost: Int) {
-        self.dbfId = dbfId
-        self.name = name
-        self.text = text
-        self.cost = cost
-    }
-}
  
-enum Stats {
+enum Stats: Codable {
+    init(from decoder: Decoder) throws {
+        
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        
+    }
+    
     case minion(MinionStats)
     case spell(SpellStats)
     
@@ -90,7 +45,12 @@ enum Stats {
 }
 
 class BloodfenRaptor: Minion {
-    static var stats: Stats = .minion(MinionStats(dbfId: 576, name: "Bloodfen Raptor", text: "", cost: 2, attack: 3, health: 2))
+    static var stats: Stats = .minion(MinionStats(dbfId: 576,
+                                                  name: "Bloodfen Raptor",
+                                                  text: "",
+                                                  cost: 2,
+                                                  attack: 3,
+                                                  health: 2))
     var stats: Stats
 
     required init() {
