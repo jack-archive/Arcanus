@@ -6,9 +6,7 @@
 
 import Foundation
 
-protocol ISpellStats {
-    
-}
+protocol ISpellStats {}
 
 class SpellStats: CardStats, ISpellStats {
     convenience init(_ stats: CardStats) {
@@ -16,10 +14,14 @@ class SpellStats: CardStats, ISpellStats {
                   collectible: stats.collectible, rarity: stats.rarity, set: stats.set, mechanics: stats.mechanics,
                   playRequirements: stats.playRequirements)
     }
-    
-    override init(dbfId: DbfID, name: String, text: String, flavor: String, cost: Int, cls: CardClass, collectible: Bool, rarity: CardRarity, set: CardSet, mechanics: [CardMechanic], playRequirements: [PlayRequirement : Int]) {
+
+    override init(dbfId: DbfID, name: String, text: String, flavor: String, cost: Int, cls: CardClass, collectible: Bool, rarity: CardRarity, set: CardSet, mechanics: [CardMechanic], playRequirements: [PlayRequirement: Int]) {
         super.init(dbfId: dbfId, name: name, text: text, flavor: flavor, cost: cost, cls: cls, collectible: collectible,
                    rarity: rarity, set: set, mechanics: mechanics, playRequirements: playRequirements)
+    }
+
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
 }
 

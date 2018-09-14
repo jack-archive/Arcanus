@@ -9,20 +9,17 @@ typealias DbfID = Int
 protocol IHeroStats {
     var health: Int { get set }
 }
- 
+
 enum Stats: Codable {
     init(from decoder: Decoder) throws {
-        
+        fatalError()
     }
-    
-    func encode(to encoder: Encoder) throws {
-        
-    }
-    
+
+    func encode(to encoder: Encoder) throws {}
+
     case minion(MinionStats)
     case spell(SpellStats)
-    
-    
+
     var cardStats: ICardStats {
         get {
             switch self {
@@ -32,7 +29,7 @@ enum Stats: Codable {
                 return stats
             }
         }
-        
+
         set {
             switch self {
             case let .minion(stats):
@@ -44,7 +41,7 @@ enum Stats: Codable {
     }
 }
 
-class BloodfenRaptor: Minion {    
+class BloodfenRaptor: Minion {
     static var stats: Stats = .minion(MinionStats(dbfId: 216,
                                                   name: "Bloodfen Raptor",
                                                   text: "",
@@ -62,7 +59,6 @@ class BloodfenRaptor: Minion {
     var stats: Stats
 
     required init() {
-        
         self.stats = BloodfenRaptor.stats
     }
 }
@@ -83,7 +79,6 @@ class TheCoin: Spell {
 
     required init() {
         self.stats = TheCoin.stats
-
     }
 
     func execute(game: Game) throws -> Bool {

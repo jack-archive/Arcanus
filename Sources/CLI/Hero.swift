@@ -8,15 +8,15 @@ import Foundation
 /*
 class HeroStats: CardStats, IHeroStats {
     var health: Int
-    
+
     convenience init(_ stats: CardStats, health: Int) {
         self.init(dbfId: stats.dbfId, name: stats.name, text: stats.text!, cost: stats.cost, health: health)
     }
-    
+
     init(dbfId: DbfID, name: String, text: String, cost: Int,
          health: Int) {
         self.health = health
-        
+
         super.init(dbfId: dbfId, name: name, text: text, cost: cost)
     }
 }

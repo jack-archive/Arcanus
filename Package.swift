@@ -18,4 +18,4 @@ let package =
                                                               "Authentication",
                                                               "VarInt",
                                                               "CommandLineKit"]), */
-            .target(name: "CLI", dependencies: [ /* "Arcanus"*/ "Vapor"])]) //.testTarget(name: "ArcanusTests", dependencies: ["Arcanus"])
+            .target(name: "CLI", dependencies: [ /* "Arcanus"*/ "Vapor", "Rainbow"])]) //.testTarget(name: "ArcanusTests", dependencies: ["Arcanus"])

@@ -19,7 +19,7 @@ protocol ICardStats: AnyObject, Codable {
     var set: CardSet { get }
     // var gang: GadgetzanGang? { get }
     var mechanics: [CardMechanic] { get set }
-    var playRequirements: [PlayRequirement:Int] { get set }
+    var playRequirements: [PlayRequirement: Int] { get set }
 }
 
 class CardStats: ICardStats {
@@ -34,10 +34,10 @@ class CardStats: ICardStats {
     var rarity: CardRarity
     var set: CardSet
     var mechanics: [CardMechanic]
-    var playRequirements: [PlayRequirement : Int]
-    
+    var playRequirements: [PlayRequirement: Int]
+
     init(dbfId: DbfID, name: String, text: String, flavor: String, cost: Int, cls: CardClass, collectible: Bool,
-         rarity: CardRarity, set: CardSet, mechanics: [CardMechanic], playRequirements: [PlayRequirement:Int]) {
+         rarity: CardRarity, set: CardSet, mechanics: [CardMechanic], playRequirements: [PlayRequirement: Int]) {
         self.dbfId = dbfId
         self.name = name
         self.text = text
@@ -61,7 +61,16 @@ protocol Card: ICardStats, CustomStringConvertible {
 
 extension Card {
     var description: String {
-        return "<\(self.name) (\(self.cost)) \(self.text)>"
+        var rv = "<\(self.name) (\(self.cost))"
+        if !self.text.isEmpty {
+            rv += " \(self.text)"
+        }
+
+        if let minion = self as? Minion {
+            rv += " [\(minion.attack)/\(minion.health)]"
+        }
+
+        return rv + ">"
     }
 }
 
@@ -77,6 +86,6 @@ extension Card {
     var rarity: CardRarity { return self.stats.cardStats.rarity }
     var set: CardSet { return self.stats.cardStats.set }
     var mechanics: [CardMechanic] { get { return self.stats.cardStats.mechanics } set { self.stats.cardStats.mechanics = newValue } }
-    var playRequirements: [PlayRequirement:Int] {
+    var playRequirements: [PlayRequirement: Int] {
         get { return self.stats.cardStats.playRequirements } set { self.stats.cardStats.playRequirements = newValue } }
 }

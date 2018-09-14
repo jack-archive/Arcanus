@@ -3,7 +3,7 @@
 swiftformat                         \
     --allman false                  \
     --wraparguments afterfirst      \
-    --wrapelements afterfirst       \
+    --wrapcollections afterfirst    \
     --self insert                   \
     --header ignore                 \
     --binarygrouping 4,8            \
