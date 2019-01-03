@@ -17,7 +17,7 @@ class CLIController: PlayerController {
 
     func chooseAction() -> PlayerAction {
         var options: [PlayerAction] = [.playCard(fromHand: 0, toBoard: 0), .endTurn, .combat(from: 0, to: 0)]
-        var strings = options.map({ String(describing: $0) })
+        let strings = options.map({ String(describing: $0) })
 
         return options[optionPrompt(strings)]
     }
@@ -63,5 +63,17 @@ class CLIController: PlayerController {
                 return rv!
             }
         }
+    }
+    
+    func willStartTurn() {
+        printPlayer()
+    }
+    
+    func printPlayer() {
+        print("Player \(player.controller.side!)")
+        print("Board: \(player.board)")
+        print("Mana: \(player.mana) ")
+        print("Hand: \(player.hand)")
+        print("Deck: \(player.deck)")
     }
 }

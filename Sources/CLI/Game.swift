@@ -71,6 +71,8 @@ class Game {
         self.players[player].drawCard()
 
         while true {
+            self.players[player].controller.willStartTurn()
+            
             let move: PlayerAction = self.players[player].controller.chooseAction()
             print(move)
 
@@ -124,6 +126,7 @@ protocol PlayerController: AnyObject {
     var player: Player! { get set }
 
     func getDeck() -> [Card]
+    func willStartTurn()
     func chooseAction() -> PlayerAction
 }
 
